@@ -104,6 +104,10 @@ Rules for that flow:
 
 CodeRabbit reads the linked issue and checks the PR against it, so the issue is the spec. Use the sections of `.github/ISSUE_TEMPLATE/task.md`, all filled in:
 
+- **Priority:** `P0` (blocks other work), `P1` (needed for the next milestone) or `P2` (if there's time).
+- **Target date:** `YYYY-MM-DD`, or leave it empty to use the milestone's due date.
+- **View/presenter:** the pair it touches (`lobbyPresenter / lobbyView`), or `none: model` / `none: persistence`.
+- Also set a **milestone** (`--milestone "Mid-project review"` or `"Final submission"`) and an **area label** (`--label "area: controller"` etc.). A GitHub Action copies Priority, Target date and View/presenter to the "Pushpull Devroad" project board; don't set those board fields by hand.
 - **Brief:** one or two sentences on what changes and why.
 - **Description:** what exists today, what's missing, which screen or flow it touches. Link mock-ups, `docs/course/` pages and related issues.
 - **Approach:** the MVP layer of each part and the files you expect to touch: the model action, the presenter's props and events, the view with its loading, empty and error states, and any API call or saved data. Follow the architecture rules above.

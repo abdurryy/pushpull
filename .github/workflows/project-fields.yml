@@ -1,0 +1,38 @@
+# Fills Priority, Target date and View/presenter on the project board from each issue's Planning part.
+name: Project board fields
+
+on:
+  issues:
+    types: [opened, edited, milestoned, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  fill:
+    name: Fill board fields
+    # Only the team's own issues, so outsiders can't use the board token.
+    if: contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.issue.author_association)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for the board token
+        id: token
+        env:
+          PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          if [ -n "$PROJECT_TOKEN" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::PROJECT_TOKEN secret is missing, so the board fields were not filled. See CONTRIBUTING.md, Repo setup."
+          fi
+
+      - name: Copy the issue's planning fields to the board
+        if: steps.token.outputs.present == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+          PROJECT_OWNER: abdurryy
+          PROJECT_NUMBER: "2"
+        run: node .github/scripts/fillProjectFields.mjs
