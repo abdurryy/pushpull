@@ -95,6 +95,7 @@ _Required in the mid-project review._
 - Design system: [docs/design.md](docs/design.md) and the CSS tokens
 - App skeleton: React + Vite, MobX model with actions, hash routes, API module for Open-Meteo and Open Trivia DB
 - First API data on screen: the TV shows the live weather for a city, with loading, empty and error states
+- Homepage: explains Double Snake and lets visitors choose the shared screen or phone
 - Firebase project and Google sign-in on the phone (`#/play/login`)
 
 **Planned**
