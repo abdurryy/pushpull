@@ -45,7 +45,8 @@ export function DemoView(props) {
 
   function handleKeyACB(event, down) {
     const isGameKey = props.keyGroups.some(function hasKeyCB(group) { return group.codes.includes(event.code); });
-    if (!playing || !isGameKey || event.altKey || event.ctrlKey || event.metaKey) return;
+    if (!playing || !isGameKey) return;
+    if (down && (event.altKey || event.ctrlKey || event.metaKey)) return;
     event.preventDefault();
     props.onKeyChange(event.code, down);
   }
