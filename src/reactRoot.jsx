@@ -5,6 +5,7 @@ import { WeatherPresenter } from "./presenters/weatherPresenter.jsx";
 import { LoginPresenter } from "./presenters/loginPresenter.jsx";
 import { JoinPresenter } from "./presenters/joinPresenter.jsx";
 import { DemoPresenter } from "./presenters/demoPresenter.jsx";
+import { ControllerPresenter } from "./presenters/controllerPresenter.jsx";
 
 function makeRouter(model) {
   return createHashRouter([
@@ -16,6 +17,7 @@ function makeRouter(model) {
     { path: "/play/login", element: <LoginPresenter model={model} /> },
     // The destination exists now; room codes and team selection are a separate feature.
     { path: "/play/join", element: <JoinPresenter model={model} /> },
+    { path: "/play/controller", element: <ControllerPresenter /> },
     // Unknown routes go back to the start screen.
     { path: "*", element: <HomePresenter /> },
   ]);

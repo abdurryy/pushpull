@@ -1,0 +1,156 @@
+/* View styles: keep controller touches inside the landscape play area. */
+.controller {
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+.controller:fullscreen {
+  width: 100%;
+  height: 100%;
+}
+
+.controller-portrait,
+.controller-setup {
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--space-4);
+  text-align: center;
+}
+
+.controller-portrait {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  font-size: var(--text-title);
+  font-weight: var(--weight-bold);
+}
+
+.controller-landscape { display: none; }
+
+@media (orientation: landscape) {
+  .controller-portrait { display: none; }
+
+  .controller-setup {
+    display: grid;
+    gap: var(--space-2);
+    justify-items: center;
+    align-content: safe center;
+    height: 100%;
+    overflow-y: auto;
+    padding-top: max(var(--space-4), env(safe-area-inset-top));
+    padding-right: max(var(--space-4), env(safe-area-inset-right));
+    padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
+    padding-left: max(var(--space-4), env(safe-area-inset-left));
+  }
+
+  .controller-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    padding: var(--space-3);
+    padding-top: max(var(--space-3), env(safe-area-inset-top));
+    padding-right: max(var(--space-3), env(safe-area-inset-right));
+    padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
+    padding-left: max(var(--space-3), env(safe-area-inset-left));
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+}
+
+.controller-setup h1,
+.controller-setup p { margin: 0; }
+.controller-setup h1 { font-size: var(--text-title); }
+.controller-setup a { color: inherit; }
+
+.controller-setup button {
+  min-height: var(--hit-min);
+  padding-inline: var(--space-4);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-ink);
+  color: var(--color-surface);
+  font: inherit;
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+
+.controller-stick {
+  position: relative;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.controller-stick-ring,
+.controller-stick-thumb {
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: var(--radius-round);
+  pointer-events: none;
+}
+
+.controller-stick-ring {
+  left: 50%;
+  top: 50%;
+  width: var(--controller-button);
+  height: var(--controller-button);
+  translate: -50% -50%;
+  border: var(--space-1) solid var(--color-ink);
+  background: var(--color-sunken);
+}
+
+.controller-stick-thumb {
+  inset: calc(var(--controller-button) / 4);
+  background: var(--color-ink);
+}
+
+.controller-actions {
+  display: grid;
+  grid-template: repeat(2, minmax(0, 1fr)) / repeat(2, minmax(0, 1fr));
+}
+
+.controller-action {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: var(--hit-min);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.controller-action-face {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--space-1);
+  width: var(--controller-button);
+  height: var(--controller-button);
+  border-radius: var(--radius-round);
+  background: var(--color-sunken);
+  transition: transform var(--duration-fast) var(--ease-out);
+  pointer-events: none;
+}
+
+.controller-action .icon { font-size: var(--text-title); }
+
+.controller-action[data-held="true"] .controller-action-face {
+  transform: scale(var(--press-scale));
+  background: var(--color-ink);
+  color: var(--color-surface);
+  transition: none;
+}
