@@ -1,0 +1,128 @@
+/* Design tokens: every colour, font, size and duration the Views use. Decisions in docs/design.md. */
+
+:root {
+  /* Colour */
+  --color-bg: #FFF6EA;
+  --color-surface: #FFFFFF;
+  --color-sunken: #F7E8D5;
+  --color-ink: #2A2134;
+  --color-muted: #6D6377;
+  --color-line: #EBDCC8;
+
+  --color-team-a: #FF5A1F;      /* never use as a text colour (too light) */
+  --color-team-a-ink: #2A2134;  /* text on Team A */
+  --color-team-a-soft: #FFE3D6;
+  --color-team-b: #2D5BFF;
+  --color-team-b-ink: #FFFFFF;  /* text on Team B */
+  --color-team-b-soft: #DFE6FF;
+
+  --color-board: #FFFCF6;
+  --color-board-dot: #E3CFB3;
+  --color-apple: #2A2134;
+
+  --color-success: #17703D;
+  --color-warning: #8F5400;
+  --color-error: #C62828;
+
+  /* Fonts */
+  --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --font-text: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-numbers: var(--font-text);   /* use together with font-variant-numeric: tabular-nums */
+  --font-icons: "Material Symbols Rounded";
+  --weight-regular: 400;
+  --weight-bold: 700;
+  --weight-display: 800;
+  --weight-display-light: 500;
+
+  /* Type scale: phone */
+  --text-small: 14px;
+  --text-body: 16px;
+  --text-large: 20px;
+  --text-title: 24px;
+  --text-hero: 32px;
+
+  /* Type scale: TV (24px at 1920px wide, the minimum for body text on a TV) */
+  --tv-text: clamp(18px, 1.25vw, 48px);
+  --tv-title: clamp(28px, 2.5vw, 96px);
+  --tv-score: clamp(36px, 3.75vw, 144px);
+  --tv-safe: 5vw;
+
+  /* Spacing (4px steps) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Shape and depth: flat fills, no shadows */
+  --radius: 10px;
+  --radius-small: 6px;
+  --radius-round: 999px;
+  --shadow: none;
+  --focus-ring: 3px solid var(--color-ink);
+  --focus-offset: 2px;
+
+  /* Board: snake blocks are inset in their cell and rounded */
+  --tile-inset: 8%;
+  --tile-radius: 24%;
+
+  /* Motion: snappy */
+  --duration-fast: 120ms;
+  --duration: 180ms;
+  --duration-loading: 900ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Touch */
+  --hit-min: 48px;
+  --phone-max-width: 480px;
+  --controller-button: 72px;
+  --controller-gap: 16px;
+  --press-scale: 0.92;
+  /* Controller behaviour, read in JS with getComputedStyle(document.documentElement).getPropertyValue(...) */
+  --press-vibration-ms: 20;     /* navigator.vibrate length for a button press */
+  --stick-dead-zone: 0.12;      /* share of the stick ring that counts as idle */
+}
+
+/* Reduced motion: every animation becomes instant */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration: 0ms;
+    --duration-loading: 0ms;
+  }
+}
+
+/* Shared base styles that every View relies on */
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-text);
+  font-size: var(--text-body);
+  line-height: 1.45;
+}
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.icon {
+  font-family: var(--font-icons);
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  white-space: nowrap;
+  font-feature-settings: "liga";
+  -webkit-font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+}
+
+.numbers {
+  font-family: var(--font-numbers);
+  font-variant-numeric: tabular-nums;
+}

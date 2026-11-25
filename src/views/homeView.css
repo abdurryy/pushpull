@@ -1,0 +1,89 @@
+/* Start screen styles. Values come from src/styles/tokens.css. */
+
+.home {
+  max-width: var(--phone-max-width);
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.home-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  font-size: var(--text-hero);
+  letter-spacing: -0.02em;
+}
+
+.home-mark {
+  width: 2em;
+  height: 1em;
+}
+
+.home-mark-a {
+  fill: var(--color-team-a);
+}
+
+.home-mark-b {
+  fill: var(--color-team-b);
+}
+
+.home-lead {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-large);
+}
+
+.home-choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.home-choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: 0;
+  min-height: var(--hit-min);
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+a.home-choice:hover {
+  background: var(--color-team-b-soft);
+}
+
+a.home-choice:active {
+  transform: scale(var(--press-scale));
+  transition: none;
+}
+
+.home-choice-icon {
+  font-size: var(--text-hero);
+}
+
+.home-choice-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.home-choice-text span {
+  color: var(--color-muted);
+  font-size: var(--text-small);
+}
+
+.home-choice-soon {
+  background: var(--color-sunken);
+  color: var(--color-muted);
+}

@@ -58,7 +58,7 @@ Full list: [keeping your presenter simple](docs/course/project/keeping-presenter
 - **Views** only render props and fire custom events (`onSearchClick`, …). All JSX and CSS live here.
 - **The model** holds the data *and* the logic. If a presenter's event handler calls more than one model method, that should be one model method.
 - **Persistence** happens in model side effects, never in presenters.
-- **The visual design comes later.** We write [docs/design.md](docs/design.md) after the idea and mock-ups, so keep styling minimal until then. Even now, every data View needs loading, empty and error states, inputs need labels, and images need `alt`.
+- **Follow [docs/design.md](docs/design.md).** Style with the tokens in `src/styles/tokens.css` (`var(--token)`), never hard-coded colours, fonts or sizes. Run its PR checklist before opening a PR that touches UI. Every data View needs loading, empty and error states, inputs need labels, and images need `alt`.
 - **Keep code simple enough to explain.** Teachers question individuals about the code, so prefer clear, boring code over clever code.
 - **DRY**, meaningful names, consistent formatting. `.editorconfig` sets 2-space indent and LF line endings.
 - Code copied from the lab gets a comment saying so.

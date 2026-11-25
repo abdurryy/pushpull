@@ -6,7 +6,7 @@ Read this first, then open only the file you need.
 
 | File | What it is |
 |---|---|
-| [design.md](design.md) | Design guidelines. **Not started:** a template plus the steps for filling it in after the idea and mock-ups |
+| [design.md](design.md) | **Design system:** look, colours with contrast checks, fonts, components, controller touch rules, UI PR checklist. Values in `src/styles/tokens.css` |
 | [proposal.md](proposal.md) | Idea brainstorm, requirements checklist, and the proposal we submit |
 | [user-testing/](user-testing/README.md) | One file per user test session plus a template (required for submission) |
 | [../README.md](../README.md) | Team, setup, project structure, status, third-party components |
