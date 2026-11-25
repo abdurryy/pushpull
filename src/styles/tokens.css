@@ -72,6 +72,7 @@
   /* Motion: snappy */
   --duration-fast: 120ms;
   --duration: 180ms;
+  --duration-loading: 900ms;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   /* Touch */
@@ -90,6 +91,7 @@
   :root {
     --duration-fast: 0ms;
     --duration: 0ms;
+    --duration-loading: 0ms;
   }
 }
 
