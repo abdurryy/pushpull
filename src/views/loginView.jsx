@@ -8,6 +8,7 @@ const ERROR_MESSAGES = {
   "auth/popup-blocked": "Your browser blocked the sign-in window. Allow pop-ups for this site and try again.",
   "auth/network-request-failed": "No connection to the sign-in service. Check your internet and try again.",
   "auth/operation-not-allowed": "Google sign-in isn't switched on for this app yet.",
+  "auth/configuration-not-found": "Sign-in isn't set up for this app yet.",
   "auth/unauthorized-domain": "Signing in isn't allowed from this web address yet.",
 };
 
