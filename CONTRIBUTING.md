@@ -11,18 +11,20 @@ npm install      # only if package.json changed
 
 ## Git and pull requests
 
-`main` is protected (see [Repo setup](#repo-setup-once-by-the-repo-owner)). You can't push to it directly, force-push it or delete it. Every change goes through a pull request.
+`main` is protected (see [Repo setup](#repo-setup-once-by-the-repo-owner)). You can't push to it directly, force-push it or delete it. Every change follows the same path: **issue → branch → pull request → review → auto-merge.**
 
-1. Create a branch: `feature/<thing>`, `fix/<thing>` or `docs/<thing>`, e.g. `feature/search-view`.
-2. Push it and open a pull request into `main`. Keep PRs small: they get reviewed faster.
-3. **CodeRabbit reviews automatically.** It requests changes when it finds problems and approves once they are fixed.
-4. **One teammate reviews and approves** too.
-5. Merge when all of these are true:
+1. **Open an issue** for the task: what to do and when it's done. Use the issue template.
+2. **Create a branch from `main`** that starts with the issue number: `feature/<issue>-<thing>`, `fix/<issue>-<thing>` or `docs/<issue>-<thing>`, e.g. `feature/12-search-view`.
+3. **Open a pull request into `main`** and write `Closes #<issue>` in the description (the PR template has the line). The issue then closes when the PR merges. Keep PRs small: they get reviewed faster.
+4. **Turn on auto-merge** right away: the "Enable auto-merge" button on the PR, or `gh pr merge <pr> --auto --merge`.
+5. **CodeRabbit reviews automatically.** It requests changes when it finds problems and approves once they are fixed.
+6. **One teammate reviews and approves** too.
+7. **GitHub merges the PR by itself** when all of these are true:
    - the `CodeRabbit` check has passed
    - you have **2 approvals** (CodeRabbit + a teammate)
    - every review thread is resolved
 
-   Pushing new commits removes the earlier approvals, so CodeRabbit and the teammate look at the latest version.
+   Pushing new commits removes the earlier approvals, so CodeRabbit and the teammate look at the latest version. Auto-merge stays on and waits for the new approvals.
 
 Handling CodeRabbit comments:
 
@@ -87,7 +89,8 @@ Use a **GitHub.com** repo. CodeRabbit Cloud doesn't connect to KTH's own GitHub 
    - all review threads resolved
    - the `CodeRabbit` status check must pass
    - enforcement **Active** with an **empty bypass list**, so admins can't skip it either
-3. After CodeRabbit has run once, open the ruleset and set the `CodeRabbit` check's source to the CodeRabbit app. Then nobody can fake the check.
-4. Add your 3 teammates as collaborators with **Write** access. Write access is enough for reviews; don't give out Admin.
+3. **Allow auto-merge:** Settings → General → Pull Requests → tick **Allow auto-merge** and **Automatically delete head branches**.
+4. After CodeRabbit has run once, open the ruleset and set the `CodeRabbit` check's source to the CodeRabbit app. Then nobody can fake the check.
+5. Add your 3 teammates as collaborators with **Write** access. Write access is enough for reviews; don't give out Admin.
 
 Rulesets on a **private** repo need GitHub Pro or Team. Pro is free with the GitHub Student Developer Pack. On a public repo they're free.
