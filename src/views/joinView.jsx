@@ -1,9 +1,17 @@
 // View (phone): the destination after login, until room joining is implemented.
 import "./loginView.css";
+import { PushMark } from "./pushMark.jsx";
 
 export function JoinView(props) {
   function renderContent() {
-    if (!props.authChecked) return <p role="status">Checking if you're signed in…</p>;
+    if (!props.authChecked) {
+      return (
+        <p className="login-checking" role="status">
+          <PushMark variant="waiting" />
+          Checking if you're signed in…
+        </p>
+      );
+    }
     if (!props.user) return <a href="#/play/login">Sign in to join a room</a>;
     return (
       <div className="login-card">

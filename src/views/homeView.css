@@ -15,14 +15,6 @@
   font: var(--weight-display) var(--text-large) / 1.25 var(--font-display);
 }
 
-.home-mark {
-  width: 2em;
-  height: 1em;
-}
-
-.home-mark-a { fill: var(--color-team-a); }
-.home-mark-b { fill: var(--color-team-b); }
-
 .home-hero,
 .home-intro,
 .home-choices {
