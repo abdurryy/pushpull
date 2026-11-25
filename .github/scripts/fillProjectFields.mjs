@@ -3,9 +3,9 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 
-const OWNER = process.env.PROJECT_OWNER;
-const PROJECT_NUMBER = process.env.PROJECT_NUMBER;
-const REPO = process.env.GITHUB_REPOSITORY;
+const OWNER = process.env.PROJECT_OWNER || "abdurryy";
+const PROJECT_NUMBER = process.env.PROJECT_NUMBER || "2";
+const REPO = process.env.GITHUB_REPOSITORY || "abdurryy/pushpull";
 
 // Runs the GitHub CLI without a shell, so text from the issue can't be run as a command.
 function gh(args) {
@@ -35,8 +35,22 @@ function sectionValue(body, heading) {
   return "";
 }
 
+function loadIssue() {
+  const number = process.argv[2];
+  if (number !== undefined) {
+    if (!/^[1-9]\d*$/.test(number) || process.argv.length !== 3) {
+      throw new Error("Pass a single positive GitHub issue number.");
+    }
+    return JSON.parse(gh(["api", "repos/" + REPO + "/issues/" + number]));
+  }
+  if (!process.env.GITHUB_EVENT_PATH) {
+    throw new Error("Usage: node .github/scripts/fillProjectFields.mjs <issue-number>");
+  }
+  return JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8")).issue;
+}
+
 function main() {
-  const issue = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8")).issue;
+  const issue = loadIssue();
   const body = issue.body || "";
 
   const priority = sectionValue(body, "Priority").toUpperCase();
@@ -46,8 +60,8 @@ function main() {
   const viewPresenter = sectionValue(body, "View/presenter");
 
   // Adding an issue that is already on the board just returns its existing item.
-  const item = JSON.parse(gh(["project", "item-add", PROJECT_NUMBER, "--owner", OWNER, "--url", issue.html_url, "--format", "json"]));
   const project = JSON.parse(gh(["project", "view", PROJECT_NUMBER, "--owner", OWNER, "--format", "json"]));
+  const item = JSON.parse(gh(["project", "item-add", PROJECT_NUMBER, "--owner", OWNER, "--url", issue.html_url, "--format", "json"]));
   const fields = JSON.parse(gh(["project", "field-list", PROJECT_NUMBER, "--owner", OWNER, "--format", "json"])).fields;
   function fieldCB(name) {
     return fields.find(function hasNameCB(field) { return field.name === name; });
