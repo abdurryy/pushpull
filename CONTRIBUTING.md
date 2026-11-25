@@ -21,7 +21,7 @@ npm install      # only if package.json changed
 6. **Teammates are welcome to review**, but their approval isn't required.
 7. **GitHub merges the PR by itself** when all of these are true:
    - the `CodeRabbit` check has passed
-   - CodeRabbit has approved
+   - the PR has 1 approval: CodeRabbit gives it automatically, and a teammate's approval counts too
    - every review thread is resolved
 
    Pushing new commits removes the earlier approval, so CodeRabbit looks at the latest version. Auto-merge stays on and waits for the new approval.
@@ -85,7 +85,7 @@ Use a **GitHub.com** repo. CodeRabbit Cloud doesn't connect to KTH's own GitHub 
    - Automatic Approvals requires CodeRabbit's **Essentials plan or higher**. Check that your plan, or a student/open-source offer, includes it. Without it, CodeRabbit still reviews but can't approve, so a teammate has to approve instead.
 2. **Protect `main`:** in the repo go to Settings → Rules → Rulesets → New ruleset → **Import a ruleset**, and pick [.github/rulesets/protect-main.json](.github/rulesets/protect-main.json). It sets:
    - no deletion and no force-push
-   - PRs required, with 1 approval (CodeRabbit's) and stale approvals dismissed on new commits
+   - PRs required, with 1 approval (CodeRabbit's or a teammate's) and stale approvals dismissed on new commits
    - all review threads resolved
    - the `CodeRabbit` status check must pass
    - enforcement **Active** with an **empty bypass list**, so admins can't skip it either
