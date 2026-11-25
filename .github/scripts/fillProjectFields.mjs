@@ -75,13 +75,14 @@ function main() {
   if (viewPresenter) {
     const [owner, name] = REPO.split("/");
     const repo = graphql(
-      "query($owner:String!,$name:String!){repository(owner:$owner,name:$name){issueFields(first:50){nodes{... on IssueFieldCommon{name} ... on Node{id}}}}}",
+      "query($owner:String!,$name:String!){repository(owner:$owner,name:$name){issueFields(first:50){nodes{... on IssueFieldText{id name}}}}}",
       { owner, name },
     ).repository;
     const viewField = repo.issueFields.nodes.find(function isViewFieldCB(field) { return field.name === "View/presenter"; });
     if (viewField) {
+      // New issues may not have a value yet. This mutation creates it or updates it.
       graphql(
-        "mutation($issue:ID!,$field:ID!,$text:String!){updateIssueFieldValue(input:{issueId:$issue, issueField:{fieldId:$field, textValue:$text}}){clientMutationId}}",
+        "mutation($issue:ID!,$field:ID!,$text:String!){setIssueFieldValue(input:{issueId:$issue, issueFields:[{fieldId:$field, textValue:$text}]}){clientMutationId}}",
         { issue: issue.node_id, field: viewField.id, text: viewPresenter },
       );
       console.log("View/presenter: " + viewPresenter);
