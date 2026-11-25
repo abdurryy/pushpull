@@ -19,10 +19,10 @@ The first game mode is **Double Snake**: eat apples to grow and make the other t
 
 | Name | KTH/GitHub username | Owns |
 |---|---|---|
-| Casper Waller | | |
+| Casper Waller | CasperWaller | |
 | Abdurrahman Giumale | abdurryy | |
 | Faraz Ahmad | | |
-| Aryan Masiul | | |
+| Aryan Masiul | aryanmasiul007 | |
 
 "Owns" means the presenter/view pairs, model, API module, persistence or auth that this person is responsible for. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
