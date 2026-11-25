@@ -11,5 +11,9 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-export const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+// Keep the public screens usable before a developer has configured sign-in.
+const hasAuthConfig = Boolean(firebaseConfig.apiKey && firebaseConfig.authDomain
+  && firebaseConfig.projectId && firebaseConfig.appId);
+
+export const app = hasAuthConfig ? initializeApp(firebaseConfig) : null;
+export const auth = app ? getAuth(app) : null;

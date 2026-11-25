@@ -3,21 +3,37 @@
 import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
 import { auth } from "./firebaseConfig.js";
 
-// Opens Google's sign-in popup. Resolves when the player is signed in, rejects if they close it or it fails.
-export function signInWithGoogle() {
-  return signInWithPopup(auth, new GoogleAuthProvider());
+function missingConfigError() {
+  const error = new Error("Sign-in configuration is missing.");
+  error.code = "auth/missing-config";
+  return error;
 }
 
-// Resolves to { signedOut: true } (signOut itself resolves to nothing, which a promise state would read as "still loading").
-export function signOutUser() {
+// The service tracks progress; only the auth listener changes the signed-in user.
+export function signInWithGoogle(model) {
+  const request = auth
+    ? signInWithPopup(auth, new GoogleAuthProvider())
+    : Promise.reject(missingConfigError());
+  model.trackAuthRequest(request);
+}
+
+// Track a nonempty result: signOut resolves to nothing, which the promise state would read as "still loading".
+export function signOutUser(model) {
   function signedOutACB() {
     return { signedOut: true };
   }
-  return signOut(auth).then(signedOutACB);
+  const request = auth
+    ? signOut(auth).then(signedOutACB)
+    : Promise.reject(missingConfigError());
+  model.trackAuthRequest(request);
 }
 
 // Firebase calls this on start-up and whenever someone signs in or out. The model only gets plain data.
 export function connectAuthToModel(model) {
+  if (!auth) {
+    model.setUser(null);
+    return;
+  }
   function authChangedACB(firebaseUser) {
     if (!firebaseUser) {
       model.setUser(null);

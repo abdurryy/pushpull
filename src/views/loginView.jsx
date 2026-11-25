@@ -9,10 +9,12 @@ const ERROR_MESSAGES = {
   "auth/network-request-failed": "No connection to the sign-in service. Check your internet and try again.",
   "auth/operation-not-allowed": "Google sign-in isn't switched on for this app yet.",
   "auth/configuration-not-found": "Sign-in isn't set up for this app yet.",
+  "auth/missing-config": "Sign-in isn't set up for this app yet.",
   "auth/unauthorized-domain": "Signing in isn't allowed from this web address yet.",
 };
 
-function errorMessage(error) {
+function errorMessage(error, signedIn) {
+  if (signedIn) return "Signing out didn't work. Try again.";
   return ERROR_MESSAGES[error.code] || "Signing in didn't work. Try again.";
 }
 
@@ -34,7 +36,7 @@ export function LoginView(props) {
             : <span className="login-avatar login-avatar-letter" aria-hidden="true">{(props.user.name || "?").charAt(0)}</span>}
           <p className="login-text">Signed in as <strong>{props.user.name}</strong></p>
         </div>
-        <p className="login-hint">Joining a room comes next.</p>
+        <a className="login-button" href="#/play/join">Continue to join a room</a>
         <button className="login-button login-button-secondary" type="button" onClick={signOutClickACB} disabled={props.status === "loading"}>
           {props.status === "loading" ? "Signing out…" : "Sign out"}
         </button>
@@ -50,7 +52,6 @@ export function LoginView(props) {
           <span className="icon" aria-hidden="true">login</span>
           {props.status === "loading" ? "Signing in…" : "Continue with Google"}
         </button>
-        {props.status === "error" && <p className="login-error" role="alert">{errorMessage(props.error)}</p>}
       </div>
     );
   }
@@ -77,6 +78,7 @@ export function LoginView(props) {
         PUSH/PULL
       </h1>
       {renderContent()}
+      {props.status === "error" && <p className="login-error" role="alert">{errorMessage(props.error, Boolean(props.user))}</p>}
     </main>
   );
 }

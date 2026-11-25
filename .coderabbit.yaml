@@ -52,6 +52,9 @@ reviews:
         calling ONE model method. Flag as errors: fetch calls, persistence/Firebase code, component state
         (useState), useEffect for data logic, reading the route (useLocation/useRoute), and any JSX
         markup or CSS beyond a single wrapping <div> or <> (a single suspense image is OK).
+        Authentication exception from docs/course/project/keeping-presenter-simple.md: the login
+        presenter calls only the auth service. That service tracks request progress, while
+        onAuthStateChanged updates the signed-in user. Do not move auth requests into model actions.
     - path: "src/views/**"
       instructions: |
         MVP rule: a View only renders props and fires custom events named onXxx. Flag imports of the

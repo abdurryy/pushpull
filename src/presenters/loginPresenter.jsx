@@ -7,11 +7,11 @@ import { LoginView } from "../views/loginView.jsx";
 
 export const LoginPresenter = observer(function LoginPresenter(props) {
   function signInRequestedACB() {
-    props.model.trackAuthRequest(signInWithGoogle());
+    signInWithGoogle(props.model);
   }
 
   function signOutRequestedACB() {
-    props.model.trackAuthRequest(signOutUser());
+    signOutUser(props.model);
   }
 
   return (
