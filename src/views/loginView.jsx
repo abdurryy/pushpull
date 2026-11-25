@@ -1,5 +1,6 @@
 // View (phone): sign in with Google. Shows checking, signed-out, signing-in, error and signed-in states.
 import "./loginView.css";
+import { PushMark } from "./pushMark.jsx";
 
 // Firebase error codes turned into sentences a player understands.
 const ERROR_MESSAGES = {
@@ -38,6 +39,7 @@ export function LoginView(props) {
         </div>
         <a className="login-button" href="#/play/join">Continue to join a room</a>
         <button className="login-button login-button-secondary" type="button" onClick={signOutClickACB} disabled={props.status === "loading"}>
+          {props.status === "loading" && <PushMark variant="loading" />}
           {props.status === "loading" ? "Signing out…" : "Sign out"}
         </button>
       </div>
@@ -49,7 +51,7 @@ export function LoginView(props) {
       <div className="login-card">
         <p className="login-text">Log in to keep your name, settings and stats.</p>
         <button className="login-button" type="button" onClick={signInClickACB} disabled={props.status === "loading"}>
-          <span className="icon" aria-hidden="true">login</span>
+          {props.status === "loading" ? <PushMark variant="loading" /> : <span className="icon" aria-hidden="true">login</span>}
           {props.status === "loading" ? "Signing in…" : "Continue with Google"}
         </button>
       </div>
@@ -60,7 +62,7 @@ export function LoginView(props) {
     if (!props.authChecked) {
       return (
         <p className="login-text login-checking" role="status">
-          <span className="login-spinner" aria-hidden="true"></span>
+          <PushMark variant="loading" />
           Checking if you're signed in…
         </p>
       );
@@ -71,14 +73,16 @@ export function LoginView(props) {
   return (
     <main className="login">
       <h1 className="login-logo">
-        <svg className="login-mark" viewBox="0 0 24 12" aria-hidden="true">
-          <path className="login-mark-a" d="M0 0H6L12 6L6 12H0L6 6Z" />
-          <path className="login-mark-b" d="M24 0H18L12 6L18 12H24L18 6Z" />
-        </svg>
+        <PushMark variant={props.user && props.status === "done" ? "success" : "static"} />
         PUSH/PULL
       </h1>
       {renderContent()}
-      {props.status === "error" && <p className="login-error" role="alert">{errorMessage(props.error, Boolean(props.user))}</p>}
+      {props.status === "error" && (
+        <p className="login-error" role="alert">
+          <PushMark variant="failure" />
+          {errorMessage(props.error, Boolean(props.user))}
+        </p>
+      )}
     </main>
   );
 }
