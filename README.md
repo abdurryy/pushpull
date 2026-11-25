@@ -30,6 +30,8 @@ The first game mode is **Double Snake**: eat apples to grow and make the other t
 
 Needs Node.js 22.12 or newer (Vite 8 requires it).
 
+Copy `.env.example` to `.env.local` and fill in the Firebase web config (Firebase console > Project settings > Your apps, or ask the team). `.env.local` is git-ignored; never commit the real values.
+
 ```sh
 npm install
 npm run dev      # http://localhost:8080
@@ -46,6 +48,7 @@ Tip: in the browser console, `myModel` shows the current application state.
 ├── index.html                    # page shell: loads the fonts and icons, mounts src/index.jsx
 ├── vite.config.js                # build config: port 8080, minify off (course rule)
 ├── package.json                  # dependencies and npm scripts
+├── .env.example                  # names of the Firebase config values (real ones go in .env.local)
 ├── src/
 │   ├── index.jsx                 # bootstrapping: makes the model reactive (MobX), mounts the root
 │   ├── reactRoot.jsx             # navigation: maps each route (#/, #/tv) to its presenter
@@ -57,12 +60,16 @@ Tip: in the browser console, `myModel` shows the current application state.
 │   │   └── triviaSource.js       # Open Trivia DB: tie-break questions
 │   ├── presenters/               # one per screen: model ↔ view, one model method per event
 │   │   ├── homePresenter.jsx     # start screen
+│   │   ├── loginPresenter.jsx    # phone login; only talks to the auth service
 │   │   └── weatherPresenter.jsx  # weather check on the TV
 │   ├── views/                    # UI only: render props, fire onXxx events, all JSX and CSS
 │   │   ├── homeView.jsx/.css     # pick this device's role
+│   │   ├── loginView.jsx/.css    # Continue with Google, with checking, signing-in and error states
 │   │   └── weatherView.jsx/.css  # city search with loading, empty and error states
 │   ├── styles/tokens.css         # design tokens (colours, fonts, sizes) used by every View
-│   └── persistence/              # (coming) Firebase config, auth, read/write of the model
+│   └── persistence/
+│       ├── firebaseConfig.js     # starts Firebase with the config from .env.local
+│       └── firebaseAuth.js       # Google sign-in/out, and onAuthStateChanged -> model.setUser
 ├── docs/
 │   ├── INDEX.md          # map of all docs, start here
 │   ├── design.md         # design system: look, components, controller rules
@@ -85,10 +92,11 @@ _Required in the mid-project review._
 - Design system: [docs/design.md](docs/design.md) and the CSS tokens
 - App skeleton: React + Vite, MobX model with actions, hash routes, API module for Open-Meteo and Open Trivia DB
 - First API data on screen: the TV shows the live weather for a city, with loading, empty and error states
+- Firebase project and Google sign-in on the phone (`#/play/login`)
 
 **Planned**
 - Deploy early to Firebase Hosting
-- MobX model with the game rules, plus Firebase login and per-user persistence
+- MobX model with the game rules, plus per-user persistence in Firebase
 - Screens on the phone: log in, join a room, controller, profile and stats
 - Screens on the TV: lobby, game board, round results
 - First user test with paper controllers
