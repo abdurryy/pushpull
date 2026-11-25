@@ -32,6 +32,8 @@ Needs Node.js 22.12 or newer (Vite 8 requires it).
 
 Copy `.env.example` to `.env.local` and fill in the Firebase web config (Firebase console > Project settings > Your apps, or ask the team). `.env.local` is git-ignored; never commit the real values.
 
+Without Firebase config, the home and weather screens still work; sign-in shows a setup message. After signing in, **Continue to join a room** opens the join destination. Room codes and team selection are being built separately in #25.
+
 ```sh
 npm install
 npm run dev      # http://localhost:8080
@@ -87,6 +89,7 @@ Tip: in the browser console, `myModel` shows the current application state.
 _Required in the mid-project review._
 
 **Done**
+- Documented the design system and shared CSS tokens, including reduced motion
 - Picked the idea and wrote the project proposal
 - Set up the repo: automated code reviews, a protected `main` branch and CI that builds every pull request
 - Design system: [docs/design.md](docs/design.md) and the CSS tokens

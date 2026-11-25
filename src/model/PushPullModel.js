@@ -20,7 +20,7 @@ export const model = {
     this.authChecked = true;
   },
 
-  // The login presenter starts a sign-in or sign-out with the auth service and hands the model the promise.
+  // The auth service starts a sign-in or sign-out and hands the model the promise.
   // The model only tracks its progress; it doesn't know which service is behind it.
   trackAuthRequest(promise) {
     resolvePromise(promise, this.authPromiseState);

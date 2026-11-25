@@ -86,7 +86,7 @@ Rules:
 
 ## Motion
 
-**Snappy:** short and quick. `--duration-fast` (120ms) for presses and toggles, `--duration` (180ms) for panels and score changes, easing `--ease-out`. Nothing loops except loading indicators (`--duration-loading`, one spinner turn). When the device asks for reduced motion, every duration becomes 0 (including `--duration-loading`), and the tokens file already handles this.
+**Snappy:** short and quick. `--duration-fast` (120ms) for presses and toggles, `--duration` (180ms) for panels and score changes, easing `--ease-out`. Loading indicators use `--duration-loading` (900ms). Nothing loops except loading indicators. When the device asks for reduced motion, every duration becomes 0 (including `--duration-loading`), and the tokens file already handles this.
 
 ## Components
 
