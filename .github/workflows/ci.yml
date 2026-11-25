@@ -52,7 +52,8 @@ jobs:
         run: |
           node --input-type=module -e "
             import { resolveConfig } from 'vite';
-            const config = await resolveConfig({}, 'build');
+            // Same mode as 'vite build' (production), so a mode-dependent setting can't slip through.
+            const config = await resolveConfig({ mode: 'production' }, 'build');
             if (config.build.minify !== false) {
               console.error('vite.config.js must set build.minify to false (course rule). Found: ' + config.build.minify);
               process.exit(1);
