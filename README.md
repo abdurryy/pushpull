@@ -28,7 +28,7 @@ The first game mode is **Double Snake**: eat apples to grow and make the other t
 
 ## Getting started
 
-Needs Node.js 22 or newer.
+Needs Node.js 22.12 or newer (Vite 8 requires it).
 
 ```sh
 npm install
