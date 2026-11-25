@@ -91,6 +91,7 @@
   :root {
     --duration-fast: 0ms;
     --duration: 0ms;
+    --duration-loading: 0ms;
   }
 }
 

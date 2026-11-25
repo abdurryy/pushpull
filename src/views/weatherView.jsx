@@ -63,8 +63,8 @@ export function WeatherView(props) {
           <li className="weather-fact">
             <span className="icon weather-fact-icon" aria-hidden="true">{weather.precipitation > 0 ? "rainy" : "sunny"}</span>
             <span>{weather.precipitation > 0
-              ? <><strong className="numbers">{weather.precipitation} mm</strong> rain: snakes slide one extra square</>
-              : <><strong>Dry</strong>: snakes stop where you steer them</>}
+              ? <><strong className="numbers">{weather.precipitation} mm</strong> rain or snow: snakes slide one extra square</>
+              : <><strong>No rain or snow</strong>: snakes stop where you steer them</>}
             </span>
           </li>
           <li className="weather-fact">
