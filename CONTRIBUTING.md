@@ -22,13 +22,16 @@ npm install      # only if package.json changed
 7. **GitHub merges the PR by itself** when all of these are true:
    - the `CodeRabbit` check has passed
    - the PR has 1 approval: CodeRabbit gives it automatically when Automatic Approvals are available; otherwise, a teammate must approve
-   - every review thread is resolved
 
    Pushing new commits removes the earlier approval, so CodeRabbit looks at the latest version.
 
 Handling CodeRabbit comments:
 
-- Fix the code and push. CodeRabbit re-reviews and resolves the threads it agrees are fixed.
+- **Major or critical** findings block the merge: CodeRabbit requests changes until they're fixed. Fix the code and push; CodeRabbit re-reviews and approves.
+- **Minor** findings and nitpicks are advice. Fix them if it's quick, otherwise leave them. They don't block the merge.
+- If CodeRabbit keeps raising something the team has decided against, reply in the thread with the decision. It remembers that for later reviews.
+- Fix comments yourself on your branch. Don't use one-click fix buttons from bots: they have reverted other work before.
+- Still working? Open the PR as a **draft**. CodeRabbit waits until you mark it ready for review.
 - If you disagree, reply in the thread and explain why. You can also ask it questions by writing `@coderabbitai` in a comment.
 - **Don't use `@coderabbitai approve` to skip the review.** CodeRabbit is set up so you can't do it on your own PR. Ask the group if CodeRabbit is broken.
 
@@ -86,7 +89,7 @@ Use a **GitHub.com** repo. CodeRabbit Cloud doesn't connect to KTH's own GitHub 
 2. **Protect `main`:** in the repo go to Settings → Rules → Rulesets → New ruleset → **Import a ruleset**, and pick [.github/rulesets/protect-main.json](.github/rulesets/protect-main.json). It sets:
    - no deletion and no force-push
    - PRs required, with 1 approval (CodeRabbit's or a teammate's) and stale approvals dismissed on new commits
-   - all review threads resolved
+   - open review threads don't block the merge (only CodeRabbit's change requests do)
    - the `CodeRabbit` status check must pass
    - enforcement **Active** with an **empty bypass list**, so admins can't skip it either
 3. **Allow auto-merge:** Settings → General → Pull Requests → tick **Allow auto-merge** and **Automatically delete head branches**.
