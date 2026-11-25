@@ -77,20 +77,22 @@ These rules don't depend on the look, so they apply now:
 
 ## Git, PRs and CodeRabbit
 
-`main` is protected. Every change goes through a pull request that needs the `CodeRabbit` check to pass, one approval, and all review threads resolved. CodeRabbit gives that approval automatically if the repository plan supports Automatic Approvals; otherwise, a teammate must approve. A teammate's approval also counts when Automatic Approvals are available.
+`main` is protected. Every change goes through a pull request that needs the `CodeRabbit` check to pass and one approval. Open review threads don't block it. CodeRabbit gives that approval automatically if the repository plan supports Automatic Approvals; otherwise, a teammate must approve. A teammate's approval also counts when Automatic Approvals are available.
 
 Every task follows the same steps, in this order:
 
 1. **Issue.** Reuse the issue for the task if there is one (`gh issue list`). Otherwise create one as a full brief (see "Writing an issue" below): `gh issue create --title "<what>" --body-file <brief.md>`. If an existing issue is thin, fill in the missing sections before you start.
 2. **Branch** from an up-to-date `main`, named after the issue: `feature/<issue>-<thing>`, `fix/<issue>-<thing>` or `docs/<issue>-<thing>`.
 3. **Push the branch, then open a pull request** into `main` with `Closes #<issue>` in the description: `git push -u origin <branch>`, then `gh pr create --base main --title "<what changed>" --body "Closes #<issue> ..."`.
-4. **Auto-merge** on that PR right after creating it: `gh pr merge <pr> --auto --merge`. GitHub merges it by itself once CodeRabbit's check has passed, the PR has an approval (normally CodeRabbit's) and all threads are resolved.
+4. **Auto-merge** on that PR right after creating it: `gh pr merge <pr> --auto --merge`. GitHub merges it by itself once CodeRabbit's check has passed, the PR has an approval (normally CodeRabbit's) and nobody has requested changes.
 
 Rules for that flow:
 
 - **Never push to `main`, never force-push, never use `--no-verify`.** Don't try to work around branch protection.
 - **Never merge by hand** and never ask an admin to bypass the rules. Auto-merge is the only way a PR lands.
-- Fix CodeRabbit's comments in code and push. If you disagree with one, reply in the thread with the reason and let the developer decide. **Never post `@coderabbitai approve` or `@coderabbitai resolve`**, and never resolve a thread without a fix or a reply.
+- **Major or critical** CodeRabbit findings block the merge: fix them in code and push. **Minor** findings and nitpicks are advice: fix them only if it's a one-line change in the files you're already touching, otherwise leave them. Don't open follow-up commits just to please a nitpick.
+- If you disagree with a finding, reply in the thread with the reason and let the developer decide. **Never post `@coderabbitai approve` or `@coderabbitai resolve`**.
+- Never use one-click bot fixes (CodeRabbit "Fix comments", Copilot autofix). Make fixes yourself on the branch, and check the diff doesn't undo other work.
 - One issue, one branch, one PR. If the work grows, open a new issue rather than piling it into the same PR.
 
 ### Writing an issue
