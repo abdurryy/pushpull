@@ -21,13 +21,13 @@ export function HomeView() {
             <span>Shows the game for everyone. Open it on a laptop or smart TV.</span>
           </span>
         </a>
-        <p className="home-choice home-choice-soon">
+        <a className="home-choice" href="#/play/login">
           <span className="icon home-choice-icon" aria-hidden="true">stay_current_landscape</span>
           <span className="home-choice-text">
             <strong>Use this phone as a controller</strong>
-            <span>Coming soon.</span>
+            <span>Log in first, then join a room.</span>
           </span>
-        </p>
+        </a>
       </nav>
     </main>
   );
