@@ -58,8 +58,11 @@ reviews:
         model, API or persistence code, and any data processing that belongs in the model.
         Flag Views that show data but have no loading, empty or error state; inputs without a visible
         <label>; images without alt; clickable <div>/<span> instead of <button> or <a>; removed focus
-        outlines. The visual design is not decided yet (docs/design.md), so don't suggest colours,
-        fonts or styling.
+        outlines. Styling follows docs/design.md: flag hard-coded colours, font families, px font
+        sizes, radii, shadows or durations instead of var(--token) from src/styles/tokens.css, orange
+        (--color-team-a) used as a text colour, and team colour shown without a team name or letter.
+        In controller views, flag actions bound to click instead of pointerdown. Don't suggest new
+        colours, fonts or visual effects.
     - path: "src/model/**"
       instructions: |
         The model holds all application state and the logic that changes it. One user action should be
