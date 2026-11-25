@@ -18,7 +18,7 @@ npm install      # only if package.json changed
 3. **Push the branch** (`git push -u origin <branch>`), then **open a pull request into `main`** and write `Closes #<issue>` in the description (the PR template has the line). The issue then closes when the PR merges. Keep PRs small: they get reviewed faster.
 4. **Turn on auto-merge** right away: the "Enable auto-merge" button on the PR, or `gh pr merge <pr> --auto --merge`.
 5. **CodeRabbit reviews automatically.** It requests changes when it finds problems and approves once they are fixed.
-6. **Teammates are welcome to review**, but their approval isn't required.
+6. **Teammates are welcome to review.** If the repository plan doesn't support Automatic Approvals, a teammate must approve the pull request; otherwise, CodeRabbit's approval is sufficient.
 7. **GitHub merges the PR by itself** when all of these are true:
    - the `CodeRabbit` check has passed
    - the PR has 1 approval: CodeRabbit gives it automatically, and a teammate's approval counts too
