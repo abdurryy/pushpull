@@ -2,7 +2,7 @@
 
 This is a group project (4 developers) for KTH DH2642/ID2216 HT26 *Developing Mobile Applications*. We're building an interactive app on top of an existing API, using Model-View-Presenter (MVP), reactive application state and per-user persistence (Firebase).
 
-**Status:** idea not chosen yet, no design direction and no code yet. `src/` gets created when we scaffold (React + Vite, see `docs/course/project/minimal-react-web-setup.md`).
+**Status:** idea chosen (Push/Pull, see `README.md`), design decided (`docs/design.md`, values in `src/styles/tokens.css`), no app code yet. The rest of `src/` gets created when we scaffold (React + Vite, see `docs/course/project/minimal-react-web-setup.md`).
 
 ## Where things are
 
@@ -15,7 +15,7 @@ This is a group project (4 developers) for KTH DH2642/ID2216 HT26 *Developing Mo
 ├── src/                 ← app code (not yet created; layout in README.md)
 └── docs/
     ├── INDEX.md         ← START HERE: map of all docs + deadlines + gaps
-    ├── design.md        ← design guidelines (template; filled in after the idea + mock-ups)
+    ├── design.md        ← design system: look, components, controller rules
     ├── proposal.md      ← idea brainstorm + our proposal
     ├── user-testing/    ← one file per user test session
     └── course/          ← Canvas material (reference, never edit by hand)
@@ -57,12 +57,17 @@ Full detail is in `docs/course/project/keeping-presenter-simple.md`.
 
 ## Design and UI
 
-**The design direction is not decided yet.** `docs/design.md` is a template the team fills in after picking the idea and testing mock-ups. Until it's filled in:
+**The design is decided: read `docs/design.md` before building any View.** Its values live in `src/styles/tokens.css`.
 
-- **Don't invent a visual style.** No colour schemes, fonts, themes or decorative CSS. Keep styling to the minimum layout a screen needs to work.
+- **Tokens only.** Views use `var(--token)` for every colour, font, font size, spacing, radius, shadow and duration. Never a hex colour, font name or px font size in a View. If a value is missing, add a token (and a line in design.md) in its own small PR first.
+- **Flat, light Toy box look:** surfaces are separated by fill colour, not borders or shadows. Don't add new colours, fonts or effects.
+- **Team colours:** Team A orange is never a text colour; put `--color-team-a-ink` on it. Always show a team name or letter next to team colour.
+- **Icons:** Material Symbols Rounded only (`<span class="icon" aria-hidden="true">name</span>`), with the meaning in text or `aria-label`.
+- **TV views:** no text smaller than `--tv-text`, everything inside `--tv-safe`.
+- **Controller:** follow the numbered rules under "Controller" in design.md: act on `pointerdown`, instant pressed state, `navigator.vibrate` where supported, confirmation from the TV, big zones, multi-touch with `pointerId`, `touch-action: none`.
 - Don't add a UI component library, icon set or font without the team agreeing. If one is added, list it under Third-party components in `README.md`. (Grades B and A need at least one user-visible component written by others. Router and suspense don't count.)
 
-These rules don't depend on the look, so they apply now:
+Always:
 
 - Use real elements: `<button>` for actions, `<a>` for navigation, `<label>` + `<input>` for forms. Never a clickable `<div>`.
 - Every View that shows data handles **loading, empty and error** as well as content.
