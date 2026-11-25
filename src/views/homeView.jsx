@@ -1,5 +1,6 @@
 // View: introduces Push/Pull and lets visitors choose this device's role.
 import "./homeView.css";
+import { PushMark } from "./pushMark.jsx";
 
 const previewTiles = [
   { column: 2, row: 5, kind: "team-a" },
@@ -30,10 +31,7 @@ export function HomeView() {
   return (
     <main className="home">
       <header className="home-logo">
-        <svg className="home-mark" viewBox="0 0 24 12" aria-hidden="true">
-          <path className="home-mark-a" d="M0 0H6L12 6L6 12H0L6 6Z" />
-          <path className="home-mark-b" d="M24 0H18L12 6L18 12H24L18 6Z" />
-        </svg>
+        <PushMark variant="entry" />
         PUSH/PULL
       </header>
 

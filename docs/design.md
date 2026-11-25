@@ -88,6 +88,22 @@ Rules:
 
 **Snappy:** short and quick. `--duration-fast` (120ms) for presses and toggles, `--duration` (180ms) for panels and score changes, easing `--ease-out`. Loading indicators use `--duration-loading` (900ms). Nothing loops except loading indicators. When the device asks for reduced motion, every duration becomes 0 (including `--duration-loading`), and the tokens file already handles this.
 
+### Animated push mark
+
+Use `PushMark` from `src/views/pushMark.jsx` alongside a visible heading or status message. The two arrows use the team color tokens, and the status effects use the existing palette. The SVG is decorative. With reduced motion, every variant renders as the static two-arrow mark.
+
+| Variant | Motion | Use |
+|---|---|---|
+| `entry` | Arrows glide together with a brief glint | On entering the homepage |
+| `loading` | Arrows separate and meet, with a pulse at the join | While checking a session or signing in or out |
+| `searching` | A scan sweeps across the mark | While looking up weather |
+| `success` | Arrows snap into place with a green halo | After signing in |
+| `failure` | Arrows shake apart with a red split | Beside the login or weather error |
+| `waiting` | Arrows separate briefly around three dots | While the join screen checks the session, and later while waiting in the lobby |
+| `game-start` | The outlines trace before the arrows fill | When the TV lobby starts a round (issue #24) |
+
+Loading and searching repeat only while the request is pending. The other variants play once per appearance. Start the round and enable controls on their normal schedule, independently of the animation.
+
 ## Components
 
 **Buttons.** One primary button per screen: ink fill, white text. Secondary: `--color-sunken` fill, ink text. Minimum height `--hit-min` (48px) on phones. A button says what it does ("Join room", "Start round").
@@ -101,7 +117,7 @@ Rules:
 **Score bar (TV).** A full-width bar on top, in `--font-display` 800 for scores and `--font-numbers` for the timer.
 
 **Loading, empty and error.** Every View that shows data has all three, plus content:
-- **Loading:** a small spinner plus a sentence saying what is loading ("Checking the weather in Stockholm…"). The rest of the screen stays usable (a course requirement).
+- **Loading:** an animated push mark plus a sentence saying what is loading ("Checking the weather in Stockholm…"). The rest of the screen stays usable (a course requirement).
 - **Empty:** what's missing and what to do ("No games yet. Join a room to play your first one.").
 - **Error:** what went wrong and a button to try again. Use `--color-error` for the message, never for the whole screen.
 

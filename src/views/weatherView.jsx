@@ -1,6 +1,7 @@
 // View (TV): the host picks the city the group plays in and sees its live weather.
 // Shows every state: nothing searched yet, loading, error, no city found, and the weather.
 import "./weatherView.css";
+import { PushMark } from "./pushMark.jsx";
 
 const COMPASS = ["north", "north-east", "east", "south-east", "south", "south-west", "west", "north-west"];
 
@@ -30,7 +31,7 @@ export function WeatherView(props) {
     if (props.status === "loading") {
       return (
         <p className="weather-message">
-          <span className="weather-spinner" aria-hidden="true"></span>
+          <PushMark variant="searching" />
           Checking the weather in {props.city}…
         </p>
       );
@@ -38,7 +39,10 @@ export function WeatherView(props) {
     if (props.status === "error") {
       return (
         <div className="weather-error">
-          <p className="weather-message">Couldn't get the weather: {props.error.message}.</p>
+          <p className="weather-message">
+            <PushMark variant="failure" />
+            Couldn't get the weather: {props.error.message}.
+          </p>
           <button className="weather-button weather-button-secondary" type="button" onClick={retryACB}>Try again</button>
         </div>
       );
