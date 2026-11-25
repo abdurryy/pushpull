@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit config. GitHub reads the required check and approvals from the
+# ruleset in .github/rulesets/protect-main.json (see CONTRIBUTING.md).
+language: en-US
+
+reviews:
+  profile: chill
+  high_level_summary: true
+
+  # CodeRabbit approves the PR only when every actionable comment is resolved,
+  # and requests changes otherwise. Its approval counts toward GitHub's
+  # required approvals.
+  auto_approvals:
+    enabled: true
+    allow_author_approval: false # PR authors can't "@coderabbitai approve" their own PR
+
+  # Post the "CodeRabbit" check, and fail it if the review errors out,
+  # so the required status check blocks the merge.
+  review_progress: true
+  fail_commit_status: true
+
+  auto_review:
+    enabled: true
+    drafts: false
+
+  # Copies of Canvas pages, not our code
+  path_filters:
+    - "!docs/course/**"
+
+  path_instructions:
+    - path: "src/**/*.{js,jsx}"
+      instructions: |
+        This is a student course project. Every developer must be able to explain their code to a teacher.
+        Flag code that is hard to explain: clever one-liners, deep nesting, unnecessary abstractions,
+        unclear names, functions doing more than one thing, and new libraries that the task doesn't need.
+        Suggest the simpler version. Follow the course lab conventions: callbacks end in ACB
+        (event, promise, side-effect callbacks) or CB (array callbacks); code copied from the lab must
+        have a comment saying so. Check DRY, naming and formatting (all graded).
+    - path: "src/presenters/**"
+      instructions: |
+        MVP rule: a Presenter only reads the model, passes props to Views and handles custom events by
+        calling ONE model method. Flag as errors: fetch calls, persistence/Firebase code, component state
+        (useState), useEffect for data logic, reading the route (useLocation/useRoute), and any JSX
+        markup or CSS beyond a single wrapping <div> or <> (a single suspense image is OK).
+    - path: "src/views/**"
+      instructions: |
+        MVP rule: a View only renders props and fires custom events named onXxx. Flag imports of the
+        model, API or persistence code, and any data processing that belongs in the model.
+        Flag Views that show data but have no loading, empty or error state; inputs without a visible
+        <label>; images without alt; clickable <div>/<span> instead of <button> or <a>; removed focus
+        outlines. The visual design is not decided yet (docs/design.md), so don't suggest colours,
+        fonts or styling.
+    - path: "src/model/**"
+      instructions: |
+        The model holds all application state and the logic that changes it. One user action should be
+        one model method. Persistence must happen in side effects, not in the methods themselves.

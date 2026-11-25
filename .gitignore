@@ -1,0 +1,27 @@
+# dependencies and build output (the course requires ignoring these)
+node_modules/
+dist/
+
+# secrets: put API keys in .env.local
+.env
+.env.*
+!.env.example
+
+# Firebase
+.firebase/
+firebase-debug.log*
+
+# logs and OS/editor files
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# local tool settings (personal, not shared)
+.*/settings.local.json
+
+# generated pitch and proposal PDFs (they contain Canvas IDs)
+output/
