@@ -1,0 +1,79 @@
+# Publish main and create temporary previews for pull requests from this repository.
+name: Firebase Hosting
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: hosting-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy Hosting
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check that minification is disabled
+        run: |
+          node --input-type=module -e "
+            import { resolveConfig } from 'vite';
+            const config = await resolveConfig({ mode: 'production' }, 'build');
+            if (config.build.minify !== false) {
+              console.error('The course requires build.minify to be false.');
+              process.exit(1);
+            }
+          "
+
+      - name: Build with Firebase web configuration
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+        run: |
+          : "${VITE_FIREBASE_API_KEY:?Missing Firebase web API key}"
+          : "${VITE_FIREBASE_AUTH_DOMAIN:?Missing Firebase auth domain}"
+          : "${VITE_FIREBASE_PROJECT_ID:?Missing Firebase project ID}"
+          : "${VITE_FIREBASE_APP_ID:?Missing Firebase app ID}"
+          npm run build
+
+      - name: Publish to the live site
+        if: github.event_name == 'push'
+        uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0
+        with:
+          firebaseServiceAccount: ${{ secrets.FIREBASE_HOSTING_SERVICE_ACCOUNT }}
+          firebaseToolsVersion: '15.37.0'
+          projectId: pushpull-1df2e
+          channelId: live
+
+      - name: Publish a pull request preview
+        if: github.event_name == 'pull_request'
+        uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_HOSTING_SERVICE_ACCOUNT }}
+          firebaseToolsVersion: '15.37.0'
+          projectId: pushpull-1df2e
+          channelId: pr${{ github.event.pull_request.number }}
+          expires: 7d
