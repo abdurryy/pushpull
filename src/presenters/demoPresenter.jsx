@@ -2,9 +2,15 @@
 import { observer } from "mobx-react-lite";
 import { demoModel, keyGroups } from "../model/DemoModel.js";
 import { COLUMNS, ROWS } from "../model/doubleSnakeRules.js";
+import { promiseStatus } from "../model/resolvePromise.js";
 import { DemoView } from "../views/demoView.jsx";
 
-export const DemoPresenter = observer(function DemoPresenter() {
+export const DemoPresenter = observer(function DemoPresenter({ model }) {
+  const weather = model.weatherPromiseState;
+  const selectedWeather = model.cityQuery.trim() ? weather.data : null;
+
+  function startRoundACB() { demoModel.startRound(selectedWeather); }
+
   return (
     <DemoView
       round={demoModel.round}
@@ -16,7 +22,13 @@ export const DemoPresenter = observer(function DemoPresenter() {
       rows={ROWS}
       teamACancelled={demoModel.teamACancelled}
       teamBCancelled={demoModel.teamBCancelled}
-      onStart={demoModel.startRound}
+      weather={demoModel.weather}
+      cityQuery={model.cityQuery}
+      weatherStatus={model.cityQuery.trim() ? promiseStatus(weather) : "idle"}
+      weatherCity={selectedWeather?.city?.name}
+      onCityChange={model.setCityQuery}
+      onSearch={model.findWeather}
+      onStart={startRoundACB}
       onKeyChange={demoModel.changeKey}
       onClearKeys={demoModel.clearKeys}
       onExit={demoModel.leaveDemo}
