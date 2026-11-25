@@ -3,6 +3,17 @@ name: Task
 about: Something to build, fix or document. Every branch and pull request starts from one of these.
 ---
 
+## Priority
+<!-- One of: P0 (blocks other work), P1 (needed for the next milestone), P2 (if there's time before the deadline).
+     Copied to the project board automatically. -->
+P1
+
+## Target date
+<!-- YYYY-MM-DD. Leave empty to use the milestone's due date. Set a milestone on the right as well. -->
+
+## View/presenter
+<!-- The pair this touches, e.g. "lobbyPresenter / lobbyView", or "none: model" / "none: persistence". -->
+
 ## Brief
 <!-- One or two sentences: what should change and why it matters to the player or the team. -->
 
