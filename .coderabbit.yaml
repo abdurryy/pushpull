@@ -23,6 +23,10 @@ reviews:
     enabled: true
     drafts: false
 
+  # Check the PR against the issue it closes (acceptance criteria, approach)
+  assess_linked_issues: true
+  related_issues: true
+
   # Copies of Canvas pages, not our code
   path_filters:
     - "!docs/course/**"
