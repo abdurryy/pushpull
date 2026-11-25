@@ -2,7 +2,7 @@
 
 A party game for four friends, two teams and one shared screen. Group project for DH2642/ID2216 *Developing Mobile Applications*, KTH HT26.
 
-**Live app:** [pushpull-1df2e.web.app](https://pushpull-1df2e.web.app)
+**Live app:** [pushpull.live](https://pushpull.live)
 
 ## About
 
@@ -17,12 +17,12 @@ The first game mode is **Double Snake**: eat apples to grow and make the other t
 
 ## Team
 
-| Name | KTH/GitHub username | Owns |
-|---|---|---|
-| Casper Waller | CasperWaller | |
-| Abdurrahman Giumale | abdurryy | |
-| Faraz Ahmad | faraz539 | |
-| Aryan Masiul | aryanmasiul007 | |
+| Name | KTH/GitHub username | Project email | Owns |
+|---|---|---|---|
+| Casper Waller | CasperWaller | [casper@pushpull.live](mailto:casper@pushpull.live) | |
+| Abdurrahman Giumale | abdurryy | [abdurrahman@pushpull.live](mailto:abdurrahman@pushpull.live) | |
+| Faraz Ahmad | faraz539 | [faraz@pushpull.live](mailto:faraz@pushpull.live) | |
+| Aryan Masiul | aryanmasiul007 | [aryan@pushpull.live](mailto:aryan@pushpull.live) | |
 
 "Owns" means the presenter/view pairs, model, API module, persistence or auth that this person is responsible for. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
