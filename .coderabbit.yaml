@@ -2,17 +2,40 @@
 # CodeRabbit config. GitHub reads the required check and approvals from the
 # ruleset in .github/rulesets/protect-main.json (see CONTRIBUTING.md).
 language: en-US
+tone_instructions: >-
+  Be brief and practical. Comment on bugs, broken course rules (MVP layers, loading/empty/error
+  states, accessibility) and security. Skip style preferences, wording and formatting nitpicks.
 
 reviews:
   profile: chill
   high_level_summary: true
 
-  # CodeRabbit approves the PR only when every actionable comment is resolved,
-  # and requests changes otherwise. Its approval counts toward GitHub's
-  # required approvals.
+  # A short walkthrough: no fortunes, diagrams, effort estimates or reviewer suggestions
+  in_progress_fortune: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  suggested_reviewers: false
+
+  # CodeRabbit requests changes only for major or critical findings and approves
+  # otherwise. Minor comments stay visible as advice. Its approval is the one
+  # approval GitHub requires.
   auto_approvals:
     enabled: true
+    min_blocking_severity: major
     allow_author_approval: false # PR authors can't "@coderabbitai approve" their own PR
+
+  # No one-click "Fix comments" commits: they have reverted other work before.
+  # Fixes are made on the branch by the PR author.
+  finishing_touches:
+    autofix:
+      enabled: false
+
+  # Grammar and markdown-style linters only produce nitpicks on our docs
+  tools:
+    languagetool:
+      enabled: false
+    markdownlint:
+      enabled: false
 
   # Post the "CodeRabbit" check, and fail it if the review errors out,
   # so the required status check blocks the merge.
@@ -32,10 +55,15 @@ reviews:
     - "!docs/course/**"
 
   path_instructions:
+    - path: "**/*.md"
+      instructions: |
+        Team docs. Only flag factual errors, broken links, or contradictions with other docs or
+        the ruleset. Don't comment on wording, tone, length or formatting.
     - path: ".github/rulesets/**"
       instructions: |
         The merge rules are a deliberate team decision: 1 approval from anyone with write access
-        (CodeRabbit's or a teammate's), the CodeRabbit check, and resolved threads. Don't ask for
+        (CodeRabbit's or a teammate's) and the CodeRabbit check. Open threads do not block merging;
+        outstanding change requests do. Don't ask for
         stricter or different approval rules. Only flag invalid JSON or rules that contradict
         CONTRIBUTING.md.
     - path: "src/**/*.{js,jsx}"
@@ -70,3 +98,13 @@ reviews:
       instructions: |
         The model holds all application state and the logic that changes it. One user action should be
         one model method. Persistence must happen in side effects, not in the methods themselves.
+
+# Issues labelled "feature" get an implementation plan from CodeRabbit,
+# which the assignee (or their coding agent) can follow.
+issue_enrichment:
+  planning:
+    enabled: true
+    auto_planning:
+      enabled: true
+      labels:
+        - feature
