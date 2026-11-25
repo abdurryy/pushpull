@@ -1,0 +1,140 @@
+/* Login screen on the phone. Values come from src/styles/tokens.css. */
+
+.login {
+  max-width: var(--phone-max-width);
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  font-size: var(--text-hero);
+  letter-spacing: -0.02em;
+}
+
+.login-mark {
+  width: 2em;
+  height: 1em;
+}
+
+.login-mark-a {
+  fill: var(--color-team-a);
+}
+
+.login-mark-b {
+  fill: var(--color-team-b);
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.login-text {
+  margin: 0;
+  font-size: var(--text-large);
+}
+
+.login-hint {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.login-checking {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-muted);
+}
+
+.login-spinner {
+  width: 1em;
+  height: 1em;
+  border-radius: var(--radius-round);
+  border: var(--space-1) solid var(--color-line);
+  border-top-color: var(--color-ink);
+  animation: login-spin var(--duration-loading) linear infinite;
+}
+
+@keyframes login-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-spinner {
+    animation: none;
+  }
+}
+
+.login-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--hit-min);
+  padding: var(--space-3) var(--space-5);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-ink);
+  color: var(--color-surface);
+  font: inherit;
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.login-button:active {
+  transform: scale(var(--press-scale));
+  transition: none;
+}
+
+.login-button:disabled {
+  background: var(--color-sunken);
+  color: var(--color-muted);
+  cursor: progress;
+}
+
+.login-button-secondary {
+  background: var(--color-sunken);
+  color: var(--color-ink);
+}
+
+.login-error {
+  margin: 0;
+  color: var(--color-error);
+}
+
+.login-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.login-avatar {
+  width: var(--hit-min);
+  height: var(--hit-min);
+  border-radius: var(--radius-round);
+  object-fit: cover;
+}
+
+.login-avatar-letter {
+  display: grid;
+  place-items: center;
+  background: var(--color-team-b-soft);
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+}

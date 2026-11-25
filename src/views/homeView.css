@@ -83,7 +83,3 @@ a.home-choice:active {
   font-size: var(--text-small);
 }
 
-.home-choice-soon {
-  background: var(--color-sunken);
-  color: var(--color-muted);
-}
