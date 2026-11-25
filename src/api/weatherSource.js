@@ -20,7 +20,8 @@ export function findCity(name) {
   return fetch(GEOCODING_URL + "?" + params).then(checkResponseACB).then(firstCityACB);
 }
 
-// Gets the current wind, rain and day/night for a place. Wind speed is in m/s, direction in degrees (where it blows from).
+// Uses the forecast endpoint's current conditions: wind, precipitation and day/night.
+// Wind speed is in m/s, direction in degrees (where it blows from).
 export function getCurrentWeather(latitude, longitude) {
   const params = new URLSearchParams({
     latitude,
