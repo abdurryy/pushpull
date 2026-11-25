@@ -1,23 +1,18 @@
-/* Start screen styles. Values come from src/styles/tokens.css. */
-
+/* Homepage layout, device links, and a static board preview. */
 .home {
-  max-width: var(--phone-max-width);
-  margin: 0 auto;
-  padding: var(--space-7) var(--space-4);
-  display: flex;
-  flex-direction: column;
+  box-sizing: border-box;
+  max-width: calc(var(--phone-max-width) * 3);
+  margin-inline: auto;
+  padding: var(--space-5) var(--space-4) var(--space-7);
+  display: grid;
   gap: var(--space-5);
 }
 
 .home-logo {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: var(--weight-display);
-  font-size: var(--text-hero);
-  letter-spacing: -0.02em;
+  gap: var(--space-2);
+  font: var(--weight-display) var(--text-large) / 1.25 var(--font-display);
 }
 
 .home-mark {
@@ -25,61 +20,206 @@
   height: 1em;
 }
 
-.home-mark-a {
-  fill: var(--color-team-a);
+.home-mark-a { fill: var(--color-team-a); }
+.home-mark-b { fill: var(--color-team-b); }
+
+.home-hero,
+.home-intro,
+.home-choices {
+  display: grid;
+  gap: var(--space-4);
 }
 
-.home-mark-b {
-  fill: var(--color-team-b);
+.home-intro {
+  align-content: center;
+}
+
+.home-title {
+  display: grid;
+  margin: 0;
+  font: var(--weight-display) var(--text-hero) / 1.12 var(--font-display);
 }
 
 .home-lead {
+  max-width: 42ch;
   margin: 0;
   color: var(--color-muted);
   font-size: var(--text-large);
 }
 
-.home-choices {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
 .home-choice {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  margin: 0;
+  gap: var(--space-3);
   min-height: var(--hit-min);
-  padding: var(--space-4);
+  padding: var(--space-3);
   border-radius: var(--radius);
-  background: var(--color-surface);
+  background: var(--color-sunken);
   color: var(--color-ink);
   text-decoration: none;
-  transition: transform var(--duration-fast) var(--ease-out);
 }
 
-a.home-choice:hover {
-  background: var(--color-team-b-soft);
+.home-choice-primary {
+  background: var(--color-ink);
+  color: var(--color-surface);
 }
 
-a.home-choice:active {
-  transform: scale(var(--press-scale));
-  transition: none;
+.home-choice:hover strong {
+  text-decoration: underline;
 }
 
-.home-choice-icon {
-  font-size: var(--text-hero);
+.home-choice > .icon {
+  flex: none;
+  font-size: var(--text-title);
 }
 
 .home-choice-text {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.home-choice-arrow {
+  margin-inline-start: auto;
+}
+
+.home-preview,
+.home-rules {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.home-preview figcaption,
+.home-rules h2 {
+  margin: 0;
+  font: var(--weight-display) var(--text-large) / 1.25 var(--font-display);
+}
+
+.home-teams {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.home-team {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-small);
+  font-weight: var(--weight-bold);
+}
+
+.home .team-a {
+  background-color: var(--color-team-a);
+  color: var(--color-team-a-ink);
+}
+
+.home .team-b {
+  background-color: var(--color-team-b);
+  color: var(--color-team-b-ink);
+}
+
+.home-board {
+  /* Keep the background dots centered in the ten by seven preview grid. */
+  display: grid;
+  grid-template: repeat(7, 1fr) / repeat(10, 1fr);
+  aspect-ratio: 10 / 7;
+  border-radius: var(--radius);
+  background-color: var(--color-board);
+  background-image: radial-gradient(circle, var(--color-board-dot) 5%, transparent 6%);
+  background-size: 10% calc(100% / 7);
+}
+
+.home-tile {
+  position: relative;
+  margin: var(--tile-inset);
+  border-radius: var(--tile-radius);
+}
+
+.home-tile.apple {
+  margin: 28%;
+  border-radius: var(--radius-round);
+  background: var(--color-apple);
+}
+
+.home-tile.head-right::before,
+.home-tile.head-right::after,
+.home-tile.head-left::before,
+.home-tile.head-left::after {
+  position: absolute;
+  width: 16%;
+  aspect-ratio: 1;
+  border-radius: var(--radius-round);
+  background: var(--color-surface);
+  content: "";
+}
+
+.home-tile.head-right::before,
+.home-tile.head-left::before { top: 23%; }
+
+.home-tile.head-right::after,
+.home-tile.head-left::after { bottom: 23%; }
+
+.home-tile.head-right::before,
+.home-tile.head-right::after { right: 20%; }
+
+.home-tile.head-left::before,
+.home-tile.head-left::after { left: 20%; }
+
+.home-rules ul {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-rules li {
+  display: grid;
+  align-content: start;
   gap: var(--space-1);
 }
 
-.home-choice-text span {
+.home-rules li span {
   color: var(--color-muted);
-  font-size: var(--text-small);
 }
 
+@media (min-width: 60rem) {
+  .home {
+    padding: var(--space-6) var(--tv-safe) var(--space-7);
+    gap: var(--space-6);
+  }
+
+  .home-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-7);
+  }
+
+  .home-title {
+    font-size: max(var(--text-hero), var(--tv-score));
+  }
+
+  .home-preview,
+  .home-rules,
+  .home-choice {
+    padding: var(--space-5);
+  }
+
+  .home-rules ul {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 80rem) and (orientation: landscape) {
+  .home,
+  .home-logo,
+  .home-lead,
+  .home-preview figcaption,
+  .home-rules h2 {
+    font-size: var(--tv-text);
+  }
+}
