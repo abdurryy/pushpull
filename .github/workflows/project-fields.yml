@@ -35,4 +35,13 @@ jobs:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
           PROJECT_OWNER: abdurryy
           PROJECT_NUMBER: "2"
-        run: node .github/scripts/fillProjectFields.mjs
+        run: |
+          if ! gh api user --silent; then
+            echo "::error::PROJECT_TOKEN could not authenticate. Update it in the repository's Actions secrets."
+            exit 1
+          fi
+          if ! gh project view "$PROJECT_NUMBER" --owner "$PROJECT_OWNER" --format json > /dev/null; then
+            echo "::error::PROJECT_TOKEN cannot access Pushpull Devroad. Use a classic token with project and public_repo scopes from an account with board write access."
+            exit 1
+          fi
+          node .github/scripts/fillProjectFields.mjs
