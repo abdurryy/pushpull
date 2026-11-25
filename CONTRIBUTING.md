@@ -69,6 +69,10 @@ When you let an agent commit, push, open PRs or merge for you:
 - **No co-author lines for AI tools**, and no "Generated with/Made with <tool>" lines in commits, PR titles, PR descriptions or comments. Check before you push and remove them.
 - **Never add an AI tool or bot account as a collaborator.**
 
+## CI
+
+Every pull request runs the **CI / Build** check ([.github/workflows/ci.yml](.github/workflows/ci.yml)): `npm ci`, `npm run lint` (if the script exists) and `npm run build`, plus a check that `vite.config.js` keeps `minify: false`. If it fails, open the check's log on the PR, fix it on your branch and push. Until the app is scaffolded it skips every step and passes.
+
 ## Deploying
 
 Deploy early and often (the course suggests Firebase Hosting). Don't deploy minified code: keep `minify: false` in `vite.config.js`.
