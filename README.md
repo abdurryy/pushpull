@@ -63,7 +63,7 @@ _Required in the mid-project review._
 
 **Done**
 - Picked the idea and wrote the project proposal
-- Set up the repo: automated CodeRabbit reviews and a protected `main` branch
+- Set up the repo: automated code reviews and a protected `main` branch
 
 **Planned**
 - Scaffold React + Vite and deploy early to Firebase Hosting
