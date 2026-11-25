@@ -1,6 +1,7 @@
 // Model: owns the keyboard demo state and starts the clock as a MobX side effect.
 import { makeAutoObservable, reaction } from "mobx";
-import { combineSticks, createRound, ROUND_SECONDS, stepRound, TICK_MS, timeOutRound } from "./doubleSnakeRules.js";
+import { combineSticks, createRound, ROUND_SECONDS, TICK_MS, timeOutRound } from "./doubleSnakeRules.js";
+import { roundWeather, weatherStep } from "./demoWeather.js";
 
 export const keyGroups = [
   { player: "A1", keys: ["W", "A", "S", "D"], codes: ["KeyW", "KeyA", "KeyS", "KeyD"] },
@@ -16,6 +17,8 @@ export const demoModel = makeAutoObservable({
   seconds: ROUND_SECONDS,
   deadline: 0,
   roundNumber: 0,
+  ticks: 0,
+  weather: null,
 
   get playing() {
     return Boolean(this.round && !this.round.outcome);
@@ -39,11 +42,13 @@ export const demoModel = makeAutoObservable({
     return Boolean(first && second && !combineSticks(first, second));
   },
 
-  startRound() {
+  startRound(weatherResult) {
     if (this.playing) return;
     this.pressed = [];
     this.seconds = ROUND_SECONDS;
     this.deadline = performance.now() + ROUND_SECONDS * 1000;
+    this.ticks = 0;
+    this.weather = roundWeather(weatherResult);
     this.round = createRound(this.round?.score);
     this.roundNumber += 1;
   },
@@ -64,6 +69,7 @@ export const demoModel = makeAutoObservable({
     this.round = null;
     this.seconds = ROUND_SECONDS;
     this.roundNumber = 0;
+    this.weather = null;
   },
 
   tick() {
@@ -72,7 +78,8 @@ export const demoModel = makeAutoObservable({
     if (this.seconds === 0) {
       this.round = timeOutRound(this.round);
     } else {
-      this.round = stepRound(this.round, this.inputs);
+      this.ticks += 1;
+      this.round = weatherStep(this.round, this.inputs, this.weather, this.ticks);
     }
   },
 }, {}, { autoBind: true });
