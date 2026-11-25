@@ -1,0 +1,9 @@
+{
+  "hosting": {
+    "site": "pushpull-1df2e",
+    "public": "dist",
+    "rewrites": [
+      { "source": "**", "destination": "/index.html" }
+    ]
+  }
+}
