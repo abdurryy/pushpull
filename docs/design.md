@@ -86,7 +86,7 @@ Rules:
 
 ## Motion
 
-**Snappy:** short and quick. `--duration-fast` (120ms) for presses and toggles, `--duration` (180ms) for panels and score changes, easing `--ease-out`. Nothing loops except loading indicators (`--duration-loading`, one spinner turn). When the device asks for reduced motion, every duration becomes 0, and the tokens file already handles this.
+**Snappy:** short and quick. `--duration-fast` (120ms) for presses and toggles, `--duration` (180ms) for panels and score changes, easing `--ease-out`. Nothing loops except loading indicators (`--duration-loading`, one spinner turn). When the device asks for reduced motion, every duration becomes 0 (including `--duration-loading`), and the tokens file already handles this.
 
 ## Components
 
@@ -111,11 +111,11 @@ Players watch the TV, not their phone. In remote-control party games, on-screen 
 
 1. **Act on press, not on release.** Start the action on `pointerdown`. A `click` only fires when the finger lifts, which feels slow.
 2. **Show the press instantly.** The pressed state appears with no transition: the button shrinks to `--press-scale` (0.92) and darkens. Only the release animates back (`--duration-fast`).
-3. **Buzz where the phone allows it.** Call `navigator.vibrate(20)` on each press. It works in Chrome on Android, but **Safari on iPhone has no web vibration at all**. A known workaround toggles a hidden `<input type="checkbox" switch>` to trigger the iPhone's haptic engine, but it is undocumented, only works on some iOS versions and may stop working, so we treat it as a bonus, never something we depend on.
+3. **Buzz where the phone allows it.** Call `navigator.vibrate()` with `--press-vibration-ms` (20) on each press. It works in Chrome on Android, but **Safari on iPhone has no web vibration at all**. A known workaround toggles a hidden `<input type="checkbox" switch>` to trigger the iPhone's haptic engine, but it is undocumented, only works on some iOS versions and may stop working, so we treat it as a bonus, never something we depend on.
 4. **Confirm from the TV.** When the TV has handled the action, the phone flashes a ring around the button, and the TV plays the action's sound. This is the "it counted" signal on iPhones that can't vibrate.
 5. **Show cooldowns.** If an action can't be used again yet, the button shows a ring that fills up and is dimmed until it's ready. A press during cooldown gives a short "no" buzz and a shake, not silence.
 6. **Big zones, not small buttons.** The visible buttons are at least `--controller-button` (72px) with `--controller-gap` (16px) between them. The **whole right half** of the screen is split into four zones, one per button, so a slightly missed press still counts. Each button has its Material Symbols icon and a short label under it: Dash `bolt`, Ping `radar`, Shed `content_cut`, Hold up `front_hand`.
-7. **Stick: drag anywhere on the left half.** Where the thumb lands becomes the centre, and a ring appears there. The drag direction is the input. A dead zone (12% of the ring) in the middle means "idle", which lets the teammate steer. Releasing the thumb sends idle at once.
+7. **Stick: drag anywhere on the left half.** Where the thumb lands becomes the centre, and a ring appears there. The drag direction is the input. A dead zone (`--stick-dead-zone`, 12% of the ring) in the middle means "idle", which lets the teammate steer. Releasing the thumb sends idle at once.
 8. **Stick and buttons at the same time.** Track each finger by its `pointerId` and use `setPointerCapture`, so a thumb sliding off a zone keeps steering, and a `pointercancel` resets the stick to idle.
 9. **Stop the browser from interfering:** `touch-action: none` (no scrolling, zoom or tap delay), `user-select: none`, `-webkit-touch-callout: none`, and block the long-press menu (`contextmenu`).
 10. **Keep the screen on and sideways.** Request a screen wake lock during a round. iPhones can't lock the orientation from a web page, so in portrait the controller shows "Turn your phone sideways" instead.
