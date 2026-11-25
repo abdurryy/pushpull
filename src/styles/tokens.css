@@ -72,7 +72,7 @@
   /* Motion: snappy */
   --duration-fast: 120ms;
   --duration: 180ms;
-  --duration-loading: 900ms;   /* one turn of a loading spinner */
+  --duration-loading: 900ms;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   /* Touch */

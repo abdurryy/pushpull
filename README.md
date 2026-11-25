@@ -80,6 +80,7 @@ Tip: in the browser console, `myModel` shows the current application state.
 _Required in the mid-project review._
 
 **Done**
+- Documented the design system and shared CSS tokens, including reduced motion
 - Picked the idea and wrote the project proposal
 - Set up the repo: automated code reviews, a protected `main` branch and CI that builds every pull request
 - Design system: [docs/design.md](docs/design.md) and the CSS tokens
