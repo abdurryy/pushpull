@@ -28,24 +28,41 @@ The first game mode is **Double Snake**: eat apples to grow and make the other t
 
 ## Getting started
 
-_Filled in when the app is scaffolded (React + Vite, see [minimal setup](docs/course/project/minimal-react-web-setup.md))._
+Needs Node.js 22 or newer.
 
 ```sh
 npm install
 npm run dev      # http://localhost:8080
+npm run build    # production build in dist/ (not minified, a course rule)
 ```
+
+Open http://localhost:8080 and pick **Use this screen as the TV**, or go straight to http://localhost:8080/#/tv. Type a city and press **Check weather** to see live data from Open-Meteo.
+
+Tip: in the browser console, `myModel` shows the current application state.
 
 ## Project structure
 
 ```
-├── src/                  # (created when we scaffold)
-│   ├── index.jsx         # bootstrapping: create the reactive model, mount the root
-│   ├── model/            # application state + side effects (persistence hooks in here)
-│   ├── presenters/       # one per screen: model ↔ view, handle custom events, no UI/CSS
-│   ├── views/            # UI only: render props, fire custom events, all JSX/CSS
-│   ├── styles/tokens.css # design tokens (colours, fonts, sizes) used by every View
-│   ├── api/              # talks to Open-Meteo and Open Trivia DB (like the lab's dishSource)
-│   └── persistence/      # Firebase config, auth, read/write of the model
+├── index.html                    # page shell: loads the fonts and icons, mounts src/index.jsx
+├── vite.config.js                # build config: port 8080, minify off (course rule)
+├── package.json                  # dependencies and npm scripts
+├── src/
+│   ├── index.jsx                 # bootstrapping: makes the model reactive (MobX), mounts the root
+│   ├── reactRoot.jsx             # navigation: maps each route (#/, #/tv) to its presenter
+│   ├── model/
+│   │   ├── PushPullModel.js      # application state and one action per user action
+│   │   └── resolvePromise.js     # keeps a promise's data/error in the model (lab pattern)
+│   ├── api/
+│   │   ├── weatherSource.js      # Open-Meteo: find a city, get its wind, rain and day/night
+│   │   └── triviaSource.js       # Open Trivia DB: tie-break questions
+│   ├── presenters/               # one per screen: model ↔ view, one model method per event
+│   │   ├── homePresenter.jsx     # start screen
+│   │   └── weatherPresenter.jsx  # weather check on the TV
+│   ├── views/                    # UI only: render props, fire onXxx events, all JSX and CSS
+│   │   ├── homeView.jsx/.css     # pick this device's role
+│   │   └── weatherView.jsx/.css  # city search with loading, empty and error states
+│   ├── styles/tokens.css         # design tokens (colours, fonts, sizes) used by every View
+│   └── persistence/              # (coming) Firebase config, auth, read/write of the model
 ├── docs/
 │   ├── INDEX.md          # map of all docs, start here
 │   ├── design.md         # design system: look, components, controller rules
@@ -64,12 +81,14 @@ _Required in the mid-project review._
 
 **Done**
 - Picked the idea and wrote the project proposal
-- Set up the repo: automated code reviews and a protected `main` branch
+- Set up the repo: automated code reviews, a protected `main` branch and CI that builds every pull request
+- Design system: [docs/design.md](docs/design.md) and the CSS tokens
+- App skeleton: React + Vite, MobX model with actions, hash routes, API module for Open-Meteo and Open Trivia DB
+- First API data on screen: the TV shows the live weather for a city, with loading, empty and error states
 
 **Planned**
-- Scaffold React + Vite and deploy early to Firebase Hosting
+- Deploy early to Firebase Hosting
 - MobX model with the game rules, plus Firebase login and per-user persistence
-- API module for Open-Meteo and Open Trivia DB
 - Screens on the phone: log in, join a room, controller, profile and stats
 - Screens on the TV: lobby, game board, round results
 - First user test with paper controllers
