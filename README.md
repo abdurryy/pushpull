@@ -6,6 +6,8 @@ A party game for four friends, two teams and one shared screen. Group project fo
 
 **Keyboard demo:** Open `#/demo` on the shared computer. Four players can try Double Snake using one keyboard.
 
+**Phone controller preview:** Open [the controller](https://pushpull.live/#/play/controller), turn the phone sideways, and tap **Enter controller**. When browser fullscreen is unavailable, open it from the Home Screen to remove the browser address bar. The phone still controls its system bars and gestures. This preview tests touch input locally while room sync is being built.
+
 ## About
 
 Push/Pull turns any big screen with a browser into a game console and every phone into a controller. Four players split into two teams. **Both players in a team steer the same character with their own joystick.** The app adds the two inputs together: pushing the same way moves the character, opposite ways cancel out, and an idle stick lets the partner steer. Each player also has four buttons, such as dash, that act on their own.
