@@ -83,7 +83,7 @@ Every task follows the same steps, in this order:
 
 1. **Issue.** Reuse the issue for the task if there is one (`gh issue list`). Otherwise create one: `gh issue create --title "<what>" --body "<what to do and when it's done>"`.
 2. **Branch** from an up-to-date `main`, named after the issue: `feature/<issue>-<thing>`, `fix/<issue>-<thing>` or `docs/<issue>-<thing>`.
-3. **Pull request** into `main` with `Closes #<issue>` in the description: `gh pr create --base main --body "Closes #<issue> ..."`.
+3. **Push the branch, then open a pull request** into `main` with `Closes #<issue>` in the description: `git push -u origin <branch>`, then `gh pr create --base main --title "<what changed>" --body "Closes #<issue> ..."`.
 4. **Auto-merge** on that PR right after creating it: `gh pr merge <pr> --auto --merge`. GitHub merges it by itself once CodeRabbit's check has passed, CodeRabbit has approved and all threads are resolved.
 
 Rules for that flow:

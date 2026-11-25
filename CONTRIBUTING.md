@@ -15,7 +15,7 @@ npm install      # only if package.json changed
 
 1. **Open an issue** for the task: what to do and when it's done. Use the issue template.
 2. **Create a branch from `main`** that starts with the issue number: `feature/<issue>-<thing>`, `fix/<issue>-<thing>` or `docs/<issue>-<thing>`, e.g. `feature/12-search-view`.
-3. **Open a pull request into `main`** and write `Closes #<issue>` in the description (the PR template has the line). The issue then closes when the PR merges. Keep PRs small: they get reviewed faster.
+3. **Push the branch** (`git push -u origin <branch>`), then **open a pull request into `main`** and write `Closes #<issue>` in the description (the PR template has the line). The issue then closes when the PR merges. Keep PRs small: they get reviewed faster.
 4. **Turn on auto-merge** right away: the "Enable auto-merge" button on the PR, or `gh pr merge <pr> --auto --merge`.
 5. **CodeRabbit reviews automatically.** It requests changes when it finds problems and approves once they are fixed.
 6. **Teammates are welcome to review**, but their approval isn't required.
