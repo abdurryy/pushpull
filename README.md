@@ -4,6 +4,8 @@ A party game for four friends, two teams and one shared screen. Group project fo
 
 **Live app:** [pushpull.live](https://pushpull.live)
 
+**Keyboard demo:** Open `#/demo` on the shared computer. Four players can try Double Snake using one keyboard.
+
 ## About
 
 Push/Pull turns any big screen with a browser into a game console and every phone into a controller. Four players split into two teams. **Both players in a team steer the same character with their own joystick.** The app adds the two inputs together: pushing the same way moves the character, opposite ways cancel out, and an idle stick lets the partner steer. Each player also has four buttons, such as dash, that act on their own.
@@ -96,6 +98,7 @@ _Required in the mid-project review._
 - App skeleton: React + Vite, MobX model with actions, hash routes, API module for Open-Meteo and Open Trivia DB
 - First API data on screen: the TV shows the live weather for a city, with loading, empty and error states
 - Homepage: explains Double Snake and lets visitors choose the shared screen or phone
+- Local Double Snake demo: shared keyboard, two teams, apples, crashes, timer and replay
 - Firebase project and Google sign-in on the phone (`#/play/login`)
 
 **Planned**
