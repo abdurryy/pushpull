@@ -81,6 +81,9 @@
   --controller-button: 72px;
   --controller-gap: 16px;
   --press-scale: 0.92;
+  /* Controller behaviour, read in JS with getComputedStyle(document.documentElement).getPropertyValue(...) */
+  --press-vibration-ms: 20;     /* navigator.vibrate length for a button press */
+  --stick-dead-zone: 0.12;      /* share of the stick ring that counts as idle */
 }
 
 /* Reduced motion: every animation becomes instant */
