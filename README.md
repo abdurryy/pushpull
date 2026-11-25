@@ -21,7 +21,7 @@ The first game mode is **Double Snake**: eat apples to grow and make the other t
 |---|---|---|
 | Casper Waller | CasperWaller | |
 | Abdurrahman Giumale | abdurryy | |
-| Faraz Ahmad | | |
+| Faraz Ahmad | faraz539 | |
 | Aryan Masiul | aryanmasiul007 | |
 
 "Owns" means the presenter/view pairs, model, API module, persistence or auth that this person is responsible for. See [CONTRIBUTING.md](CONTRIBUTING.md).
