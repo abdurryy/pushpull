@@ -18,13 +18,13 @@ npm install      # only if package.json changed
 3. **Open a pull request into `main`** and write `Closes #<issue>` in the description (the PR template has the line). The issue then closes when the PR merges. Keep PRs small: they get reviewed faster.
 4. **Turn on auto-merge** right away: the "Enable auto-merge" button on the PR, or `gh pr merge <pr> --auto --merge`.
 5. **CodeRabbit reviews automatically.** It requests changes when it finds problems and approves once they are fixed.
-6. **One teammate reviews and approves** too.
+6. **Teammates are welcome to review**, but their approval isn't required.
 7. **GitHub merges the PR by itself** when all of these are true:
    - the `CodeRabbit` check has passed
-   - you have **2 approvals** (CodeRabbit + a teammate)
+   - CodeRabbit has approved
    - every review thread is resolved
 
-   Pushing new commits removes the earlier approvals, so CodeRabbit and the teammate look at the latest version. Auto-merge stays on and waits for the new approvals.
+   Pushing new commits removes the earlier approval, so CodeRabbit looks at the latest version. Auto-merge stays on and waits for the new approval.
 
 Handling CodeRabbit comments:
 
@@ -82,10 +82,10 @@ Every time you test with users (paper mock-up or deployed app), add a file in [d
 Use a **GitHub.com** repo. CodeRabbit Cloud doesn't connect to KTH's own GitHub server. The course accepts a public GitHub repo that the TAs can access.
 
 1. **Install CodeRabbit** on the repo (coderabbit.ai → sign in with GitHub → add the repo). It reads [.coderabbit.yaml](.coderabbit.yaml).
-   - Automatic Approvals requires CodeRabbit's **Essentials plan or higher**. Check that your plan, or a student/open-source offer, includes it. Without it, CodeRabbit still reviews, but it can't approve, so you'd need 2 human approvals.
+   - Automatic Approvals requires CodeRabbit's **Essentials plan or higher**. Check that your plan, or a student/open-source offer, includes it. Without it, CodeRabbit still reviews but can't approve, so a teammate has to approve instead.
 2. **Protect `main`:** in the repo go to Settings → Rules → Rulesets → New ruleset → **Import a ruleset**, and pick [.github/rulesets/protect-main.json](.github/rulesets/protect-main.json). It sets:
    - no deletion and no force-push
-   - PRs required, with 2 approvals and stale approvals dismissed on new commits
+   - PRs required, with 1 approval (CodeRabbit's) and stale approvals dismissed on new commits
    - all review threads resolved
    - the `CodeRabbit` status check must pass
    - enforcement **Active** with an **empty bypass list**, so admins can't skip it either
