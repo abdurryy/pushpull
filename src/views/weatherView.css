@@ -84,27 +84,6 @@
   gap: var(--space-3);
 }
 
-.weather-spinner {
-  width: 1em;
-  height: 1em;
-  border-radius: var(--radius-round);
-  border: var(--space-1) solid var(--color-line);
-  border-top-color: var(--color-ink);
-  animation: weather-spin var(--duration-loading) linear infinite;
-}
-
-@keyframes weather-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .weather-spinner {
-    animation: none;
-  }
-}
-
 .weather-error {
   display: flex;
   flex-wrap: wrap;
