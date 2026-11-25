@@ -45,11 +45,17 @@ jobs:
         if: steps.app.outputs.exists == 'true'
         run: npm run build
 
-      # The course forbids deploying minified code
+      # The course forbids deploying minified code. Ask Vite for the build setting it will
+      # actually use, so comments or a missing config file can't fool the check.
       - name: Check that minify stays off
-        if: steps.app.outputs.exists == 'true' && hashFiles('vite.config.js') != ''
+        if: steps.app.outputs.exists == 'true'
         run: |
-          grep -Eq "minify:[[:space:]]*false" vite.config.js || {
-            echo "vite.config.js must keep 'minify: false' (course rule)."
-            exit 1
-          }
+          node --input-type=module -e "
+            import { resolveConfig } from 'vite';
+            const config = await resolveConfig({}, 'build');
+            if (config.build.minify !== false) {
+              console.error('vite.config.js must set build.minify to false (course rule). Found: ' + config.build.minify);
+              process.exit(1);
+            }
+            console.log('build.minify is false');
+          "
