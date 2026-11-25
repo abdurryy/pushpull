@@ -63,6 +63,7 @@ npm run dev      # http://localhost:8080
 _Required in the mid-project review._
 
 **Done**
+- Documented the design system and shared CSS tokens, including reduced motion
 - Picked the idea and wrote the project proposal
 - Set up the repo: automated code reviews and a protected `main` branch
 
