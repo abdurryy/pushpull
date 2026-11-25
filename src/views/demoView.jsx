@@ -20,6 +20,19 @@ function outcomeText(outcome) {
   return "Team B wins the round!";
 }
 
+function renderWeatherStatus(status, city) {
+  if (status === "loading") return <><PushMark variant="searching" /> Looking up weather…</>;
+  if (status === "error") return "Weather is unavailable. Try again or start without it.";
+  if (status === "done" && !city) return "No city found. Check the spelling or start without weather.";
+  if (city) return city + " weather is ready for the next round.";
+  return "Leave the city blank to play in ordinary conditions.";
+}
+
+function headPosition(snake, columns, rows) {
+  const head = snake.body[0];
+  return ((head.x + 0.5) / columns * 100) + "% " + ((head.y + 0.5) / rows * 100) + "%";
+}
+
 export function DemoView(props) {
   const arena = useRef(null);
   const { onClearKeys, onExit, playing } = props;
@@ -52,8 +65,13 @@ export function DemoView(props) {
 
   function keyDownACB(event) { handleKeyACB(event, true); }
   function keyUpACB(event) { handleKeyACB(event, false); }
+  function cityChangeACB(event) { props.onCityChange(event.target.value); }
+  function searchACB(event) {
+    event.preventDefault();
+    props.onSearch();
+  }
 
-  const { round, roundNumber, seconds } = props;
+  const { round, roundNumber, seconds, weather } = props;
   const score = round?.score || { a: 0, b: 0 };
 
   return (
@@ -75,9 +93,32 @@ export function DemoView(props) {
           {round && renderSnake(round.b, "b")}
           {round?.apple && <span className="demo-tile demo-apple" style={tilePosition(round.apple)} />}
         </div>
+        {playing && weather?.night && (
+          <div className="demo-night" aria-hidden="true" style={{
+            "--demo-head-a": headPosition(round.a, props.columns, props.rows),
+            "--demo-head-b": headPosition(round.b, props.columns, props.rows),
+          }} />
+        )}
         {!round && <p className="demo-overlay">Start a round to place both snakes on the board.</p>}
         {round?.outcome && <p className="demo-overlay" role="status">{outcomeText(round.outcome)}</p>}
       </div>
+      {playing && weather && (
+        <p className="demo-weather-summary">
+          {weather.city} · {weather.night ? "Night" : "Daylight"}
+          {weather.wet ? " · Wet: snakes slide one extra square" : " · Dry"}
+          {weather.wind ? " · Wind: apples drift " + weather.wind : " · Calm"}
+        </p>
+      )}
+      {!playing && (
+        <form className="demo-weather" onSubmit={searchACB}>
+          <label htmlFor="demo-city">Weather city (optional)</label>
+          <div className="demo-weather-form">
+            <input id="demo-city" value={props.cityQuery} onChange={cityChangeACB} />
+            <button type="submit" disabled={!props.cityQuery.trim() || props.weatherStatus === "loading"}>Check weather</button>
+          </div>
+          <p role="status">{renderWeatherStatus(props.weatherStatus, props.weatherCity)}</p>
+        </form>
+      )}
       <div className="demo-actions">
         {playing ? (
           <p key={roundNumber} className="demo-round" role="status">

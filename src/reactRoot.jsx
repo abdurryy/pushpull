@@ -9,7 +9,7 @@ import { DemoPresenter } from "./presenters/demoPresenter.jsx";
 function makeRouter(model) {
   return createHashRouter([
     { path: "/", element: <HomePresenter /> },
-    { path: "/demo", element: <DemoPresenter /> },
+    { path: "/demo", element: <DemoPresenter model={model} /> },
     // The shared screen. Shows the weather check for now; the lobby and game board come later.
     { path: "/tv", element: <WeatherPresenter model={model} /> },
     // The phone flow starts with logging in: Log in -> Join a room -> Controller.
