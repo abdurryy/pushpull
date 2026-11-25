@@ -22,7 +22,7 @@ npm install      # only if package.json changed
 7. **GitHub merges the PR by itself** when all of these are true:
    - the `CodeRabbit` check has passed
    - the PR has 1 approval: CodeRabbit gives it automatically when Automatic Approvals are available; otherwise, a teammate must approve
-   - nobody with write access has requested changes (CodeRabbit or a teammate). A change request keeps auto-merge waiting until it's fixed or withdrawn
+   - nobody with write access has requested changes (CodeRabbit or a teammate). A change request keeps auto-merge waiting. CodeRabbit clears its own after your fix; a teammate's only clears when they approve the new version or dismiss their review, so ask them to look again
 
    Pushing new commits removes the earlier approval, so CodeRabbit looks at the latest version.
 
