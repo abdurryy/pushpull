@@ -101,7 +101,8 @@ export function ControllerView({ onClear, onStick, onAction, direction, ...heldA
     const dx = event.clientX - pointer.startX;
     const dy = event.clientY - pointer.startY;
     const distance = Math.hypot(dx, dy);
-    const ratio = distance > pointer.radius ? pointer.radius / distance : 1;
+    const thumbTravel = pointer.radius / 2;
+    const ratio = distance > thumbTravel ? thumbTravel / distance : 1;
     setStick({ ...pointer.point, dx: dx * ratio, dy: dy * ratio });
     if (distance <= pointer.deadZone) {
       onStick("idle");
@@ -166,7 +167,7 @@ export function ControllerView({ onClear, onStick, onAction, direction, ...heldA
           <p>Try the stick and buttons on this phone.</p>
           {mode === "fallback" ? (
             <>
-              <p role="status">Fullscreen is unavailable here. Open Push/Pull from your Home Screen for a view without the browser address bar.</p>
+              <p role="status">Fullscreen is unavailable here. On iPhone, open this page in Safari and use Share → Add to Home Screen, then launch Push/Pull from the icon.</p>
               <button type="button" onClick={continueACB}>Continue in browser</button>
             </>
           ) : <button type="button" onClick={enterACB}>Enter controller</button>}
@@ -177,7 +178,7 @@ export function ControllerView({ onClear, onStick, onAction, direction, ...heldA
             onPointerDown={stickDownACB} onPointerMove={stickMoveACB} onPointerUp={stickReleaseACB}
             onPointerCancel={stickReleaseACB} onLostPointerCapture={stickReleaseACB}>
             <span className="controller-stick-ring" aria-hidden="true"
-              style={stick ? { left: stick.x, top: stick.y } : undefined}>
+              style={stick ? { "--stick-x": stick.x + "px", "--stick-y": stick.y + "px" } : undefined}>
               <span className="controller-stick-thumb"
                 style={stick ? { transform: "translate(" + stick.dx + "px, " + stick.dy + "px)" } : undefined} />
             </span>
