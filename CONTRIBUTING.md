@@ -21,10 +21,10 @@ npm install      # only if package.json changed
 6. **Teammates are welcome to review.** If the repository plan doesn't support Automatic Approvals, a teammate must approve the pull request; otherwise, CodeRabbit's approval is sufficient.
 7. **GitHub merges the PR by itself** when all of these are true:
    - the `CodeRabbit` check has passed
-   - the PR has 1 approval: CodeRabbit gives it automatically, and a teammate's approval counts too
+   - the PR has 1 approval: CodeRabbit gives it automatically when Automatic Approvals are available; otherwise, a teammate must approve
    - every review thread is resolved
 
-   Pushing new commits removes the earlier approval, so CodeRabbit looks at the latest version. Auto-merge stays on and waits for the new approval.
+   Pushing new commits removes the earlier approval, so CodeRabbit looks at the latest version.
 
 Handling CodeRabbit comments:
 
