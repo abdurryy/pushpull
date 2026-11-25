@@ -26,6 +26,15 @@
   align-content: center;
 }
 
+.home-demo-link {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--hit-min);
+  color: var(--color-ink);
+  font-weight: var(--weight-bold);
+}
+
 .home-title {
   display: grid;
   margin: 0;
