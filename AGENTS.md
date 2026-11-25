@@ -77,7 +77,7 @@ These rules don't depend on the look, so they apply now:
 
 ## Git, PRs and CodeRabbit
 
-`main` is protected. Every change goes through a pull request that needs the `CodeRabbit` check to pass, one approval, and all review threads resolved. CodeRabbit gives that approval automatically; a teammate's approval counts too, so no human approval is required.
+`main` is protected. Every change goes through a pull request that needs the `CodeRabbit` check to pass, one approval, and all review threads resolved. CodeRabbit gives that approval automatically if the repository plan supports Automatic Approvals; otherwise, a teammate must approve. A teammate's approval also counts when Automatic Approvals are available.
 
 Every task follows the same steps, in this order:
 
