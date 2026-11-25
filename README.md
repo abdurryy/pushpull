@@ -43,11 +43,12 @@ npm run dev      # http://localhost:8080
 │   ├── model/            # application state + side effects (persistence hooks in here)
 │   ├── presenters/       # one per screen: model ↔ view, handle custom events, no UI/CSS
 │   ├── views/            # UI only: render props, fire custom events, all JSX/CSS
+│   ├── styles/tokens.css # design tokens (colours, fonts, sizes) used by every View
 │   ├── api/              # talks to Open-Meteo and Open Trivia DB (like the lab's dishSource)
 │   └── persistence/      # Firebase config, auth, read/write of the model
 ├── docs/
 │   ├── INDEX.md          # map of all docs, start here
-│   ├── design.md         # design guidelines (filled in after the mock-ups)
+│   ├── design.md         # design system: look, components, controller rules
 │   ├── proposal.md       # idea brainstorm + our project proposal
 │   ├── user-testing/     # one file per user test (required for submission)
 │   └── course/           # course material from Canvas (reference, read-only)
@@ -79,7 +80,10 @@ _Required in the final submission: user-visible components written by others for
 
 Planned:
 - [react-qr-code](https://www.npmjs.com/package/react-qr-code): the QR code players scan to join a room
-- [react-joystick-component](https://www.npmjs.com/package/react-joystick-component): the stick on the phone controller
+
+Fonts and icons (Google Fonts):
+- [Unbounded](https://fonts.google.com/specimen/Unbounded) and [Atkinson Hyperlegible Next](https://fonts.google.com/specimen/Atkinson+Hyperlegible+Next)
+- [Material Symbols Rounded](https://fonts.google.com/icons): every icon in the app
 
 ## Credits
 
