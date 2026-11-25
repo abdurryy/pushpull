@@ -28,6 +28,12 @@ reviews:
     - "!docs/course/**"
 
   path_instructions:
+    - path: ".github/rulesets/**"
+      instructions: |
+        The merge rules are a deliberate team decision: 1 approval from anyone with write access
+        (CodeRabbit's or a teammate's), the CodeRabbit check, and resolved threads. Don't ask for
+        stricter or different approval rules. Only flag invalid JSON or rules that contradict
+        CONTRIBUTING.md.
     - path: "src/**/*.{js,jsx}"
       instructions: |
         This is a student course project. Every developer must be able to explain their code to a teacher.
