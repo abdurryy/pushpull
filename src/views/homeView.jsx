@@ -64,6 +64,7 @@ export function HomeView() {
               <span className="icon home-choice-arrow" aria-hidden="true">arrow_forward</span>
             </a>
           </nav>
+          <a className="home-demo-link" href="#/demo">Play the keyboard demo</a>
         </section>
 
         <figure className="home-preview">
