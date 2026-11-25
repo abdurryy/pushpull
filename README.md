@@ -2,7 +2,7 @@
 
 A party game for four friends, two teams and one shared screen. Group project for DH2642/ID2216 *Developing Mobile Applications*, KTH HT26.
 
-**Live app:** _not deployed yet_
+**Live app:** [pushpull-1df2e.web.app](https://pushpull-1df2e.web.app)
 
 ## About
 
@@ -99,7 +99,6 @@ _Required in the mid-project review._
 - Firebase project and Google sign-in on the phone (`#/play/login`)
 
 **Planned**
-- Deploy early to Firebase Hosting
 - MobX model with the game rules, plus per-user persistence in Firebase
 - Screens on the phone: log in, join a room, controller, profile and stats
 - Screens on the TV: lobby, game board, round results

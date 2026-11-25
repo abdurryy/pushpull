@@ -79,6 +79,8 @@ Every pull request runs the **CI / Build** check ([.github/workflows/ci.yml](.gi
 
 ## Deploying
 
+The Firebase Hosting workflow builds and publishes the app on every push to `main`. Pull requests from branches in this repository get a temporary preview link in a comment. The production site is linked in README. Preview links can be used to try the UI, and Google sign-in on a preview requires that its hostname be added to Firebase Authentication's authorized domains.
+
 Deploy early and often (the course suggests Firebase Hosting). Don't deploy minified code: keep `minify: false` in `vite.config.js`.
 
 ## User testing
