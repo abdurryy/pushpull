@@ -1,0 +1,55 @@
+# CI: install, lint and build the app on every pull request.
+# Every step skips while there's no package.json, so the check stays green until the app is scaffolded.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for app code
+        id: app
+        run: |
+          if [ -f package.json ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "No package.json yet, nothing to build."
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.app.outputs.exists == 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        if: steps.app.outputs.exists == 'true'
+        run: npm ci
+
+      - name: Lint
+        if: steps.app.outputs.exists == 'true'
+        run: npm run lint --if-present
+
+      - name: Build
+        if: steps.app.outputs.exists == 'true'
+        run: npm run build
+
+      # The course forbids deploying minified code
+      - name: Check that minify stays off
+        if: steps.app.outputs.exists == 'true' && hashFiles('vite.config.js') != ''
+        run: |
+          grep -Eq "minify:[[:space:]]*false" vite.config.js || {
+            echo "vite.config.js must keep 'minify: false' (course rule)."
+            exit 1
+          }
