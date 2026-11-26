@@ -1,6 +1,8 @@
 // Dev tool (not app code): saves screenshots of app routes at phone, laptop and TV sizes, so UI work can be checked by eye.
-// Usage:  node .agents/skills/ui-design/scripts/screenshot.mjs "#/tv" "#/play/login" [--js="myModel.findWeather()"]
-// Needs:  the dev server running (npm run dev) and Playwright (see SKILL.md, step 5).
+// Usage:  npm run shots -- "#/tv" "#/play/login" [--js="myModel.findWeather()"]
+// Options: --click="Enter controller" presses a button by its text first (repeat it for more, in order)
+//          --name=controller saves this run in its own folder (default: named after the first route)
+// Needs:  the dev server running (npm run dev) and Playwright's browser (see SKILL.md, step 5).
 import { createRequire } from "node:module";
 import { mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -24,29 +26,48 @@ function loadPlaywright() {
   try {
     return require("playwright");
   } catch {
-    console.error("Playwright is missing. Run: npm install --no-save playwright && npx playwright install chromium");
+    console.error("Playwright is missing. Run: npm install && npx playwright install chromium");
     process.exit(1);
   }
 }
 
-// Splits the command line into routes and an optional script to run in the page before the screenshot.
+// Splits the command line into routes and options: a script to run in the page, buttons to press, a folder name.
 function readArguments(args) {
-  const routes = [];
-  let pageScript = "";
+  const options = { routes: [], pageScript: "", clicks: [], name: "" };
   for (const arg of args) {
     if (arg.startsWith("--js=")) {
-      pageScript = arg.slice("--js=".length);
+      options.pageScript = arg.slice("--js=".length);
+    } else if (arg.startsWith("--click=")) {
+      options.clicks.push(arg.slice("--click=".length));
+    } else if (arg.startsWith("--name=")) {
+      options.name = arg.slice("--name=".length);
     } else {
-      routes.push(arg);
+      options.routes.push(arg);
     }
   }
-  if (routes.length === 0) routes.push("#/");
-  return { routes, pageScript };
+  if (options.routes.length === 0) options.routes.push("#/");
+  return options;
+}
+
+// "#/play/controller" becomes "play-controller", safe as a file or folder name.
+function safeName(text) {
+  return text.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() || "home";
 }
 
 function fileName(route, size) {
-  const routeName = route.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "home";
-  return routeName + "_" + size.name + ".png";
+  return safeName(route) + "_" + size.name + ".png";
+}
+
+// Presses buttons by their visible text, in order, to reach a state a model action can't (like the fullscreen controller).
+// A button that isn't shown at this size is skipped: the controller hides its setup in portrait, and that picture still helps.
+async function pressButtons(page, clicks, size) {
+  for (const text of clicks) {
+    try {
+      await page.getByRole("button", { name: text, exact: true }).first().click({ timeout: 3000 });
+    } catch {
+      console.log('  note: no "' + text + '" button to press at ' + size.name + ", so this picture shows the screen before it");
+    }
+  }
 }
 
 // Runs in the page: how far the content reaches compared with the window.
@@ -61,7 +82,7 @@ async function waitForFontsCB() {
   await document.fonts.ready;
 }
 
-async function screenshotRoute(browser, route, size, pageScript) {
+async function screenshotRoute(browser, route, size, options, folder) {
   const page = await browser.newPage({
     viewport: { width: size.width, height: size.height },
     isMobile: size.phone,
@@ -77,11 +98,12 @@ async function screenshotRoute(browser, route, size, pageScript) {
 
   await page.goto(new URL(route, BASE_URL).href, { waitUntil: "load" });
   await page.evaluate(waitForFontsCB);
-  if (pageScript) await page.evaluate(pageScript);
+  await pressButtons(page, options.clicks, size);
+  if (options.pageScript) await page.evaluate(options.pageScript);
   // Give React and any quick API answer a moment to show up.
   await page.waitForTimeout(800);
 
-  const path = join(FOLDER, fileName(route, size));
+  const path = join(folder, fileName(route, size));
   await page.screenshot({ path, fullPage: true });
   const measured = await page.evaluate(measurePageCB);
   await page.close();
@@ -93,15 +115,17 @@ async function screenshotRoute(browser, route, size, pageScript) {
 }
 
 async function main() {
-  const { routes, pageScript } = readArguments(process.argv.slice(2));
+  const options = readArguments(process.argv.slice(2));
   const { chromium } = loadPlaywright();
-  mkdirSync(FOLDER, { recursive: true });
+  // Each run gets its own folder, so the pictures of two scenarios never mix or overwrite each other.
+  const folder = join(FOLDER, safeName(options.name || options.routes[0]));
+  mkdirSync(folder, { recursive: true });
 
   const browser = await chromium.launch();
   try {
-    for (const route of routes) {
+    for (const route of options.routes) {
       for (const size of SIZES) {
-        await screenshotRoute(browser, route, size, pageScript);
+        await screenshotRoute(browser, route, size, options, folder);
       }
     }
   } catch (error) {

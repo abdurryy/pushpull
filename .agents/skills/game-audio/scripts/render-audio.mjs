@@ -1,7 +1,7 @@
 // Dev tool (not app code): renders every sound effect and music track to WAV files and prints how loud each one is.
 // Agents can't listen, so these numbers are their ears. People can open the WAV files and listen.
-// Usage:  node .agents/skills/game-audio/scripts/render-audio.mjs [names...]   e.g. "eat" "round"
-// Needs:  the dev server running (npm run dev) and Playwright (see the ui-design skill, step 5).
+// Usage:  npm run sounds -- [names...]   e.g. "eat" "round"
+// Needs:  the dev server running (npm run dev) and Playwright's browser (see the ui-design skill, step 5).
 import { createRequire } from "node:module";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -18,7 +18,7 @@ function loadPlaywright() {
   try {
     return require("playwright");
   } catch {
-    console.error("Playwright is missing. Run: npm install --no-save playwright && npx playwright install chromium");
+    console.error("Playwright is missing. Run: npm install && npx playwright install chromium");
     process.exit(1);
   }
 }

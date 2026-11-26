@@ -79,10 +79,10 @@ A normal screenshot catches an effect at a random moment, or not at all. Capture
 
 ```
 npm run dev   # keeps running: start it in its own terminal or in the background first
-node .agents/skills/game-feel/scripts/capture-frames.mjs "#/components" --click="Team A eats" --selector=".gallery-board"
+npm run frames -- "#/components" --click="Team A eats" --selector=".gallery-board"
 ```
 
-It presses the button, then moves time forward exactly: Playwright's paused fake clock drives the canvas, and every CSS animation is paused at the same time. It saves frames at 0, 60, 120, 200, 300 and 450ms, then one frame with reduced motion. Use `--js="..."` to start an effect with a model action instead of a click, and `--times="0,100,200"` for other times. Frames land in the system temp folder under `pushpull-frames`.
+It presses the button, then moves time forward exactly: Playwright's paused fake clock drives the canvas, and every CSS animation is paused at the same time. It saves frames at 0, 60, 120, 200, 300 and 450ms, then one frame with reduced motion. Use `--js="..."` to start an effect with a model action instead of a click, and `--times="0,100,200"` for other times. Frames land in the system temp folder under `pushpull-frames`, in a folder named after the button, or after `--name=<folder>`. `npm run frames:crash` captures the gallery's crash.
 
 Open the frames and check:
 

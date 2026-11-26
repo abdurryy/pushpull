@@ -11,17 +11,29 @@ npm install      # only if package.json changed
 
 ## One-time setup for the agent check scripts
 
-The skills' check scripts drive a real browser: the ui-design screenshots, the game-feel frame captures and the game-audio sound measurements (in `.agents/skills/*/scripts/`). They need Playwright and its Chromium. Install them once:
+The skills' check scripts drive a real browser: the ui-design screenshots, the game-feel frame captures and the game-audio sound measurements (in `.agents/skills/*/scripts/`). Playwright comes with `npm install`. Its Chromium is a separate download, once per computer:
 
 ```sh
-npm install --no-save playwright
 npx playwright install chromium
 ```
 
-- `--no-save` keeps Playwright out of `package.json`, so it isn't part of the app or the build.
-- A plain `npm install` removes it again. If a script then says "Playwright is missing", run the first command again. The browser stays downloaded, so it only takes a few seconds.
+- Playwright is a dev dependency at an exact version, so it isn't part of the app or the build, and everyone uses the same browser build. When `package.json` changes its version, run the command above again.
 - The scripts also need the dev server: keep `npm run dev` running in its own terminal while they run.
 - If your coding agent asks for permission to use the network for these commands, allow it.
+
+### Capture commands
+
+| Command | What it saves |
+|---|---|
+| `npm run shots -- "#/tv"` | Screenshots of one or more routes at small phone, phone, phone sideways, laptop and TV size |
+| `npm run shots:controller` | The controller after "Enter controller", with the stick and buttons showing |
+| `npm run frames -- "#/components" --click="Team A eats" --selector=".gallery-board"` | Frames of an effect over time, plus one with reduced motion |
+| `npm run frames:crash` | Frames of the crash on the gallery board |
+| `npm run sounds` | Every sound effect and music track as a WAV file, with loudness warnings |
+
+- `--click="Button text"` presses a button before the picture. Repeat it to press several, in order.
+- `--name=<folder>` saves the run in its own folder. Without it, screenshots go in a folder named after the route and frames in one named after the button. Each run prints where its files are (the system temp folder, under `pushpull-screenshots`, `pushpull-frames` or `pushpull-audio`).
+- In Git Bash, a route like `"#/tv"` turns into a Windows path before the script sees it. Start the command with `MSYS_NO_PATHCONV=1`, or use PowerShell.
 
 ## Git and pull requests
 
