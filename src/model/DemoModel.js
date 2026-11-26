@@ -10,6 +10,34 @@ export const keyGroups = [
   { player: "B2", keys: ["↑", "←", "↓", "→"], codes: ["ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"] },
 ];
 const directionsByKey = ["up", "left", "down", "right"];
+const KEPT_EVENTS = 8;
+
+// The teams whose snake crashed, from a round's outcome. A tie from a step means both crashed.
+function crashedTeams(outcome) {
+  if (outcome === "a") return ["b"];
+  if (outcome === "b") return ["a"];
+  return ["a", "b"];
+}
+
+// Game feel events (design.md): what one tick changed, for the board's effects and the sounds.
+function eventsBetween(before, after) {
+  const events = [];
+  ["a", "b"].forEach(function checkTeamCB(team) {
+    if (after[team].body.length > before[team].body.length) {
+      events.push({ kind: "eat", team, ...after[team].body[0] });
+    }
+  });
+  if (after.outcome && !before.outcome) {
+    crashedTeams(after.outcome).forEach(function addCrashCB(team) {
+      events.push({ kind: "crash", team, ...after[team].body[0] });
+    });
+  }
+  return events;
+}
+
+function outcomeEvent(outcome) {
+  return outcome === "tie" ? { kind: "tie" } : { kind: "win", team: outcome };
+}
 
 export const demoModel = makeAutoObservable({
   round: null,
@@ -19,6 +47,10 @@ export const demoModel = makeAutoObservable({
   roundNumber: 0,
   ticks: 0,
   weather: null,
+  events: [],
+  eventCount: 0,
+  crashed: [],
+  soundOn: true,
 
   get playing() {
     return Boolean(this.round && !this.round.outcome);
@@ -37,6 +69,26 @@ export const demoModel = makeAutoObservable({
     return Boolean(first && second && !combineSticks(first, second));
   },
 
+  // The board's view of the round: each snake with its team and whether it crashed.
+  get boardSnakes() {
+    const round = this.round;
+    const crashed = this.crashed;
+    if (!round) return [];
+    return ["a", "b"].map(function snakeForTeamCB(team) {
+      return { team, ...round[team], crashed: crashed.includes(team) };
+    });
+  },
+
+  get boardApples() {
+    return this.round?.apple ? [this.round.apple] : [];
+  },
+
+  // Each team's two sticks, so the board can show both teammates' directions.
+  get teamInputs() {
+    const [a1, a2, b1, b2] = this.inputs;
+    return { a: [a1, a2], b: [b1, b2] };
+  },
+
   get teamBCancelled() {
     const [, , first, second] = this.inputs;
     return Boolean(first && second && !combineSticks(first, second));
@@ -51,6 +103,22 @@ export const demoModel = makeAutoObservable({
     this.weather = roundWeather(weatherResult);
     this.round = createRound(this.round?.score);
     this.roundNumber += 1;
+    this.crashed = [];
+    this.addEvents([{ kind: "go" }]);
+  },
+
+  // Gives each event a new id (the board and the sounds play each id once) and keeps only the latest few.
+  addEvents(events) {
+    const firstId = this.eventCount + 1;
+    const numbered = events.map(function numberEventCB(event, index) {
+      return { ...event, id: firstId + index };
+    });
+    this.eventCount += events.length;
+    this.events = [...this.events, ...numbered].slice(-KEPT_EVENTS);
+  },
+
+  toggleSound() {
+    this.soundOn = !this.soundOn;
   },
 
   changeKey(code, down) {
@@ -75,12 +143,24 @@ export const demoModel = makeAutoObservable({
   tick() {
     if (!this.playing) return;
     this.seconds = Math.max(0, Math.ceil((this.deadline - performance.now()) / 1000));
+    const before = this.round;
     if (this.seconds === 0) {
       this.round = timeOutRound(this.round);
     } else {
       this.ticks += 1;
       this.round = weatherStep(this.round, this.inputs, this.weather, this.ticks);
     }
+    this.noteChanges(before, this.seconds === 0);
+  },
+
+  // Turns what a tick changed into Game feel events, and remembers which snakes crashed.
+  noteChanges(before, timeIsUp) {
+    const events = timeIsUp ? [] : eventsBetween(before, this.round);
+    if (events.some(function isCrashCB(event) { return event.kind === "crash"; })) {
+      this.crashed = crashedTeams(this.round.outcome);
+    }
+    if (this.round.outcome) events.push(outcomeEvent(this.round.outcome));
+    if (events.length) this.addEvents(events);
   },
 }, {}, { autoBind: true });
 

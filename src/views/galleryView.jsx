@@ -21,6 +21,23 @@ const SAMPLE_SNAKES = [
   { team: "b", heading: "left", body: [{ x: 13, y: 6 }, { x: 14, y: 6 }, { x: 15, y: 6 }, { x: 15, y: 5 }] },
 ];
 const SAMPLE_APPLES = [{ x: 10, y: 5 }, { x: 11, y: 9 }];
+// Team A's teammates push the same way (a double chevron), Team B's push apart (they cancel out).
+const SAMPLE_INPUTS = { a: ["right", "right"], b: ["up", "down"] };
+const SAMPLE_WEATHER = {
+  clear: null,
+  rain: { wet: true, wind: "right" },
+  wind: { wind: "left" },
+  night: { night: true },
+};
+const STEPS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+
+// Moves a sample snake one cell forward, wrapping at the edges, so the gallery can show the glide between ticks.
+function stepSnakeCB(snake) {
+  const [dx, dy] = STEPS[snake.heading];
+  const head = snake.body[0];
+  const next = { x: (head.x + dx + 20) % 20, y: (head.y + dy + 12) % 12 };
+  return { ...snake, body: [next, ...snake.body.slice(0, -1)] };
+}
 const COUNTDOWN_STEPS = ["3", "2", "1", "Go!", null];
 const TRACKS = ["lobby", "round", "trivia", "results"];
 
@@ -39,6 +56,8 @@ export function GalleryView() {
   const [soundOff, setSoundOff] = useState(false);
   const [track, setTrack] = useState(null);
   const [lastTenLayer, setLastTenLayer] = useState(false);
+  const [snakes, setSnakes] = useState(SAMPLE_SNAKES);
+  const [weatherName, setWeatherName] = useState("clear");
 
   function retryACB() { setRetryKind("loading"); }
   function addEvent(event) {
@@ -69,6 +88,12 @@ export function GalleryView() {
   }
 
   function toggleSoundACB() { setSoundOff(!soundOff); }
+  function stepSnakesACB() { setSnakes(snakes.map(stepSnakeCB)); }
+  function weatherClickACB(event) { setWeatherName(event.currentTarget.dataset.weather); }
+
+  function renderWeatherButtonCB(name) {
+    return <button key={name} type="button" data-weather={name} aria-pressed={weatherName === name} onClick={weatherClickACB}>{name}</button>;
+  }
   function trackClickACB(event) { setTrack(event.currentTarget.dataset.track); }
   function stopMusicACB() { setTrack(null); }
   function lastTenLayerACB() { setLastTenLayer(!lastTenLayer); }
@@ -140,7 +165,8 @@ export function GalleryView() {
           secondsLeft={secondsLeft}
         />
         <div className="gallery-board">
-          <GameBoard columns={20} rows={12} snakes={SAMPLE_SNAKES} apples={SAMPLE_APPLES} effects={events}
+          <GameBoard columns={20} rows={12} snakes={snakes} apples={SAMPLE_APPLES} effects={events}
+            inputs={SAMPLE_INPUTS} weather={SAMPLE_WEATHER[weatherName]} tickMs={240}
             label="Team A's snake is 5 long, Team B's is 4 long" />
           <Countdown value={COUNTDOWN_STEPS[countdownStep]} />
         </div>
@@ -148,11 +174,15 @@ export function GalleryView() {
           <button type="button" onClick={teamAEatsACB}>Team A eats</button>
           <button type="button" onClick={teamBEatsACB}>Team B eats</button>
           <button type="button" onClick={crashACB}>Crash</button>
+          <button type="button" onClick={stepSnakesACB}>Step snakes</button>
           <button type="button" onClick={scoreAACB}>Team A scores</button>
           <button type="button" onClick={scoreBACB}>Team B scores</button>
           <button type="button" onClick={nextSecondACB}>Next second</button>
           <button type="button" onClick={lastTenACB}>Last 10 seconds</button>
           <button type="button" onClick={countdownACB}>Next countdown step</button>
+        </div>
+        <div className="gallery-row">
+          {Object.keys(SAMPLE_WEATHER).map(renderWeatherButtonCB)}
         </div>
       </section>
 

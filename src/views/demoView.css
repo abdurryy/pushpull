@@ -67,26 +67,6 @@
   border-radius: var(--radius);
 }
 
-.demo-board {
-  display: grid;
-  grid-template: repeat(var(--demo-rows), minmax(0, 1fr)) / repeat(var(--demo-columns), minmax(0, 1fr));
-  aspect-ratio: var(--demo-columns) / var(--demo-rows);
-  border-radius: inherit;
-  background: radial-gradient(circle, var(--color-board-dot) 5%, transparent 6%) var(--color-board);
-  background-size: calc(100% / var(--demo-columns)) calc(100% / var(--demo-rows));
-}
-
-.demo-night {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  background: var(--color-ink);
-  mask-image: radial-gradient(circle at var(--demo-head-a), transparent var(--space-7), black var(--space-8)),
-    radial-gradient(circle at var(--demo-head-b), transparent var(--space-7), black var(--space-8));
-  mask-composite: intersect;
-}
-
 .demo-weather,
 .demo-weather-form {
   display: flex;
@@ -117,37 +97,6 @@
 .demo-weather-form button:not(:disabled) { cursor: pointer; }
 .demo-weather-form button:disabled { color: var(--color-muted); }
 
-.demo-tile {
-  margin: var(--tile-inset);
-  border-radius: var(--tile-radius);
-}
-
-.demo-apple {
-  margin: 26%;
-  border-radius: var(--radius-round);
-  background: var(--color-apple);
-}
-
-.demo-head {
-  position: relative;
-}
-
-.demo-head::before,
-.demo-head::after {
-  position: absolute;
-  right: 20%;
-  width: 16%;
-  aspect-ratio: 1;
-  border-radius: var(--radius-round);
-  background: var(--color-surface);
-  content: "";
-}
-
-.demo-head::before { top: 23%; }
-.demo-head::after { bottom: 23%; }
-.demo-head-up { transform: rotate(-90deg); }
-.demo-head-left { transform: rotate(180deg); }
-.demo-head-down { transform: rotate(90deg); }
 
 .demo-overlay {
   position: absolute;
