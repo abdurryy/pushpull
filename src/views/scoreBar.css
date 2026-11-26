@@ -1,0 +1,54 @@
+/* View styles: TV score bar (design.md, Components: Score bar). Uses only the TV text sizes. */
+.score-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-size: var(--tv-text);
+}
+
+.score-bar-team {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.score-bar-team-b {
+  justify-content: end;
+}
+
+.score-bar-score {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: var(--tv-score);
+  font-weight: var(--weight-display);
+  line-height: 1;
+  animation: pop var(--duration-effect) var(--ease-out);
+}
+
+.score-bar-middle {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+}
+
+.score-bar-title {
+  color: var(--color-muted);
+  font-weight: var(--weight-bold);
+}
+
+.score-bar-timer {
+  display: inline-block;
+  font-size: var(--tv-title);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+}
+
+.score-bar-warning {
+  color: var(--color-warning);
+  animation: pop var(--duration-effect) var(--ease-out);
+}

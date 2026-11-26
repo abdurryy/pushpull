@@ -136,3 +136,19 @@ body {
   font-family: var(--font-numbers);
   font-variant-numeric: tabular-nums;
 }
+
+/* Text for screen readers only, e.g. a room code spelled out letter by letter */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Shared effect: something that just changed grows once and settles (design.md, Game feel).
+   Replay it by giving the element a new React key, e.g. key={score}. */
+@keyframes pop {
+  40% { transform: scale(var(--pop-scale)); }
+}

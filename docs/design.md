@@ -170,6 +170,23 @@ Rules:
 - **Empty:** what's missing and what to do ("No games yet. Join a room to play your first one.").
 - **Error:** what went wrong and a button to try again. Use `--color-error` for the message, never for the whole screen.
 
+### Shared components
+
+Ready-made View components in `src/views/`. **Use them before writing your own**, and see every one in every state on `#/components` (the props to copy are in `galleryView.jsx`). If one is missing something, extend it in its own small PR instead of copying it.
+
+| Component | Props | For |
+|---|---|---|
+| `StatusMessage` | `kind` (`loading`, `waiting`, `searching`, `empty`, `success`, `error`), the sentence as children, `onRetry`, `retryLabel` | Every loading, empty and error state |
+| `TeamChip` | `team` (`"a"` or `"b"`), a name as children (default "Team A") | Anywhere a team is shown |
+| `TeamRoster` | `team`, `players` (`[{ id, name }]`), `seats` (default 2), `youId`, `name` | Lobby (#24), join (#25) |
+| `RoomCode` | `code` (empty shows four dots). Its size follows the parent's font size | Lobby (#24) |
+| `RoomCodeInput` | `value`, `onCodeChange(code)`, `disabled`, `invalid`, `label`. Put it inside a `<form>` so Enter submits | Join (#25) |
+| `ScoreBar` | `scoreA`, `scoreB`, `teamAName`, `teamBName`, `title`, `secondsLeft` | Game board (#28) |
+| `Countdown` | `value` (`"3"`, `"2"`, `"1"`, `"Go!"` or nothing). The parent needs `position: relative` | Game board (#28) |
+| `GameBoard` | `columns`, `rows`, `snakes` (`[{ team, heading, body }]`), `apples`, `effects` (`[{ id, kind: "eat" or "crash", team, x, y }]`), `label` | Game board (#28) |
+
+Every component sizes its text from the parent's font size, so the same piece works on the phone and, inside a parent with `font-size: var(--tv-text)`, on the TV.
+
 ### Controller (phone, landscape)
 
 Players watch the TV, not their phone. In remote-control party games, on-screen buttons often feel dead: nothing moves, nothing buzzes, and you can't tell whether a press counted. These rules make every press feel like it landed:

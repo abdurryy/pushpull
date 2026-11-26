@@ -1,0 +1,42 @@
+/* View styles: status lines. Sizes follow the parent's font size, so the same line works on a phone and a TV. */
+.status-message {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+}
+
+.status-message-text {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.status-message-loading,
+.status-message-waiting,
+.status-message-searching,
+.status-message-empty {
+  color: var(--color-muted);
+}
+
+.status-message-success { color: var(--color-success); }
+.status-message-error { color: var(--color-error); }
+
+.status-message-retry {
+  min-height: var(--hit-min);
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-sunken);
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.status-message-retry:active {
+  transform: scale(var(--press-scale));
+  transition: none;
+}
