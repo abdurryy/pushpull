@@ -12,6 +12,7 @@ This is a group project (4 developers) for KTH DH2642/ID2216 HT26 *Developing Mo
 ├── .coderabbit.yaml     ← CodeRabbit review rules
 ├── .github/rulesets/    ← GitHub branch protection for main (import in repo settings)
 ├── .github/ISSUE_TEMPLATE/, pull_request_template.md  ← issue and PR templates
+├── .agents/skills/ui-design/  ← UI skill: workflow, taste rules, screenshot script (.claude/skills/ui-design links here)
 ├── src/                 ← app code (not yet created; layout in README.md)
 └── docs/
     ├── INDEX.md         ← START HERE: map of all docs + deadlines + gaps
@@ -58,6 +59,8 @@ Full detail is in `docs/course/project/keeping-presenter-simple.md`.
 ## Design and UI
 
 **The design is decided: read `docs/design.md` before building any View.** Its values live in `src/styles/tokens.css`.
+
+**Before any UI work, read `.agents/skills/ui-design/SKILL.md` and follow its steps.** This applies to every new or changed View, CSS file, on-screen text, animation and UI review, even when your tool didn't load the skill by itself. Its short version: write the brief, use tokens only, design every state, then take screenshots with its script and look at them before you say you're done. If you couldn't take screenshots, say so.
 
 - **Tokens only.** Views use `var(--token)` for every colour, font, font size, spacing, radius, shadow and duration. Never a hex colour, font name or px font size in a View. If a value is missing, add a token (and a line in design.md) in its own small PR first.
 - **Flat, light Toy box look:** surfaces are separated by fill colour, not borders or shadows. Don't add new colours, fonts or effects.
