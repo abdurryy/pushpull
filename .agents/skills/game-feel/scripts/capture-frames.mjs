@@ -1,5 +1,6 @@
 // Dev tool (not app code): saves frames of an animation so an effect can be checked by eye, like a flipbook.
-// It presses a button (or runs a script), pauses every CSS animation and moves them to exact times before each picture.
+// It presses a button (or runs a script), then moves time forward exactly: Playwright's fake clock drives canvas drawing
+// (requestAnimationFrame, performance.now) and every CSS animation is paused and moved to the same time before each picture.
 // Usage:  node .agents/skills/game-feel/scripts/capture-frames.mjs "#/components" --click="Team A eats" --selector=".gallery-board"
 // Options: --js="code to run instead of a click"  --times="0,60,120,200,300,450" (milliseconds)
 // Needs:  the dev server running (npm run dev) and Playwright (see the ui-design skill, step 5).
@@ -43,7 +44,8 @@ function seekAnimationsCB(milliseconds) {
 
 async function trigger(page, options) {
   if (options.click) await page.getByRole("button", { name: options.click, exact: true }).click();
-  if (options.js) await page.evaluate(options.js);
+  // ";undefined" makes the script return nothing, so a returned promise that waits for the paused clock can't hang us.
+  if (options.js) await page.evaluate(options.js + ";undefined");
 }
 
 async function picture(page, options, path) {
@@ -54,9 +56,15 @@ async function picture(page, options, path) {
 
 async function openPage(browser, options, reducedMotion) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 }, reducedMotion });
+  await page.clock.install();
   await page.goto(new URL(options.route, BASE_URL).href, { waitUntil: "load" });
   await page.evaluate(async function waitForFontsCB() { await document.fonts.ready; });
   if (options.selector) await page.locator(options.selector).first().scrollIntoViewIfNeeded();
+  // Stop the clock: screenshots take real time, and a running clock would make every frame late.
+  const start = await page.evaluate(function nowCB() { return Date.now(); });
+  await page.clock.pauseAt(start + 500);
+  // Let the page draw its first frames before the effect starts.
+  await page.clock.runFor(300);
   return page;
 }
 
@@ -73,14 +81,17 @@ async function main() {
     // With motion: one frame per time.
     const page = await openPage(browser, options, "no-preference");
     await trigger(page, options);
+    let elapsed = 0;
     for (const time of options.times) {
+      await page.clock.runFor(Math.max(0, time - elapsed));
+      elapsed = Math.max(elapsed, time);
       await page.evaluate(seekAnimationsCB, time);
       await picture(page, options, join(FOLDER, "frame-" + String(time).padStart(4, "0") + "ms.png"));
     }
     // With reduced motion: the effect should add nothing on top of the normal change.
     const calmPage = await openPage(browser, options, "reduce");
     await trigger(calmPage, options);
-    await calmPage.waitForTimeout(50);
+    await calmPage.clock.runFor(100);
     await picture(calmPage, options, join(FOLDER, "frame-reduced-motion.png"));
   } catch (error) {
     const offline = error.message.includes("ERR_CONNECTION_REFUSED");

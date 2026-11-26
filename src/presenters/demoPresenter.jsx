@@ -1,7 +1,7 @@
 // Presenter: connects the keyboard demo view to its reactive round model.
 import { observer } from "mobx-react-lite";
 import { demoModel, keyGroups } from "../model/DemoModel.js";
-import { COLUMNS, ROWS } from "../model/doubleSnakeRules.js";
+import { COLUMNS, ROWS, TICK_MS } from "../model/doubleSnakeRules.js";
 import { promiseStatus } from "../model/resolvePromise.js";
 import { DemoView } from "../views/demoView.jsx";
 
@@ -14,6 +14,12 @@ export const DemoPresenter = observer(function DemoPresenter({ model }) {
   return (
     <DemoView
       round={demoModel.round}
+      snakes={demoModel.boardSnakes}
+      apples={demoModel.boardApples}
+      inputs={demoModel.teamInputs}
+      events={demoModel.events}
+      tickMs={TICK_MS}
+      soundOn={demoModel.soundOn}
       roundNumber={demoModel.roundNumber}
       seconds={demoModel.seconds}
       playing={demoModel.playing}
@@ -32,6 +38,7 @@ export const DemoPresenter = observer(function DemoPresenter({ model }) {
       onKeyChange={demoModel.changeKey}
       onClearKeys={demoModel.clearKeys}
       onExit={demoModel.leaveDemo}
+      onToggleSound={demoModel.toggleSound}
     />
   );
 });

@@ -81,7 +81,7 @@ Never call `playSound` from the model or a presenter.
 ## Step 6: Measure, then get a person to listen (mandatory)
 
 ```
-npm run dev
+npm run dev   # keeps running: start it in its own terminal or in the background first
 node .agents/skills/game-audio/scripts/render-audio.mjs            # everything
 node .agents/skills/game-audio/scripts/render-audio.mjs eat round  # only these
 ```

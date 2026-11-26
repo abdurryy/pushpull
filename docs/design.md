@@ -86,7 +86,7 @@ Rules:
 
 ## Motion
 
-**Snappy:** short and quick. `--duration-fast` (120ms) for presses and toggles, `--duration` (180ms) for panels and score changes, easing `--ease-out`. Loading indicators use `--duration-loading` (900ms). Nothing loops except loading indicators. Game events (eating, crashing, scoring) use the effect tokens in [Game feel](#game-feel). When the device asks for reduced motion, every duration becomes 0 (including `--duration-loading`), and the tokens file already handles this.
+**Snappy:** short and quick. `--duration-fast` (120ms) for presses and toggles, `--duration` (180ms) for panels and score changes, easing `--ease-out`. Loading indicators use `--duration-loading` (900ms). Nothing loops except loading indicators and the game board (see Game board below). Game events (eating, crashing, scoring) use the effect tokens in [Game feel](#game-feel). When the device asks for reduced motion, every duration becomes 0 (including `--duration-loading`), and the tokens file already handles this.
 
 ### Animated push mark
 
@@ -110,8 +110,8 @@ Every game event answers on three channels at once: something moves on the TV, t
 
 | Event | On the TV | TV sound | Phone |
 |---|---|---|---|
-| Apple eaten | The apple bursts into six dots in the team colour and a ring grows from its cell | `eat`: two quick rising wooden notes, a little higher for Team B | Short buzz for both teammates |
-| Snake crashes | A spark at the crashed head and the board shakes once | `crash`: a low thud that slides down | Long buzz for the team that crashed |
+| Apple eaten | The apple bursts into six dots in the team colour, a ring grows from its cell, and a bulge travels down the snake's body | `eat`: two quick rising wooden notes, a little higher for Team B | Short buzz for both teammates |
+| Snake crashes | A spark at the crashed head, the board shakes once, the snake flashes ink twice and its eyes turn to "x" | `crash`: a low thud that slides down | Long buzz for the team that crashed |
 | Score changes | The score number pops once | `point`: three rising notes | None |
 | Round starts | "3", "2", "1", "Go!" in the middle of the board, one per second | `count` on each number, `go` on "Go!" | Short buzz on "Go!" |
 | Last 10 seconds | The timer turns `--color-warning` and pops each second | `tick` each second, and the music adds its last-10-seconds layer | None |
@@ -163,7 +163,15 @@ Rules:
 
 **Team chips.** Team colour fill, `--radius`, text in the team's ink (`--color-team-a-ink` / `--color-team-b-ink`), always with the team name or a player name.
 
-**Game board.** `--color-board` with a dot on every cell (`--color-board-dot`). Snakes are rounded blocks in the team colour: each block is inset 8% in its cell with a 24% corner radius. The head has two white eyes facing the direction of travel. Apples are ink.
+**Game board.** The board is where the fun is, so it is the one place that is always a little alive. `GameBoard` draws it on a canvas (`src/views/boardPainter.js`), with colours and timings read from the tokens:
+
+- **Floor:** `--color-board` with a dot on every cell (`--color-board-dot`).
+- **Snakes** are creatures, not loose blocks: one continuous body in the team colour, 84% of a cell thick (8% space on each side, like `--tile-inset`) with round corners, a stripe of the team's soft colour along the back, and a round head with white eyes that blink now and then. The pupils look where the team is steering, even before the snake turns, so players see their input land at once. When teammates pull apart the snake goes cross-eyed, and a crashed snake gets "x" eyes. Eyes turn smoothly, never snap.
+- **Movement:** snakes glide from cell to cell over one tick instead of jumping.
+- **Apples** are ink, with a stalk, a leaf and a small white shine. They pop in when they appear and bob gently.
+- **Both teammates' sticks** show as ink chevrons by the head. Two the same way make a double chevron and opposite ones point apart, so everyone can see why a snake stopped.
+- **Weather from Open-Meteo is visible:** rain falls in slanted streaks, wind blows streaks the way the apples drift, and at night the board goes dark except for a light around each head.
+- **Reduced motion:** snakes jump cell to cell, and nothing moves on its own (no gliding, bobbing, blinking, rain, wind or effects). Night stays dark.
 
 **Score bar (TV).** A full-width bar on top, in `--font-display` 800 for scores and `--font-numbers` for the timer.
 
@@ -185,7 +193,7 @@ Ready-made View components in `src/views/`. **Use them before writing your own**
 | `RoomCodeInput` | `value`, `onCodeChange(code)`, `disabled`, `invalid`, `label`. Put it inside a `<form>` so Enter submits | Join (#25) |
 | `ScoreBar` | `scoreA`, `scoreB`, `teamAName`, `teamBName`, `title`, `secondsLeft` | Game board (#28) |
 | `Countdown` | `value` (`"3"`, `"2"`, `"1"`, `"Go!"` or nothing). The parent needs `position: relative` | Game board (#28) |
-| `GameBoard` | `columns`, `rows`, `snakes` (`[{ team, heading, body }]`), `apples`, `effects` (`[{ id, kind: "eat" or "crash", team, x, y }]`, other kinds are ignored), `label` | Game board (#28) |
+| `GameBoard` | `columns`, `rows`, `snakes` (`[{ team, heading, body, crashed, looking, torn }]`, where `looking` is the direction the team steers and `torn` means teammates pull apart), `apples`, `effects` (`[{ id, kind: "eat" or "crash", team, x, y }]`, other kinds are ignored), `inputs` (`{ a: [dir, dir], b: [dir, dir] }`), `weather` (`{ wet, wind, night }`), `tickMs`, `label`. Drawn on a canvas, see Game board above | Game board (#28) |
 | `SoundCues` | `cues`: the same event list as `GameBoard`. Plays each new `id` once; `kind` is a sound name from `src/sound/effects.js` | Every TV screen with events |
 | `MusicTrack` | `name` (`lobby`, `round`, `trivia`, `results` or nothing), `intensity` (1 in the last 10 seconds), `muted`. One per screen | Every TV screen |
 | `SoundToggle` | `muted`, `onToggle` | Every TV screen |

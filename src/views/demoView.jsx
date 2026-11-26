@@ -1,18 +1,11 @@
 // View: shows the local Double Snake board, keyboard controls, and round results.
 import { useEffect, useRef } from "react";
 import { PushMark } from "./pushMark.jsx";
+import { GameBoard } from "./gameBoard.jsx";
+import { SoundCues } from "./soundCues.jsx";
+import { MusicTrack } from "./musicTrack.jsx";
+import { SoundToggle } from "./soundToggle.jsx";
 import "./demoView.css";
-
-function tilePosition({ x, y }) {
-  return { gridColumn: x + 1, gridRow: y + 1 };
-}
-
-function renderSnake(snake, team) {
-  return snake.body.map(function renderTileCB(cell, index) {
-    const head = index === 0 ? " demo-head demo-head-" + snake.heading : "";
-    return <span key={cell.x + ":" + cell.y} className={"demo-tile demo-" + team + head} style={tilePosition(cell)} />;
-  });
-}
 
 function outcomeText(outcome) {
   if (outcome === "tie") return "Round tied.";
@@ -28,9 +21,18 @@ function renderWeatherStatus(status, city) {
   return "Leave the city blank to play in ordinary conditions.";
 }
 
-function headPosition(snake, columns, rows) {
-  const head = snake.body[0];
-  return ((head.x + 0.5) / columns * 100) + "% " + ((head.y + 0.5) / rows * 100) + "%";
+// The board is a picture, so screen readers get the same facts in words.
+function boardLabel(snakes) {
+  if (snakes.length === 0) return "Empty game board";
+  return snakes.map(function describeSnakeCB(snake) {
+    return "Team " + snake.team.toUpperCase() + "'s snake is " + snake.body.length + " long" + (snake.crashed ? " and crashed" : "");
+  }).join(", ");
+}
+
+// Round music while playing, the results track after a round, nothing before the first one.
+function musicFor(playing, round) {
+  if (playing) return "round";
+  return round?.outcome ? "results" : null;
 }
 
 export function DemoView(props) {
@@ -64,6 +66,12 @@ export function DemoView(props) {
     props.onKeyChange(event.code, down);
   }
 
+  // Clicking the sound button takes focus away from the board. During a round, give it back so the keys keep steering.
+  function toggleSoundACB() {
+    props.onToggleSound();
+    if (playing) arena.current?.focus();
+  }
+
   function keyDownACB(event) { handleKeyACB(event, true); }
   function keyUpACB(event) { handleKeyACB(event, false); }
   function cityChangeACB(event) { props.onCityChange(event.target.value); }
@@ -77,6 +85,8 @@ export function DemoView(props) {
 
   return (
     <main className="demo">
+      <MusicTrack name={musicFor(playing, round)} intensity={playing && seconds <= 10 ? 1 : 0} muted={!props.soundOn} />
+      <SoundCues cues={props.events} />
       <header className="demo-header">
         <a href="#/">Back to home</a>
         <h1>Double Snake demo</h1>
@@ -89,17 +99,17 @@ export function DemoView(props) {
       </div>
       <div className="demo-arena" ref={arena} tabIndex={playing ? 0 : -1} aria-label="Game board keyboard controls"
         onKeyDown={keyDownACB} onKeyUp={keyUpACB} onBlur={onClearKeys}>
-        <div className="demo-board" aria-hidden="true" style={{ "--demo-columns": props.columns, "--demo-rows": props.rows }}>
-          {round && renderSnake(round.a, "a")}
-          {round && renderSnake(round.b, "b")}
-          {round?.apple && <span className="demo-tile demo-apple" style={tilePosition(round.apple)} />}
-        </div>
-        {playing && weather?.night && (
-          <div className="demo-night" aria-hidden="true" style={{
-            "--demo-head-a": headPosition(round.a, props.columns, props.rows),
-            "--demo-head-b": headPosition(round.b, props.columns, props.rows),
-          }} />
-        )}
+        <GameBoard
+          columns={props.columns}
+          rows={props.rows}
+          snakes={props.snakes}
+          apples={props.apples}
+          effects={props.events}
+          inputs={playing ? props.inputs : {}}
+          weather={playing ? weather : null}
+          tickMs={props.tickMs}
+          label={boardLabel(props.snakes)}
+        />
         {!round && <p className="demo-overlay">Start a round to place both snakes on the board.</p>}
         {round?.outcome && <p className="demo-overlay" role="status">{outcomeText(round.outcome)}</p>}
       </div>
@@ -133,6 +143,7 @@ export function DemoView(props) {
         {playing && (props.teamACancelled || props.teamBCancelled) && (
           <span>{props.teamACancelled && "Team A stopped. "}{props.teamBCancelled && "Team B stopped."}</span>
         )}
+        <SoundToggle muted={!props.soundOn} onToggle={toggleSoundACB} />
       </div>
       <section className="demo-keys" aria-labelledby="demo-keys-title">
         <h2 id="demo-keys-title">Keyboard controls</h2>

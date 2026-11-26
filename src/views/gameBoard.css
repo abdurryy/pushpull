@@ -1,126 +1,13 @@
-/* View styles: the dotted board, rounded snake blocks with eyes, ink apples and short event effects (design.md). */
+/* View styles: the board's canvas fills its box at the board's own shape. The drawing itself is in boardPainter.js. */
 .game-board {
-  display: grid;
   width: 100%;
   aspect-ratio: var(--columns) / var(--rows);
 }
 
-/* Pieces and effects are two grids stacked on the same spot. */
-.game-board-layer {
-  display: grid;
-  grid-area: 1 / 1;
-  grid-template: repeat(var(--rows), minmax(0, 1fr)) / repeat(var(--columns), minmax(0, 1fr));
-}
-
-.game-board-pieces {
+.game-board-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
   border-radius: var(--radius);
-  background: radial-gradient(circle, var(--color-board-dot) 5%, transparent 6%) var(--color-board);
-  background-size: calc(100% / var(--columns)) calc(100% / var(--rows));
-}
-
-.game-board-effects {
-  pointer-events: none;
-}
-
-.game-board-tile {
-  margin: var(--tile-inset);
-  border-radius: var(--tile-radius);
-}
-
-.game-board-snake-a { background: var(--color-team-a); }
-.game-board-snake-b { background: var(--color-team-b); }
-
-.game-board-apple {
-  margin: 26%;
-  border-radius: var(--radius-round);
-  background: var(--color-apple);
-}
-
-/* The head's two white eyes look right; the heading class turns them the way the snake travels. */
-.game-board-head {
-  position: relative;
-}
-
-.game-board-head::before,
-.game-board-head::after {
-  position: absolute;
-  right: 20%;
-  width: 16%;
-  aspect-ratio: 1;
-  border-radius: var(--radius-round);
-  background: var(--color-surface);
-  content: "";
-}
-
-.game-board-head::before { top: 23%; }
-.game-board-head::after { bottom: 23%; }
-.game-board-head-up { transform: rotate(-90deg); }
-.game-board-head-left { transform: rotate(180deg); }
-.game-board-head-down { transform: rotate(90deg); }
-
-/* Effects: each one plays once, ends invisible, and is skipped with reduced motion (the tokens become 0). */
-.game-board-effect {
-  --effect-colour: var(--color-ink);
-  position: relative;
-}
-
-.game-board-effect-a { --effect-colour: var(--color-team-a); }
-.game-board-effect-b { --effect-colour: var(--color-team-b); }
-
-.game-board-ring,
-.game-board-dot {
-  position: absolute;
-  inset: 0;
-  animation: var(--duration-effect) var(--ease-out) both;
-}
-
-.game-board-ring {
-  border-radius: var(--radius-round);
-  background: radial-gradient(circle, transparent 50%, var(--effect-colour) 52%, var(--effect-colour) 66%, transparent 68%);
-  animation-name: game-board-ring;
-}
-
-.game-board-dot {
-  animation-name: game-board-burst;
-}
-
-.game-board-dot::after {
-  position: absolute;
-  top: 39%;
-  left: 39%;
-  width: 22%;
-  aspect-ratio: 1;
-  border-radius: var(--radius-round);
-  background: var(--effect-colour);
-  content: "";
-}
-
-.game-board-crash .game-board-dot::after {
-  width: 14%;
-  top: 43%;
-  left: 43%;
-}
-
-.game-board-shake {
-  animation: game-board-shake var(--duration-effect) var(--ease-out);
-}
-
-/* Fully visible for the first half, then fade, so the effect reads before it goes. */
-@keyframes game-board-ring {
-  from { transform: scale(0.4); }
-  50% { opacity: 1; }
-  to { opacity: 0; transform: scale(1.6); }
-}
-
-@keyframes game-board-burst {
-  from { transform: rotate(var(--angle)) translateX(0); }
-  50% { opacity: 1; }
-  to { opacity: 0; transform: rotate(var(--angle)) translateX(var(--burst-distance)); }
-}
-
-@keyframes game-board-shake {
-  20% { transform: translateX(var(--shake-distance)); }
-  40% { transform: translateX(calc(var(--shake-distance) * -1)); }
-  60% { transform: translateX(calc(var(--shake-distance) / 2)); }
-  80% { transform: translateX(calc(var(--shake-distance) / -2)); }
+  background: var(--color-board);
 }
