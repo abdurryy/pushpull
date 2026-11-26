@@ -377,55 +377,62 @@ function paintHead(frame, snake, colour) {
   });
 }
 
-// A small tile of staggered, rounded scale edges. The team fill is part of the tile
-// so the body and the swallow bulge can use the same pattern without a clipping layer.
-function makeSkin(context, colour, scaleColour) {
-  const tile = document.createElement("canvas");
-  tile.width = tile.height = 48;
-  const skin = tile.getContext("2d");
-  skin.scale(tile.width, tile.height);
-  skin.fillStyle = colour;
-  skin.fillRect(0, 0, 1, 1);
-  skin.strokeStyle = scaleColour;
-  skin.globalAlpha = 0.23;
-  skin.lineWidth = 0.047;
-  skin.lineCap = "round";
-  skin.beginPath();
-  for (const y of [0.12, 0.62]) {
-    const offset = y < 0.5 ? 0 : 0.25;
-    // The curve on the tile's left edge finishes on the next copy at the right edge.
-    for (const x of [-offset + 0.25, -offset + 0.75, -offset + 1.25]) {
-      skin.moveTo(x - 0.19, y);
-      skin.bezierCurveTo(x - 0.16, y + 0.08, x - 0.08, y + 0.24, x, y + 0.24);
-      skin.bezierCurveTo(x + 0.08, y + 0.24, x + 0.16, y + 0.08, x + 0.19, y);
+// Each row follows the direction of the nearby body, so the curves turn with the snake.
+function paintScaleRow(frame, point, angle, offsets) {
+  const { context, cell } = frame;
+  atWrappedPoint(frame, point, cell * 0.38, function addScaleRowAtEdgeCB() {
+    context.save();
+    context.translate(point.x, point.y);
+    context.rotate(angle);
+    context.scale(cell, cell);
+    for (const side of offsets) {
+      context.moveTo(0, side - 0.088);
+      context.quadraticCurveTo(0.24, side, 0, side + 0.088);
     }
-  }
-  skin.stroke();
-  return { pattern: context.createPattern(tile, "repeat"), size: tile.width };
+    context.restore();
+  });
 }
 
-function skinForSnake(frame, snake, colour) {
-  if (snake.flashing) return colour;
-  const { context, cell, palette, skins } = frame;
-  const skin = skins[snake.team] ??= makeSkin(context, colour, palette.teamSoft[snake.team]);
-  const head = snake.points[0];
-  // One tile spans a cell, so the scale spacing and phase agree at the wrap seam.
-  skin.pattern.setTransform(new DOMMatrix([cell / skin.size, 0, 0, cell / skin.size, head.x, head.y]));
-  return skin.pattern;
+function paintScales(frame, snake) {
+  if (snake.flashing) return;
+  const { context, cell, palette, boardWidth, boardHeight } = frame;
+  context.strokeStyle = palette.teamSoft[snake.team];
+  context.globalAlpha = 0.23;
+  context.lineWidth = cell * 0.041;
+  context.lineCap = "round";
+  context.beginPath();
+  for (let index = 1; index < snake.points.length; index += 1) {
+    const from = snake.points[index - 1];
+    const to = snake.points[index];
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const stepX = dx - acrossSeam(dx, boardWidth, cell);
+    const stepY = dy - acrossSeam(dy, boardHeight, cell);
+    const length = Math.hypot(stepX, stepY);
+    // Skip very short links while a new tail segment grows in or a turn compresses it.
+    if (length < cell * 0.5 || length > cell * 1.5) continue;
+    const angle = Math.atan2(stepY, stepX);
+    const link = [from, to];
+    // The neck starts with one row, leaving space around the face.
+    if (index > 1) paintScaleRow(frame, pointAlong(frame, link, 0.27), angle, [-0.13, 0.13]);
+    paintScaleRow(frame, pointAlong(frame, link, 0.73), angle, [-0.23, 0, 0.23]);
+  }
+  context.stroke();
+  context.globalAlpha = 1;
 }
 
 function paintSnake(frame, snake) {
   const { context, cell, palette } = frame;
   const colour = snake.flashing ? palette.ink : palette.team[snake.team];
-  const skin = skinForSnake(frame, snake, colour);
-  strokeBody(frame, snake.points, cell * palette.bodyWidth, skin);
+  strokeBody(frame, snake.points, cell * palette.bodyWidth, colour);
   snake.swallows.forEach(function paintSwallowCB(fraction) {
     const point = pointAlong(frame, snake.points, fraction);
     const radius = cell * (0.46 + 0.08 * Math.sin(fraction * Math.PI));
     atWrappedPoint(frame, point, radius, function paintSwallowAtEdgeCB() {
-      circle(context, point.x, point.y, radius, skin);
+      circle(context, point.x, point.y, radius, colour);
     });
   });
+  paintScales(frame, snake);
   paintHead(frame, snake, colour);
 }
 
@@ -544,7 +551,6 @@ export function paintBoard(context, memory, palette, now, calm) {
   const frame = {
     context,
     palette,
-    skins: memory.skins ??= {},
     now,
     calm,
     width: canvas.width,
