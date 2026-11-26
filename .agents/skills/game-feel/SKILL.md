@@ -18,13 +18,13 @@ Read with it: `docs/design.md` (Game feel, Motion, Shared components) and `src/s
 5. Team colour for team events, ink for neutral ones. Bigger event, bigger effect.
 6. No full-screen flashes, and nothing flashes more than three times a second.
 7. Reduced motion turns the effect tokens to 0. The effect must then end invisible, and the game must still make sense.
-8. CSS keyframes on `transform` and `opacity`, with tokens for every colour and duration. No JavaScript animation loops.
+8. On the board, effects are drawn by `boardPainter.js` in GameBoard's one animation loop. Everywhere else, CSS keyframes on `transform` and `opacity`. Tokens for every colour and duration, and no extra timers per effect.
 9. Look at the frames before you say you're done (step 6).
 
 ## Step 1: Load the context
 
 1. design.md: the Game feel table and its rules, Motion, Shared components.
-2. `src/views/gameBoard.jsx` and `.css`: the burst, spark and shake are the house style. Copy their pattern.
+2. `src/views/boardPainter.js`: the board's burst, swallow bulge, crash flash and shake are the house style for board effects. Copy their pattern: a function that gets the effect's age and draws it, fully visible for the first half, then fading. For effects outside the board, the `pop` keyframes in tokens.css and `scoreBar.css` are the pattern.
 3. Open `#/components` and press the board buttons to see the existing effects.
 4. If the event is new, check with the model owner (README Team table) that the model will emit it (#27 is the game model).
 
@@ -53,18 +53,19 @@ If the model doesn't emit the event yet, say so and ask the model owner. Don't d
 | Effect | How | Use for |
 |---|---|---|
 | Pop | Give the element a new React `key` when the value changes and `animation: pop var(--duration-effect) var(--ease-out)` (the `pop` keyframes are in tokens.css). It needs `display: inline-block` | Score, timer, seat filled, any number that changed |
-| Burst | Up to eight dots, each with `--angle`, flying `--burst-distance` and fading (see `.game-board-dot`) | Something collected or gained |
-| Ring | A circle that grows from 0.4 to 1.6 and fades (see `.game-board-ring`) | Marks where something happened |
-| Shake | A wrapper whose `key` changes per event, moving `--shake-distance` back and forth | Crashes only. Never for small events |
+| Burst | Up to eight dots flying `--burst-distance` and fading (`paintBurst` in boardPainter.js) | Something collected or gained |
+| Ring | A circle that grows and fades (also in `paintBurst`) | Marks where something happened |
+| Travel | A shape moving along the snake's body (`pointAlong`, used for the swallow bulge) | Something passing through a snake |
+| Shake | The whole board moving `--shake-distance` back and forth, fading (`shakeOffset`) | Crashes only. Never for small events |
 | Enter | `opacity` from 0 and `transform: scale()` or `translateY()` into place, `animation-fill-mode: both` | Countdown numbers, banners, new things on screen |
 | Flash | One or two changes of fill colour, never the whole screen | Confirming a phone press on its button (Controller rule 4) |
 
 Timing:
 
 - Arrivals use `--ease-out`: fast start, soft landing. The biggest change happens at the start, which is when the eye needs it.
-- Keep an effect fully visible for the first half, then fade (see the `50% { opacity: 1; }` step in gameBoard.css). An effect that starts fading at once is gone before anyone sees it.
+- Keep an effect fully visible for the first half, then fade (see `paintBurst`). An effect that starts fading at once is gone before anyone sees it.
 - Several particles may be staggered by up to 40ms. More than that feels slow.
-- Effects sit in their own layer with `pointer-events: none` and `aria-hidden="true"`, so they never block a press or confuse a screen reader.
+- Effects outside the board sit in their own layer with `pointer-events: none` and `aria-hidden="true"`, so they never block a press or confuse a screen reader. On the board they are part of the canvas picture, and the board's `label` says what matters in words.
 
 ## Step 5: Pair it
 
@@ -81,7 +82,7 @@ npm run dev
 node .agents/skills/game-feel/scripts/capture-frames.mjs "#/components" --click="Team A eats" --selector=".gallery-board"
 ```
 
-It presses the button, pauses every CSS animation and saves frames at 0, 60, 120, 200, 300 and 450ms, then one frame with reduced motion. Use `--js="..."` to start an effect with a model action instead of a click, and `--times="0,100,200"` for other times. Frames land in the system temp folder under `pushpull-frames`.
+It presses the button, then moves time forward exactly: Playwright's paused fake clock drives the canvas, and every CSS animation is paused at the same time. It saves frames at 0, 60, 120, 200, 300 and 450ms, then one frame with reduced motion. Use `--js="..."` to start an effect with a model action instead of a click, and `--times="0,100,200"` for other times. Frames land in the system temp folder under `pushpull-frames`.
 
 Open the frames and check:
 
@@ -101,7 +102,7 @@ If something fails, fix it and capture again. If you can't run a browser, say so
 | Shake on every apple | Shake only on crashes |
 | Effects longer than half a second | `--duration-effect`, fully visible for the first half |
 | Full-screen flashes or blinking | A local ring, burst or pop |
-| Effects drawn with `setTimeout` or `requestAnimationFrame` | CSS keyframes, replayed with a new `key` |
+| A `setTimeout` or animation loop per effect | Board: a draw function in boardPainter.js. Elsewhere: CSS keyframes, replayed with a new `key` |
 | Hard-coded colours, sizes or durations in keyframes | Tokens (`--effect-colour` set from team tokens) |
 | Animating `width`, `top` or `margin` | `transform` and `opacity` |
 | The View comparing old and new boards to spot events | Events from the model, animated by `id` |
