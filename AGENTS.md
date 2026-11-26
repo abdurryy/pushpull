@@ -26,7 +26,7 @@ This is a group project (4 developers) for KTH DH2642/ID2216 HT26 *Developing Mo
 
 ## Skills: read the matching one first
 
-Skills are step-by-step guides with checks and scripts, in `.agents/skills/<name>/SKILL.md` (`.claude/skills/<name>` links to the same folder). **Before you start a task, find every skill below that matches it, read its SKILL.md and follow it**, even when your tool didn't load it by itself. Say in your report which skills you used.
+Skills are step-by-step guides with checks and scripts, in `.agents/skills/<name>/SKILL.md` (the entry points in `.claude/skills/` refer to the same guides). **Before you start a task, find every skill below that matches it, read its SKILL.md and follow it**, even when your tool didn't load it by itself. Say in your report which skills you used.
 
 | Skill | Read it before |
 |---|---|
