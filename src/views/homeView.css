@@ -1,17 +1,18 @@
-/* Homepage layout, device links, and a static board preview. */
+/* View styles: lay out the device choices and shared game board on the landing page. */
+
 .home {
   box-sizing: border-box;
-  max-width: calc(var(--phone-max-width) * 3);
+  max-width: var(--phone-max-width);
   margin-inline: auto;
-  padding: var(--space-5) var(--space-4) var(--space-7);
-  display: grid;
-  gap: var(--space-5);
+  padding: var(--space-5) max(var(--space-4), env(safe-area-inset-right))
+    max(var(--space-7), env(safe-area-inset-bottom)) max(var(--space-4), env(safe-area-inset-left));
 }
 
 .home-logo {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  margin-block-end: var(--space-2);
   font: var(--weight-display) var(--text-large) / 1.25 var(--font-display);
 }
 
@@ -19,20 +20,15 @@
 .home-intro,
 .home-choices {
   display: grid;
-  gap: var(--space-4);
+}
+
+.home-hero {
+  gap: var(--space-6);
 }
 
 .home-intro {
   align-content: center;
-}
-
-.home-demo-link {
-  justify-self: start;
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--hit-min);
-  color: var(--color-ink);
-  font-weight: var(--weight-bold);
+  gap: var(--space-4);
 }
 
 .home-title {
@@ -45,19 +41,24 @@
   max-width: 42ch;
   margin: 0;
   color: var(--color-muted);
-  font-size: var(--text-large);
+}
+
+.home-choices {
+  gap: var(--space-3);
+  max-width: var(--phone-max-width);
 }
 
 .home-choice {
-  box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
+  box-sizing: border-box;
   min-height: var(--hit-min);
   padding: var(--space-3);
   border-radius: var(--radius);
   background: var(--color-sunken);
   color: var(--color-ink);
+  font-weight: var(--weight-bold);
   text-decoration: none;
 }
 
@@ -66,38 +67,40 @@
   color: var(--color-surface);
 }
 
-.home-choice:hover strong {
+.home-choice:hover,
+.home-choice:active,
+.home-demo-link:active {
   text-decoration: underline;
-}
-
-.home-choice > .icon {
-  flex: none;
-  font-size: var(--text-title);
-}
-
-.home-choice-text {
-  display: grid;
-  gap: var(--space-1);
-  min-width: 0;
+  text-decoration-thickness: var(--focus-offset);
 }
 
 .home-choice-arrow {
   margin-inline-start: auto;
 }
 
-.home-preview,
-.home-rules {
+.home-choice > .icon {
+  font-size: var(--text-large);
+}
+
+.home-demo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: var(--hit-min);
+  color: var(--color-ink);
+}
+
+.home-preview {
   display: grid;
   gap: var(--space-3);
+  min-width: 0;
   margin: 0;
   padding: var(--space-4);
   border-radius: var(--radius);
   background: var(--color-surface);
 }
 
-.home-preview figcaption,
-.home-rules h2 {
-  margin: 0;
+.home-preview figcaption {
   font: var(--weight-display) var(--text-large) / 1.25 var(--font-display);
 }
 
@@ -107,120 +110,59 @@
   gap: var(--space-2);
 }
 
-.home-team {
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-small);
-  font-weight: var(--weight-bold);
-}
-
-.home .team-a {
-  background-color: var(--color-team-a);
-  color: var(--color-team-a-ink);
-}
-
-.home .team-b {
-  background-color: var(--color-team-b);
-  color: var(--color-team-b-ink);
-}
-
-.home-board {
-  /* Keep the background dots centered in the ten by seven preview grid. */
-  display: grid;
-  grid-template: repeat(7, 1fr) / repeat(10, 1fr);
-  aspect-ratio: 10 / 7;
-  border-radius: var(--radius);
-  background-color: var(--color-board);
-  background-image: radial-gradient(circle, var(--color-board-dot) 5%, transparent 6%);
-  background-size: 10% calc(100% / 7);
-}
-
-.home-tile {
-  position: relative;
-  margin: var(--tile-inset);
-  border-radius: var(--tile-radius);
-}
-
-.home-tile.apple {
-  margin: 28%;
-  border-radius: var(--radius-round);
-  background: var(--color-apple);
-}
-
-.home-tile.head-right::before,
-.home-tile.head-right::after,
-.home-tile.head-left::before,
-.home-tile.head-left::after {
-  position: absolute;
-  width: 16%;
-  aspect-ratio: 1;
-  border-radius: var(--radius-round);
-  background: var(--color-surface);
-  content: "";
-}
-
-.home-tile.head-right::before,
-.home-tile.head-left::before { top: 23%; }
-
-.home-tile.head-right::after,
-.home-tile.head-left::after { bottom: 23%; }
-
-.home-tile.head-right::before,
-.home-tile.head-right::after { right: 20%; }
-
-.home-tile.head-left::before,
-.home-tile.head-left::after { left: 20%; }
-
-.home-rules ul {
-  display: grid;
-  gap: var(--space-4);
+.home-preview-copy {
   margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.home-rules li {
-  display: grid;
-  align-content: start;
-  gap: var(--space-1);
-}
-
-.home-rules li span {
   color: var(--color-muted);
+  text-wrap: pretty;
+}
+
+@media (45rem <= width < 60rem) and (orientation: landscape) {
+  .home-choices {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (min-width: 60rem) {
   .home {
-    padding: var(--space-6) var(--tv-safe) var(--space-7);
-    gap: var(--space-6);
+    display: grid;
+    align-content: center;
+    min-height: 100svh;
+    max-width: calc(var(--phone-max-width) * 4);
+    padding: var(--space-7) var(--tv-safe);
   }
 
   .home-hero {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
     align-items: center;
     gap: var(--space-7);
   }
 
   .home-title {
-    font-size: max(var(--text-hero), var(--tv-score));
+    font-size: max(var(--text-hero), var(--tv-title));
   }
 
-  .home-preview,
-  .home-rules,
-  .home-choice {
+  .home-logo {
+    margin-block-end: var(--space-4);
+  }
+
+  .home-preview {
     padding: var(--space-5);
-  }
-
-  .home-rules ul {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 80rem) and (orientation: landscape) {
   .home,
   .home-logo,
-  .home-lead,
   .home-preview figcaption,
-  .home-rules h2 {
+  .home-choice > .icon {
     font-size: var(--tv-text);
+  }
+
+  .home-title {
+    font-size: var(--tv-score);
+  }
+
+  .home-choice {
+    padding: var(--space-3) var(--space-4);
   }
 }
