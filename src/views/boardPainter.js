@@ -6,7 +6,6 @@ const DIRECTIONS = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y
 const ANGLES = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
 const TURN_MS = 70;        // eyes and head turn most of the way to a new direction in about this long
 const BODY_WIDTH = 0.84;   // snake thickness in cells: 8% space on each side, like --tile-inset
-const SWALLOW_MS = 600;    // how long a swallowed apple takes to travel from head to tail
 const MAX_SLIDE = 2.5;     // a part that moved further than this (a new round) jumps instead of sliding
 const RAIN_DROPS = 70;
 const WIND_STREAKS = 14;
@@ -24,7 +23,8 @@ export function readPalette(element) {
     apple: token("--color-apple"),
     team: { a: token("--color-team-a"), b: token("--color-team-b") },
     teamSoft: { a: token("--color-team-a-soft"), b: token("--color-team-b-soft") },
-    effectMs: parseFloat(token("--duration-effect")) || 0,
+    effectMs: parseFloat(token("--duration-effect")) || 0,   // bursts, the swallow bulge, the crash flash and shake
+    popMs: parseFloat(token("--duration")) || 0,              // a new apple popping in
     shake: parseFloat(token("--shake-distance")) || 0,
     burst: (parseFloat(token("--burst-distance")) || 0) / 100,
   };
@@ -49,7 +49,9 @@ function circle(context, x, y, radius, colour) {
   context.fill();
 }
 
-function strokePath(context, points, width, colour) {
+// Neighbouring body parts are never more than one cell apart, so a bigger gap means the snake crossed an edge:
+// start a new piece of line there instead of drawing straight across the board.
+function strokePath(context, points, width, colour, gap) {
   if (points.length < 2) return;
   context.strokeStyle = colour;
   context.lineWidth = width;
@@ -57,8 +59,10 @@ function strokePath(context, points, width, colour) {
   context.lineJoin = "round";
   context.beginPath();
   context.moveTo(points[0].x, points[0].y);
-  points.slice(1).forEach(function lineToCB(point) {
-    context.lineTo(point.x, point.y);
+  points.slice(1).forEach(function lineToCB(point, index) {
+    const before = points[index];
+    if (Math.hypot(point.x - before.x, point.y - before.y) > gap) context.moveTo(point.x, point.y);
+    else context.lineTo(point.x, point.y);
   });
   context.stroke();
 }
@@ -123,8 +127,7 @@ function runningEffects(memory, now, palette, calm) {
       return { ...effect, age: now - (memory.effectStarts.get(effect.id) ?? now) };
     })
     .filter(function isRunningCB(effect) {
-      const length = effect.kind === "eat" ? Math.max(SWALLOW_MS, palette.effectMs) : palette.effectMs;
-      return effect.age >= 0 && effect.age < length;
+      return effect.age >= 0 && effect.age < palette.effectMs;
     });
 }
 
@@ -174,7 +177,7 @@ function paintFloor(frame, board) {
 // An ink apple with a stalk, a leaf and a small shine. It pops in when it appears and bobs gently.
 function paintApple(frame, apple, bornAt) {
   const { context, cell, palette, now, calm } = frame;
-  const size = calm ? 1 : Math.max(0, popIn((now - bornAt) / 300));
+  const size = calm || !palette.popMs ? 1 : Math.max(0, popIn((now - bornAt) / palette.popMs));
   const bob = calm ? 0 : Math.sin(now / 450 + apple.x) * cell * 0.04;
   const centre = toPixels(frame, apple);
   const x = centre.x;
@@ -207,7 +210,7 @@ function prepareSnake(frame, memory, snake, progress, effects) {
   const ownEffects = effects.filter(function isOwnCB(effect) { return effect.team === snake.team; });
   const swallows = ownEffects
     .filter(function isEatCB(effect) { return effect.kind === "eat"; })
-    .map(function progressCB(effect) { return effect.age / SWALLOW_MS; })
+    .map(function progressCB(effect) { return effect.age / frame.palette.effectMs; })
     .filter(function isTravellingCB(fraction) { return fraction < 1; });
   const crash = ownEffects.find(function isCrashCB(effect) { return effect.kind === "crash"; });
   // Two flashes during the crash effect, well under three a second (design.md, Game feel rule 5).
@@ -265,9 +268,9 @@ function paintEyes(frame, snake) {
 function paintSnake(frame, snake) {
   const { context, cell, palette } = frame;
   const colour = snake.flashing ? palette.ink : palette.team[snake.team];
-  strokePath(context, snake.points, cell * BODY_WIDTH, colour);
+  strokePath(context, snake.points, cell * BODY_WIDTH, colour, cell * 1.5);
   context.globalAlpha = 0.55;
-  strokePath(context, snake.points.slice(1), cell * 0.18, palette.teamSoft[snake.team]);
+  strokePath(context, snake.points.slice(1), cell * 0.18, palette.teamSoft[snake.team], cell * 1.5);
   context.globalAlpha = 1;
   snake.swallows.forEach(function paintSwallowCB(fraction) {
     const point = pointAlong(snake.points, fraction);

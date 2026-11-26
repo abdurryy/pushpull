@@ -44,7 +44,8 @@ function seekAnimationsCB(milliseconds) {
 
 async function trigger(page, options) {
   if (options.click) await page.getByRole("button", { name: options.click, exact: true }).click();
-  if (options.js) await page.evaluate(options.js);
+  // ";undefined" makes the script return nothing, so a returned promise that waits for the paused clock can't hang us.
+  if (options.js) await page.evaluate(options.js + ";undefined");
 }
 
 async function picture(page, options, path) {

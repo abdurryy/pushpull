@@ -78,7 +78,7 @@ Timing:
 A normal screenshot catches an effect at a random moment, or not at all. Capture it frame by frame:
 
 ```
-npm run dev
+npm run dev   # keeps running: start it in its own terminal or in the background first
 node .agents/skills/game-feel/scripts/capture-frames.mjs "#/components" --click="Team A eats" --selector=".gallery-board"
 ```
 

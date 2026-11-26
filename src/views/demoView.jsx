@@ -66,6 +66,12 @@ export function DemoView(props) {
     props.onKeyChange(event.code, down);
   }
 
+  // Clicking the sound button takes focus away from the board. During a round, give it back so the keys keep steering.
+  function toggleSoundACB() {
+    props.onToggleSound();
+    if (playing) arena.current?.focus();
+  }
+
   function keyDownACB(event) { handleKeyACB(event, true); }
   function keyUpACB(event) { handleKeyACB(event, false); }
   function cityChangeACB(event) { props.onCityChange(event.target.value); }
@@ -137,7 +143,7 @@ export function DemoView(props) {
         {playing && (props.teamACancelled || props.teamBCancelled) && (
           <span>{props.teamACancelled && "Team A stopped. "}{props.teamBCancelled && "Team B stopped."}</span>
         )}
-        <SoundToggle muted={!props.soundOn} onToggle={props.onToggleSound} />
+        <SoundToggle muted={!props.soundOn} onToggle={toggleSoundACB} />
       </div>
       <section className="demo-keys" aria-labelledby="demo-keys-title">
         <h2 id="demo-keys-title">Keyboard controls</h2>
