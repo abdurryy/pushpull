@@ -43,7 +43,7 @@ const PREVIEW_INPUTS = { a: ["right", "right"], b: ["up", "down"] };
 export function HomeView(props) {
   function renderAccountAction() {
     if (!props.authChecked) {
-      return <StatusMessage>Checking your account…</StatusMessage>;
+      return <StatusMessage>Checking…</StatusMessage>;
     }
     if (props.user) {
       return (
@@ -73,19 +73,17 @@ export function HomeView(props) {
             <span>One snake.</span>
           </h1>
           <p className="home-lead">
-            A party game for four. Each pair uses their phones to steer one snake on the TV.
+            Four friends, one TV. Each pair steers a snake with their phones.
           </p>
 
           <nav className="home-choices" aria-label="Choose this device’s role">
             <a className="home-choice home-choice-primary" href="#/tv">
               <span className="icon" aria-hidden="true">tv</span>
-              This is the TV
-              <span className="icon home-choice-arrow" aria-hidden="true">arrow_forward</span>
+              Play on TV
             </a>
             <a className="home-choice" href="#/play/login">
               <span className="icon" aria-hidden="true">smartphone</span>
-              This is my phone
-              <span className="icon home-choice-arrow" aria-hidden="true">arrow_forward</span>
+              Use phone
             </a>
           </nav>
         </section>
@@ -106,13 +104,13 @@ export function HomeView(props) {
             inputs={PREVIEW_INPUTS}
             label="Team A steers its snake toward an apple. Team B’s two players steer in opposite directions, stopping their snake."
           />
-          <p className="home-preview-copy">Steer together to move. Steer apart to stop.</p>
+          <p className="home-preview-copy">Steer together. Pull apart to stop.</p>
         </figure>
       </div>
 
       <nav className="home-extras" aria-label="Demo and testing">
-        <a href="#/demo">Play the keyboard demo</a>
-        <a href="#/components">Test components and sound</a>
+        <a href="#/demo">Keyboard demo</a>
+        <a href="#/components">Component gallery</a>
       </nav>
     </main>
   );
