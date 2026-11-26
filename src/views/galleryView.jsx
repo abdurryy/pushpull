@@ -33,11 +33,26 @@ const SAMPLE_WEATHER = {
 const STEPS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 
 // Moves a sample snake one cell forward, wrapping at the edges, so the gallery can show the glide between ticks.
+// A crashed snake stays where it hit, as it does at the end of a real round.
 function stepSnakeCB(snake) {
+  if (snake.crashed) return snake;
   const [dx, dy] = STEPS[snake.heading];
   const head = snake.body[0];
   const next = { x: (head.x + dx + 20) % 20, y: (head.y + dy + 12) % 12 };
   return { ...snake, body: [next, ...snake.body.slice(0, -1)] };
+}
+
+function isTeamBCB(snake) { return snake.team === "b"; }
+
+// The board draws a crash from the snake itself (crossed-out eyes, no arrows), not from the effect.
+// In a real round the model sets this flag; here the Crash button does.
+function crashTeamBCB(snake) {
+  return isTeamBCB(snake) ? { ...snake, crashed: true } : snake;
+}
+
+// The board is a picture, so screen readers get the same facts in words (same wording as demoView.jsx).
+function describeSnakeCB(snake) {
+  return "Team " + snake.team.toUpperCase() + "'s snake is " + snake.body.length + " long" + (snake.crashed ? " and crashed" : "");
 }
 const COUNTDOWN_STEPS = ["3", "2", "1", "Go!", null];
 const TRACKS = ["lobby", "round", "trivia", "results"];
@@ -69,7 +84,14 @@ export function GalleryView() {
   }
   function teamAEatsACB() { addEvent({ kind: "eat", team: "a", x: 10, y: 5 }); }
   function teamBEatsACB() { addEvent({ kind: "eat", team: "b", x: 11, y: 9 }); }
-  function crashACB() { addEvent({ kind: "crash", team: "b", x: 13, y: 6 }); }
+  // The effect goes where Team B's head is now, which moves after Step snakes.
+  function crashACB() {
+    const head = snakes.find(isTeamBCB).body[0];
+    setSnakes(snakes.map(crashTeamBCB));
+    addEvent({ kind: "crash", team: "b", x: head.x, y: head.y });
+  }
+  // Only the snakes go back: the board and SoundCues remember event ids, so the event list keeps growing.
+  function resetSnakesACB() { setSnakes(SAMPLE_SNAKES); }
 
   function scoreAACB() {
     setScore({ a: score.a + 1, b: score.b });
@@ -184,7 +206,7 @@ export function GalleryView() {
           <GameBoard columns={20} rows={12} snakes={snakes} apples={SAMPLE_APPLES}
             effects={events.filter(function hasPositionCB(event) { return event.x !== undefined; })}
             inputs={SAMPLE_INPUTS} weather={SAMPLE_WEATHER[weatherName]} tickMs={240}
-            label="Team A's snake is 5 long, Team B's is 4 long" />
+            label={snakes.map(describeSnakeCB).join(", ")} />
           <Countdown value={COUNTDOWN_STEPS[countdownStep]} />
         </div>
         <div className="gallery-row">
@@ -192,6 +214,7 @@ export function GalleryView() {
           <button type="button" onClick={teamBEatsACB}>Team B eats</button>
           <button type="button" onClick={crashACB}>Crash</button>
           <button type="button" onClick={stepSnakesACB}>Step snakes</button>
+          <button type="button" onClick={resetSnakesACB}>Reset snakes</button>
           <button type="button" onClick={scoreAACB}>Team A scores</button>
           <button type="button" onClick={scoreBACB}>Team B scores</button>
           <button type="button" onClick={nextSecondACB}>Next second</button>
