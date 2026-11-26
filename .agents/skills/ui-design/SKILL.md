@@ -234,11 +234,13 @@ When a screen feels off and you don't know why, try these in order:
 ## Step 5: Look at it (mandatory)
 
 1. Start the dev server in the background: `npm run dev` (port 8080).
-2. Take screenshots: `node .agents/skills/ui-design/scripts/screenshot.mjs "#/your-route"`
+2. Take screenshots: `npm run shots -- "#/your-route"` (the same as `node .agents/skills/ui-design/scripts/screenshot.mjs "#/your-route"`)
    - Sizes: small phone 360×640, phone 390×844, phone sideways 844×390, laptop 1280×720 and TV 1920×1080. Reduced motion is on, so animations don't blur the picture.
    - It warns when a page scrolls sideways, when a TV-sized page scrolls at all, and when the page throws an error.
    - To see another state, run a model action first: `--js="myModel.setCityQuery('Stockholm'); myModel.findWeather()"`. `myModel` and `roomModel` are on `window` in dev. For a state that's hard to reach, change the starting value in the model locally, take the screenshot and **undo it before you commit**.
-   - First time only, if Playwright is missing: `npm install --no-save playwright` then `npx playwright install chromium`. `--no-save` keeps it out of package.json.
+   - For a state behind a button, press it first by its text: `--click="Enter controller"` (repeat for more, in order). `npm run shots:controller` does this for the controller. A size where the button isn't shown is skipped with a note.
+   - Each run saves into its own folder, named after the first route or `--name=<folder>`. The script prints the paths.
+   - First time only, if the browser is missing: `npx playwright install chromium`. Playwright itself comes with `npm install` (see CONTRIBUTING.md, one-time setup).
 3. **Open every image and look at it.** Write one sentence: what does the eye hit first? If it isn't the "Loudest thing" from your brief, fix that before anything else.
 4. Score it with the rubric below. Fix everything under 4, take new screenshots and score again. Stop after three rounds and report what is left.
 
