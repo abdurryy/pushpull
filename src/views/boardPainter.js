@@ -22,6 +22,7 @@ export function readPalette(element) {
     apple: token("--color-apple"),
     bodyWidth: 1 - 2 * parseFloat(token("--tile-inset")) / 100,
     team: { a: token("--color-team-a"), b: token("--color-team-b") },
+    teamSoft: { a: token("--color-team-a-soft"), b: token("--color-team-b-soft") },
     effectMs: parseFloat(token("--duration-effect")) || 0,   // bursts, the swallow bulge, the crash flash and shake
     popMs: parseFloat(token("--duration")) || 0,              // a new apple popping in
     shake: parseFloat(token("--shake-distance")) || 0,
@@ -376,15 +377,52 @@ function paintHead(frame, snake, colour) {
   });
 }
 
+// A small tile of offset, pointed scale edges. The team fill is part of the tile
+// so the body and the swallow bulge can use the same pattern without a clipping layer.
+function makeSkin(context, colour, scaleColour) {
+  const tile = document.createElement("canvas");
+  tile.width = tile.height = 48;
+  const skin = tile.getContext("2d");
+  skin.scale(tile.width, tile.height);
+  skin.fillStyle = colour;
+  skin.fillRect(0, 0, 1, 1);
+  skin.strokeStyle = scaleColour;
+  skin.globalAlpha = 0.32;
+  skin.lineWidth = 0.065;
+  skin.lineJoin = "round";
+  skin.beginPath();
+  for (const y of [-0.5, 0, 0.5, 1]) {
+    for (const x of [-0.5, 0, 0.5, 1]) {
+      const offset = y === 0 || y === 1 ? 0 : 0.25;
+      skin.moveTo(x + offset, y);
+      skin.quadraticCurveTo(x + offset + 0.04, y + 0.27, x + offset + 0.25, y + 0.5);
+      skin.quadraticCurveTo(x + offset + 0.46, y + 0.27, x + offset + 0.5, y);
+    }
+  }
+  skin.stroke();
+  return { pattern: context.createPattern(tile, "repeat"), size: tile.width };
+}
+
+function skinForSnake(frame, snake, colour) {
+  if (snake.flashing) return colour;
+  const { context, cell, palette, skins } = frame;
+  const skin = skins[snake.team] ??= makeSkin(context, colour, palette.teamSoft[snake.team]);
+  const head = snake.points[0];
+  // One tile spans a cell, so the scale spacing and phase agree at the wrap seam.
+  skin.pattern.setTransform(new DOMMatrix([cell / skin.size, 0, 0, cell / skin.size, head.x, head.y]));
+  return skin.pattern;
+}
+
 function paintSnake(frame, snake) {
   const { context, cell, palette } = frame;
   const colour = snake.flashing ? palette.ink : palette.team[snake.team];
-  strokeBody(frame, snake.points, cell * palette.bodyWidth, colour);
+  const skin = skinForSnake(frame, snake, colour);
+  strokeBody(frame, snake.points, cell * palette.bodyWidth, skin);
   snake.swallows.forEach(function paintSwallowCB(fraction) {
     const point = pointAlong(frame, snake.points, fraction);
     const radius = cell * (0.46 + 0.08 * Math.sin(fraction * Math.PI));
     atWrappedPoint(frame, point, radius, function paintSwallowAtEdgeCB() {
-      circle(context, point.x, point.y, radius, colour);
+      circle(context, point.x, point.y, radius, skin);
     });
   });
   paintHead(frame, snake, colour);
@@ -505,6 +543,7 @@ export function paintBoard(context, memory, palette, now, calm) {
   const frame = {
     context,
     palette,
+    skins: memory.skins ??= {},
     now,
     calm,
     width: canvas.width,
