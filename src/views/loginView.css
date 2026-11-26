@@ -58,6 +58,7 @@
 
 .login-button {
   display: inline-flex;
+  box-sizing: border-box;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
@@ -89,14 +90,6 @@
 .login-button-secondary {
   background: var(--color-sunken);
   color: var(--color-ink);
-}
-
-.login-error {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin: 0;
-  color: var(--color-error);
 }
 
 .login-user {

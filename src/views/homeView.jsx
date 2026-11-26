@@ -1,7 +1,9 @@
 // View: introduces Push/Pull and lets visitors choose this device's role.
 import "./homeView.css";
+import { AccountSignIn } from "./accountSignIn.jsx";
 import { GameBoard } from "./gameBoard.jsx";
 import { PushMark } from "./pushMark.jsx";
+import { StatusMessage } from "./statusMessage.jsx";
 import { TeamChip } from "./teamChip.jsx";
 
 // A sample turn shows one pair agreeing and the other pair pulling apart.
@@ -38,15 +40,34 @@ const PREVIEW_SNAKES = [
 const PREVIEW_APPLES = [{ x: 8, y: 2 }, { x: 5, y: 6 }];
 const PREVIEW_INPUTS = { a: ["right", "right"], b: ["up", "down"] };
 
-export function HomeView() {
+export function HomeView(props) {
+  function renderAccountAction() {
+    if (!props.authChecked) {
+      return <StatusMessage>Checking your account…</StatusMessage>;
+    }
+    if (props.user) {
+      return (
+        <a className="login-button login-button-secondary" href="#/profile">
+          <span className="icon" aria-hidden="true">account_circle</span>
+          View profile
+        </a>
+      );
+    }
+    return <AccountSignIn status={props.status} error={props.error} onSignIn={props.onSignIn} label="Sign in" secondary />;
+  }
+
   return (
     <main className="home">
+      <header className="home-header">
+        <div className="home-logo">
+          <PushMark variant="entry" />
+          PUSH/PULL
+        </div>
+        <div className="home-account">{renderAccountAction()}</div>
+      </header>
+
       <div className="home-hero">
         <section className="home-intro" aria-labelledby="home-title">
-          <header className="home-logo">
-            <PushMark variant="entry" />
-            PUSH/PULL
-          </header>
           <h1 id="home-title" className="home-title">
             <span>Two friends.</span>
             <span>One snake.</span>
@@ -67,18 +88,16 @@ export function HomeView() {
               <span className="icon home-choice-arrow" aria-hidden="true">arrow_forward</span>
             </a>
           </nav>
-          <nav className="home-extras" aria-label="Demo and testing">
-            <a href="#/demo">Play the keyboard demo</a>
-            <a href="#/components">Test components and sound</a>
-          </nav>
         </section>
 
         <figure className="home-preview">
-          <figcaption>Double Snake</figcaption>
-          <div className="home-teams">
-            <TeamChip team="a" />
-            <TeamChip team="b" />
-          </div>
+          <figcaption className="home-preview-header">
+            <span>Double Snake</span>
+            <div className="home-teams">
+              <TeamChip team="a" />
+              <TeamChip team="b" />
+            </div>
+          </figcaption>
           <GameBoard
             columns={14}
             rows={8}
@@ -90,6 +109,11 @@ export function HomeView() {
           <p className="home-preview-copy">Steer together to move. Steer apart to stop.</p>
         </figure>
       </div>
+
+      <nav className="home-extras" aria-label="Demo and testing">
+        <a href="#/demo">Play the keyboard demo</a>
+        <a href="#/components">Test components and sound</a>
+      </nav>
     </main>
   );
 }

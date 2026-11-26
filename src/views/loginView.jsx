@@ -1,29 +1,10 @@
 // View (phone): sign in with Google. Shows checking, signed-out, signing-in, error and signed-in states.
 import "./loginView.css";
+import { AccountSignIn } from "./accountSignIn.jsx";
 import { PushMark } from "./pushMark.jsx";
-
-// Firebase error codes turned into sentences a player understands.
-const ERROR_MESSAGES = {
-  "auth/popup-closed-by-user": "The sign-in window was closed before you finished.",
-  "auth/cancelled-popup-request": "The sign-in window was closed before you finished.",
-  "auth/popup-blocked": "Your browser blocked the sign-in window. Allow pop-ups for this site and try again.",
-  "auth/network-request-failed": "No connection to the sign-in service. Check your internet and try again.",
-  "auth/operation-not-allowed": "Google sign-in isn't switched on for this app yet.",
-  "auth/configuration-not-found": "Sign-in isn't set up for this app yet.",
-  "auth/missing-config": "Sign-in isn't set up for this app yet.",
-  "auth/unauthorized-domain": "Signing in isn't allowed from this web address yet.",
-};
-
-function errorMessage(error, signedIn) {
-  if (signedIn) return "Signing out didn't work. Try again.";
-  return ERROR_MESSAGES[error.code] || "Signing in didn't work. Try again.";
-}
+import { StatusMessage } from "./statusMessage.jsx";
 
 export function LoginView(props) {
-  function signInClickACB() {
-    props.onSignIn();
-  }
-
   function signOutClickACB() {
     props.onSignOut();
   }
@@ -50,10 +31,7 @@ export function LoginView(props) {
     return (
       <div className="login-card">
         <p className="login-text">Log in to keep your name, settings and stats.</p>
-        <button className="login-button" type="button" onClick={signInClickACB} disabled={props.status === "loading"}>
-          {props.status === "loading" ? <PushMark variant="loading" /> : <span className="icon" aria-hidden="true">login</span>}
-          {props.status === "loading" ? "Signing in…" : "Continue with Google"}
-        </button>
+        <AccountSignIn status={props.status} error={props.error} onSignIn={props.onSignIn} />
       </div>
     );
   }
@@ -78,12 +56,7 @@ export function LoginView(props) {
         PUSH/PULL
       </h1>
       {renderContent()}
-      {props.status === "error" && (
-        <p className="login-error" role="alert">
-          <PushMark variant="failure" />
-          {errorMessage(props.error, Boolean(props.user))}
-        </p>
-      )}
+      {props.user && props.status === "error" && <StatusMessage kind="error">Signing out didn't work. Try again.</StatusMessage>}
     </main>
   );
 }
