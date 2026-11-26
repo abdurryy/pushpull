@@ -101,6 +101,16 @@ Agents also have **skills**: step-by-step guides with checks and scripts in [.ag
 - **mvp-feature:** model, presenter, API and persistence work, with checks for the graded MVP rules.
 - **user-testing:** planning and writing up user tests, plus the writing rules for school text.
 
+### Agent models and usage
+
+The repo sets cheaper defaults so we don't run out of usage. Your personal settings still win.
+
+- **Claude Code** starts on `opusplan` (`.claude/settings.json`): Opus while planning, Sonnet while writing code. Override it for yourself in `.claude/settings.local.json` (ignored by git).
+- **Codex** uses medium reasoning (`.codex/config.toml`). If your Codex version doesn't read project config, put `model_reasoning_effort = "medium"` in `~/.codex/config.toml`.
+- **Step up only for hard issues** (`Difficulty: hard` in the issue): `/model opus` in Claude Code, or high reasoning in Codex. Switch back when the issue is done.
+- **One issue per session.** Start a fresh session (or `/clear`) for each issue. A long chat costs more on every message and gives worse answers.
+- If a cheap run comes out weak, step up and redo that part rather than running everything on the strongest model.
+
 When you let an agent commit, push, open PRs or merge for you:
 
 - It commits with **your** git identity.
