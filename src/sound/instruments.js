@@ -132,6 +132,6 @@ export const instruments = {
   },
 
   snip(output, time, frequency, volume) {
-    noise(output, time, { filter: "highpass", frequency: 5000, volume, decay: 0.04 });
+    noise(output, time, { filter: "highpass", frequency: 5000, volume, decay: 0.06 });
   },
 };
