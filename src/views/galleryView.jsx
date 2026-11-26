@@ -16,13 +16,14 @@ import { SoundCues } from "./soundCues.jsx";
 import { SOUND_NAMES } from "../sound/effects.js";
 import "./galleryView.css";
 
+// Team A's teammates both steer down, so its eyes already look down. Team B's pull apart, so it goes cross-eyed.
 const SAMPLE_SNAKES = [
-  { team: "a", heading: "right", body: [{ x: 7, y: 5 }, { x: 6, y: 5 }, { x: 5, y: 5 }, { x: 5, y: 6 }, { x: 5, y: 7 }] },
-  { team: "b", heading: "left", body: [{ x: 13, y: 6 }, { x: 14, y: 6 }, { x: 15, y: 6 }, { x: 15, y: 5 }] },
+  { team: "a", heading: "right", looking: "down", body: [{ x: 7, y: 5 }, { x: 6, y: 5 }, { x: 5, y: 5 }, { x: 5, y: 6 }, { x: 5, y: 7 }] },
+  { team: "b", heading: "left", torn: true, body: [{ x: 13, y: 6 }, { x: 14, y: 6 }, { x: 15, y: 6 }, { x: 15, y: 5 }] },
 ];
 const SAMPLE_APPLES = [{ x: 10, y: 5 }, { x: 11, y: 9 }];
 // Team A's teammates push the same way (a double chevron), Team B's push apart (they cancel out).
-const SAMPLE_INPUTS = { a: ["right", "right"], b: ["up", "down"] };
+const SAMPLE_INPUTS = { a: ["down", "down"], b: ["up", "down"] };
 const SAMPLE_WEATHER = {
   clear: null,
   rain: { wet: true, wind: "right" },

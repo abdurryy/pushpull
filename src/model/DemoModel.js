@@ -35,6 +35,11 @@ function eventsBetween(before, after) {
   return events;
 }
 
+// True when two teammates push opposite ways, so their snake stops.
+function sticksCancel(first, second) {
+  return Boolean(first && second && !combineSticks(first, second));
+}
+
 function outcomeEvent(outcome) {
   return outcome === "tie" ? { kind: "tie" } : { kind: "win", team: outcome };
 }
@@ -66,16 +71,26 @@ export const demoModel = makeAutoObservable({
 
   get teamACancelled() {
     const [first, second] = this.inputs;
-    return Boolean(first && second && !combineSticks(first, second));
+    return sticksCancel(first, second);
   },
 
-  // The board's view of the round: each snake with its team and whether it crashed.
+  // The board's view of the round: each snake with its team, whether it crashed, where its team is
+  // steering right now (its eyes look there before the next tick) and whether the teammates pull apart.
   get boardSnakes() {
     const round = this.round;
     const crashed = this.crashed;
+    const inputs = this.teamInputs;
     if (!round) return [];
     return ["a", "b"].map(function snakeForTeamCB(team) {
-      return { team, ...round[team], crashed: crashed.includes(team) };
+      const snake = round[team];
+      const [first, second] = inputs[team];
+      return {
+        team,
+        ...snake,
+        crashed: crashed.includes(team),
+        looking: combineSticks(first, second, snake.heading) || snake.heading,
+        torn: sticksCancel(first, second),
+      };
     });
   },
 
@@ -91,7 +106,7 @@ export const demoModel = makeAutoObservable({
 
   get teamBCancelled() {
     const [, , first, second] = this.inputs;
-    return Boolean(first && second && !combineSticks(first, second));
+    return sticksCancel(first, second);
   },
 
   startRound(weatherResult) {

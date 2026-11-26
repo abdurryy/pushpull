@@ -31,7 +31,7 @@ function rememberStarts(starts, keys, now) {
 
 export function GameBoard(props) {
   const canvas = useRef(null);
-  const memory = useRef({ board: null, previousBoard: null, changedAt: 0, effectStarts: new Map(), appleBirths: new Map() });
+  const memory = useRef({ board: null, previousBoard: null, changedAt: 0, effectStarts: new Map(), appleBirths: new Map(), faces: {} });
 
   // After every render: store the newest board. When the snakes moved, the old board becomes "previous" to slide from.
   useEffect(function rememberBoardACB() {

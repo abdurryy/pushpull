@@ -3,6 +3,8 @@
 // Colours and timings are read from the design tokens, so the canvas follows design.md just like the CSS does.
 
 const DIRECTIONS = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
+const ANGLES = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
+const TURN_MS = 70;        // eyes and head turn most of the way to a new direction in about this long
 const BODY_WIDTH = 0.84;   // snake thickness in cells: 8% space on each side, like --tile-inset
 const SWALLOW_MS = 600;    // how long a swallowed apple takes to travel from head to tail
 const MAX_SLIDE = 2.5;     // a part that moved further than this (a new round) jumps instead of sliding
@@ -86,6 +88,12 @@ function pointAlong(points, fraction) {
     remaining -= lengths[index];
   }
   return points[points.length - 1];
+}
+
+// Turns an angle a share of the way towards a target angle, the short way round.
+function turnTowards(angle, target, share) {
+  const difference = Math.atan2(Math.sin(target - angle), Math.cos(target - angle));
+  return angle + difference * share;
 }
 
 // --- Movement between ticks ---
@@ -204,14 +212,27 @@ function prepareSnake(frame, memory, snake, progress, effects) {
   const crash = ownEffects.find(function isCrashCB(effect) { return effect.kind === "crash"; });
   // Two flashes during the crash effect, well under three a second (design.md, Game feel rule 5).
   const flashing = Boolean(crash) && Math.floor(crash.age / (frame.palette.effectMs / 4)) % 2 === 0;
-  return { ...snake, points, swallows, flashing };
+  return { ...snake, points, swallows, flashing, face: turnFace(frame, memory, snake) };
+}
+
+// The head faces where the snake travels, and the pupils look where its team is steering. Both turn smoothly
+// instead of snapping, and remember their angle between frames (memory.faces).
+function turnFace(frame, memory, snake) {
+  const facing = ANGLES[snake.heading] ?? 0;
+  const looking = ANGLES[snake.looking] ?? facing;
+  const face = memory.faces[snake.team] || { facing, looking };
+  face.facing = turnTowards(face.facing, facing, frame.turnShare);
+  face.looking = turnTowards(face.looking, looking, frame.turnShare);
+  memory.faces[snake.team] = face;
+  return face;
 }
 
 function paintEyes(frame, snake) {
   const { context, cell, palette, now, calm } = frame;
   const head = snake.points[0];
-  const ahead = DIRECTIONS[snake.heading] || DIRECTIONS.right;
+  const ahead = { x: Math.cos(snake.face.facing), y: Math.sin(snake.face.facing) };
   const side = { x: -ahead.y, y: ahead.x };
+  const gaze = { x: Math.cos(snake.face.looking), y: Math.sin(snake.face.looking) };
   // Each team blinks at its own moment, for an eighth of a second every few seconds.
   const blinking = !calm && !snake.crashed && (now + (snake.team === "a" ? 0 : 1700)) % 3600 < 130;
   [-1, 1].forEach(function paintEyeCB(sideSign) {
@@ -233,7 +254,10 @@ function paintEyes(frame, snake) {
     context.beginPath();
     context.ellipse(x, y, cell * 0.13, blinking ? cell * 0.02 : cell * 0.13, 0, 0, Math.PI * 2);
     context.fill();
-    if (!blinking) circle(context, x + ahead.x * cell * 0.05, y + ahead.y * cell * 0.05, cell * 0.065, palette.ink);
+    if (blinking) return;
+    // Pupils look where the team steers. When teammates pull apart, each eye looks inwards: the snake goes cross-eyed.
+    const look = snake.torn ? { x: -side.x * sideSign, y: -side.y * sideSign } : gaze;
+    circle(context, x + look.x * cell * 0.06, y + look.y * cell * 0.06, cell * 0.065, palette.ink);
   });
 }
 
@@ -373,7 +397,10 @@ export function paintBoard(context, memory, palette, now, calm) {
     height: canvas.height,
     cell: canvas.width / board.columns,
     pixelRatio: canvas.width / (canvas.clientWidth || canvas.width),
+    // How far faces turn this frame: all the way with reduced motion, otherwise a share based on the time since the last frame.
+    turnShare: calm ? 1 : 1 - Math.exp(-(now - (memory.lastPaintAt ?? now)) / TURN_MS),
   };
+  memory.lastPaintAt = now;
   const progress = calm ? 1 : Math.min(1, (now - memory.changedAt) / board.tickMs);
   const effects = runningEffects(memory, now, palette, calm);
   const snakes = board.snakes.map(function prepareCB(snake) {

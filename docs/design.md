@@ -166,7 +166,7 @@ Rules:
 **Game board.** The board is where the fun is, so it is the one place that is always a little alive. `GameBoard` draws it on a canvas (`src/views/boardPainter.js`), with colours and timings read from the tokens:
 
 - **Floor:** `--color-board` with a dot on every cell (`--color-board-dot`).
-- **Snakes** are creatures, not loose blocks: one continuous body in the team colour, 84% of a cell thick (8% space on each side, like `--tile-inset`) with round corners, a stripe of the team's soft colour along the back, and a round head with white eyes that look where it is going and blink now and then. A crashed snake gets "x" eyes.
+- **Snakes** are creatures, not loose blocks: one continuous body in the team colour, 84% of a cell thick (8% space on each side, like `--tile-inset`) with round corners, a stripe of the team's soft colour along the back, and a round head with white eyes that blink now and then. The pupils look where the team is steering, even before the snake turns, so players see their input land at once. When teammates pull apart the snake goes cross-eyed, and a crashed snake gets "x" eyes. Eyes turn smoothly, never snap.
 - **Movement:** snakes glide from cell to cell over one tick instead of jumping.
 - **Apples** are ink, with a stalk, a leaf and a small white shine. They pop in when they appear and bob gently.
 - **Both teammates' sticks** show as ink chevrons by the head. Two the same way make a double chevron and opposite ones point apart, so everyone can see why a snake stopped.
@@ -193,7 +193,7 @@ Ready-made View components in `src/views/`. **Use them before writing your own**
 | `RoomCodeInput` | `value`, `onCodeChange(code)`, `disabled`, `invalid`, `label`. Put it inside a `<form>` so Enter submits | Join (#25) |
 | `ScoreBar` | `scoreA`, `scoreB`, `teamAName`, `teamBName`, `title`, `secondsLeft` | Game board (#28) |
 | `Countdown` | `value` (`"3"`, `"2"`, `"1"`, `"Go!"` or nothing). The parent needs `position: relative` | Game board (#28) |
-| `GameBoard` | `columns`, `rows`, `snakes` (`[{ team, heading, body, crashed }]`), `apples`, `effects` (`[{ id, kind: "eat" or "crash", team, x, y }]`, other kinds are ignored), `inputs` (`{ a: [dir, dir], b: [dir, dir] }`), `weather` (`{ wet, wind, night }`), `tickMs`, `label`. Drawn on a canvas, see Game board above | Game board (#28) |
+| `GameBoard` | `columns`, `rows`, `snakes` (`[{ team, heading, body, crashed, looking, torn }]`, where `looking` is the direction the team steers and `torn` means teammates pull apart), `apples`, `effects` (`[{ id, kind: "eat" or "crash", team, x, y }]`, other kinds are ignored), `inputs` (`{ a: [dir, dir], b: [dir, dir] }`), `weather` (`{ wet, wind, night }`), `tickMs`, `label`. Drawn on a canvas, see Game board above | Game board (#28) |
 | `SoundCues` | `cues`: the same event list as `GameBoard`. Plays each new `id` once; `kind` is a sound name from `src/sound/effects.js` | Every TV screen with events |
 | `MusicTrack` | `name` (`lobby`, `round`, `trivia`, `results` or nothing), `intensity` (1 in the last 10 seconds), `muted`. One per screen | Every TV screen |
 | `SoundToggle` | `muted`, `onToggle` | Every TV screen |
