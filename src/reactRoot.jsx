@@ -6,6 +6,7 @@ import { LoginPresenter } from "./presenters/loginPresenter.jsx";
 import { JoinPresenter } from "./presenters/joinPresenter.jsx";
 import { DemoPresenter } from "./presenters/demoPresenter.jsx";
 import { ControllerPresenter } from "./presenters/controllerPresenter.jsx";
+import { GalleryPresenter } from "./presenters/galleryPresenter.jsx";
 
 function makeRouter(model) {
   return createHashRouter([
@@ -18,6 +19,8 @@ function makeRouter(model) {
     // The destination exists now; room codes and team selection are a separate feature.
     { path: "/play/join", element: <JoinPresenter model={model} /> },
     { path: "/play/controller", element: <ControllerPresenter /> },
+    // Dev page: every shared component in every state.
+    { path: "/components", element: <GalleryPresenter /> },
     // Unknown routes go back to the start screen.
     { path: "*", element: <HomePresenter /> },
   ]);

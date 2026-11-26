@@ -1,0 +1,78 @@
+/* View styles: a team's seats on the team's soft colour. A filled seat pops in once (design.md, Game feel). */
+.team-roster {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius);
+}
+
+.team-roster-a { background: var(--color-team-a-soft); }
+.team-roster-b { background: var(--color-team-b-soft); }
+
+.team-roster-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.team-roster-count {
+  color: var(--color-muted);
+  font-weight: var(--weight-bold);
+}
+
+.team-roster-seats {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.team-roster-seat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--hit-min);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+}
+
+.team-roster-filled {
+  background: var(--color-surface);
+  font-weight: var(--weight-bold);
+}
+
+.team-roster-open {
+  color: var(--color-muted);
+}
+
+.team-roster-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.75em;
+  aspect-ratio: 1;
+  border-radius: var(--radius-round);
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  animation: pop var(--duration-effect) var(--ease-out);
+}
+
+.team-roster-a .team-roster-avatar { background: var(--color-team-a); color: var(--color-team-a-ink); }
+.team-roster-b .team-roster-avatar { background: var(--color-team-b); color: var(--color-team-b-ink); }
+
+.team-roster-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team-roster-you {
+  margin-inline-start: auto;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-small);
+  background: var(--color-sunken);
+}

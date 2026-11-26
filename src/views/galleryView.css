@@ -1,0 +1,107 @@
+/* View styles: the component gallery, a dev page laid out like the home page. */
+.gallery {
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--space-5);
+  max-width: calc(var(--phone-max-width) * 3);
+  margin-inline: auto;
+  padding: var(--space-5) var(--space-4) var(--space-7);
+}
+
+.gallery-header {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.gallery-header a {
+  justify-self: start;
+  color: var(--color-ink);
+}
+
+.gallery h1,
+.gallery h2,
+.gallery p {
+  margin: 0;
+}
+
+.gallery h1,
+.gallery h2 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+}
+
+.gallery h1 { font-size: var(--text-hero); }
+.gallery h2 { font-size: var(--text-large); }
+
+.gallery-header p,
+.gallery-note {
+  max-width: 60ch;
+  color: var(--color-muted);
+}
+
+.gallery-section {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.gallery-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.gallery-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--space-4);
+}
+
+.gallery-form {
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* TV samples use the TV text size, so they look like they will on the shared screen. */
+.gallery-tv {
+  font-size: var(--tv-text);
+}
+
+.gallery-tv .room-code {
+  font-size: var(--tv-score);
+}
+
+.gallery-board {
+  position: relative;
+}
+
+.gallery-row button {
+  min-height: var(--hit-min);
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-sunken);
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.gallery-row button:active {
+  transform: scale(var(--press-scale));
+  transition: none;
+}
+
+@media (min-width: 60rem) {
+  .gallery {
+    padding: var(--space-6) var(--tv-safe) var(--space-7);
+  }
+
+  .gallery-section {
+    padding: var(--space-5);
+  }
+}

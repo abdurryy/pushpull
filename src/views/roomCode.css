@@ -1,0 +1,21 @@
+/* View styles: room code boxes on sunken fill. They scale with the parent's font size (TV: --tv-score, phone: --text-hero). */
+.room-code {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.room-code-box {
+  display: grid;
+  place-items: center;
+  min-width: 1.3em;
+  padding: var(--space-2);
+  border-radius: var(--radius);
+  background: var(--color-sunken);
+  font-weight: var(--weight-bold);
+  line-height: 1.1;
+}
+
+.room-code-empty .room-code-box {
+  color: var(--color-muted);
+}

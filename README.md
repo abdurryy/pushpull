@@ -48,6 +48,8 @@ Open http://localhost:8080 and pick **Use this screen as the TV**, or go straigh
 
 Tip: in the browser console, `myModel` shows the current application state.
 
+Building a screen? Open http://localhost:8080/#/components first: it shows every shared component (status lines, team chips and seats, room code boxes, score bar, countdown and the game board with its effects) in every state.
+
 ## Project structure
 
 ```
@@ -67,11 +69,15 @@ Tip: in the browser console, `myModel` shows the current application state.
 │   ├── presenters/               # one per screen: model ↔ view, one model method per event
 │   │   ├── homePresenter.jsx     # start screen
 │   │   ├── loginPresenter.jsx    # phone login; only talks to the auth service
-│   │   └── weatherPresenter.jsx  # weather check on the TV
+│   │   ├── weatherPresenter.jsx  # weather check on the TV
+│   │   └── galleryPresenter.jsx  # dev page with every shared component
 │   ├── views/                    # UI only: render props, fire onXxx events, all JSX and CSS
 │   │   ├── homeView.jsx/.css     # pick this device's role
 │   │   ├── loginView.jsx/.css    # Continue with Google, with checking, signing-in and error states
-│   │   └── weatherView.jsx/.css  # city search with loading, empty and error states
+│   │   ├── weatherView.jsx/.css  # city search with loading, empty and error states
+│   │   ├── galleryView.jsx/.css  # #/components: every shared component in every state
+│   │   └── statusMessage, teamChip, teamRoster, roomCode, roomCodeInput, scoreBar,
+│   │       countdown, gameBoard  # shared components, listed in docs/design.md
 │   ├── styles/tokens.css         # design tokens (colours, fonts, sizes) used by every View
 │   └── persistence/
 │       ├── firebaseConfig.js     # starts Firebase with the config from .env.local

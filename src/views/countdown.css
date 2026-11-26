@@ -1,0 +1,30 @@
+/* View styles: the countdown sits in the middle of its parent, which needs position: relative. */
+.countdown {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.countdown-value {
+  display: grid;
+  place-items: center;
+  min-width: 1.4em;
+  aspect-ratio: 1;
+  padding: var(--space-4);
+  border-radius: var(--radius-round);
+  background: var(--color-surface);
+  font-family: var(--font-display);
+  font-size: calc(var(--tv-score) * 2);
+  font-weight: var(--weight-display);
+  line-height: 1;
+  animation: countdown-in var(--duration-effect) var(--ease-out) both;
+}
+
+@keyframes countdown-in {
+  from {
+    opacity: 0;
+    transform: scale(calc(var(--pop-scale) * 1.5));
+  }
+}

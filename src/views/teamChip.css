@@ -1,0 +1,19 @@
+/* View styles: team chips. Orange gets ink text and blue gets white text (design.md, Colour). */
+.team-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius);
+  font-weight: var(--weight-bold);
+  white-space: nowrap;
+}
+
+.team-chip-a {
+  background: var(--color-team-a);
+  color: var(--color-team-a-ink);
+}
+
+.team-chip-b {
+  background: var(--color-team-b);
+  color: var(--color-team-b-ink);
+}

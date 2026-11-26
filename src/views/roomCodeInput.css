@@ -1,0 +1,47 @@
+/* View styles: the four room code boxes on the phone (design.md, Components: Inputs). */
+.room-code-input {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.room-code-input-label {
+  margin-bottom: var(--space-2);
+  padding: 0;
+  font-weight: var(--weight-bold);
+}
+
+.room-code-input-boxes {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+  max-width: calc(var(--hit-min) * 6);  /* four chunky boxes, not stretched across a wide phone */
+}
+
+.room-code-input-box {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: calc(var(--hit-min) * 1.5);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-sunken);
+  color: var(--color-ink);
+  font-size: var(--text-hero);
+  font-weight: var(--weight-bold);
+  text-align: center;
+  text-transform: uppercase;
+  caret-color: transparent;
+}
+
+.room-code-input-box:focus-visible {
+  background: var(--color-surface);
+}
+
+.room-code-input-box[aria-invalid="true"] {
+  color: var(--color-error);
+}
+
+.room-code-input-box:disabled {
+  color: var(--color-muted);
+}
