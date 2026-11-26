@@ -159,7 +159,7 @@ Things that belong together sit closer than things that don't. Use this ladder:
 
 - Every press shows a change **at once**: the pressed state has no transition (see the controller rules in design.md).
 - While waiting, **say what is happening in words**: `PushMark` plus a sentence like "Joining room 4KQ7…". Disable only the button that is waiting. The rest of the screen keeps working (a course requirement for grade C and up).
-- For asynchronously loaded images, reuse `ImageSkeleton` from `src/views/imageSkeleton.jsx`. Reserve space with `width` and `height` or a layout class, supply `alt` and give it a suitable fallback. Keep decorative avatars quiet when the name is already visible. The warm `--color-sunken` placeholder and `--color-bg` highlight stay over the image until it decodes, then the placeholder fades away. Use the gallery replay to check the reveal and verify slow, failed and reduced-motion states.
+- For asynchronously loaded images, reuse `ImageSkeleton` from `src/views/imageSkeleton.jsx`. Reserve space with `width` and `height` or a layout class, supply `alt` and give it a suitable fallback. Keep decorative avatars quiet when the name is already visible. After decoding, the warm placeholder fades away in 540ms to reveal the image. Check intermediate frames during the gallery replay with normal motion. Also verify slow, failed and reduced-motion states.
 - After success, show the result **where the player is already looking**. No pop-up toasts.
 - An error says what went wrong in the player's words, what to do next, and has a "Try again" button. Keep whatever they typed.
 - Never a blank screen, a silent failure, `alert()`, or a raw error code.
