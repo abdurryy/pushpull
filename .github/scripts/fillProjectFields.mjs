@@ -1,4 +1,4 @@
-// Automation: copies Priority, Target date and View/presenter from an issue to the project board.
+// Automation: copies Priority, Target date, Difficulty and View/presenter from an issue to the project board.
 // Run by .github/workflows/project-fields.yml with a token (PROJECT_TOKEN) that can edit the board.
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -75,17 +75,20 @@ async function findOrAddProjectItem(issueId, fieldIds) {
   }
 }
 
-async function syncProjectFields(issue, priority, targetDate) {
+async function syncProjectFields(issue, priority, targetDate, difficulty) {
   const fields = request(PROJECT + "/fields?per_page=100");
   const priorityField = fields.find(function priorityCB(field) { return field.name === "Priority"; });
   const dateField = fields.find(function dateCB(field) { return field.name === "Target date"; });
-  if (!priorityField || !dateField) {
-    throw new Error("The board must have Priority and Target date fields.");
+  const difficultyField = fields.find(function difficultyCB(field) { return field.name === "Difficulty"; });
+  if (!priorityField || !dateField || !difficultyField) {
+    throw new Error("The board must have Priority, Target date and Difficulty fields.");
   }
 
-  const item = await findOrAddProjectItem(issue.id, [priorityField.id, dateField.id]);
+  const item = await findOrAddProjectItem(issue.id, [priorityField.id, dateField.id, difficultyField.id]);
   const currentPriority = item.fields?.find(function priorityCB(field) { return field.id === priorityField.id; });
   const currentDate = item.fields?.find(function dateCB(field) { return field.id === dateField.id; });
+  const currentDifficulty = item.fields?.find(function difficultyCB(field) { return field.id === difficultyField.id; });
+  const level = difficultyField.options.find(function matchesCB(choice) { return choice.name.raw === difficulty; });
   const option = priorityField.options.find(function matchesCB(choice) { return choice.name.raw === priority; });
   const updates = [];
   if (option && currentPriority?.value?.id !== option.id) {
@@ -94,12 +97,16 @@ async function syncProjectFields(issue, priority, targetDate) {
   if (targetDate && currentDate?.value?.slice(0, 10) !== targetDate) {
     updates.push({ id: dateField.id, value: targetDate });
   }
+  if (level && currentDifficulty?.value?.id !== level.id) {
+    updates.push({ id: difficultyField.id, value: level.id });
+  }
   if (updates.length) {
     request(PROJECT + "/items/" + item.id, { method: "PATCH", body: { fields: updates } });
   }
 
   console.log("Priority: " + (option?.name.raw || "not set (write P0, P1 or P2 under ## Priority)"));
   console.log("Target date: " + (targetDate || "not set (no date and no milestone due date)"));
+  console.log("Difficulty: " + (level?.name.raw || "not set (write easy or hard under ## Difficulty)"));
 }
 
 function syncViewField(number, text) {
@@ -125,7 +132,10 @@ async function main() {
   const writtenDate = sectionValue(body, "Target date");
   const targetDate = /^\d{4}-\d{2}-\d{2}$/.test(writtenDate) ? writtenDate : issue.milestone?.due_on?.slice(0, 10);
 
-  await syncProjectFields(issue, priority, targetDate);
+  // The section reads "easy: reason", and the board only needs the first word.
+  const difficulty = sectionValue(body, "Difficulty").split(/[^A-Za-z]/)[0].toLowerCase();
+
+  await syncProjectFields(issue, priority, targetDate, difficulty);
   syncViewField(issue.number, sectionValue(body, "View/presenter"));
 }
 
