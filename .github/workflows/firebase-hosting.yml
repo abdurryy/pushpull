@@ -19,6 +19,11 @@ jobs:
     name: Deploy Hosting
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    # Naming an environment makes GitHub record each run as a deployment,
+    # so the repository page can link to the live site and PR previews.
+    environment:
+      name: ${{ github.event_name == 'push' && 'production' || 'preview' }}
+      url: ${{ github.event_name == 'push' && 'https://pushpull.live' || steps.preview.outputs.details_url }}
     permissions:
       checks: write
       contents: read
@@ -70,6 +75,7 @@ jobs:
           channelId: live
 
       - name: Publish a pull request preview
+        id: preview
         if: github.event_name == 'pull_request'
         uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0
         with:
