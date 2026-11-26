@@ -12,7 +12,6 @@
   inset: 0;
   pointer-events: none;
   background: var(--color-sunken);
-  transition: opacity var(--duration) var(--ease-out);
 }
 
 .image-skeleton[data-state="ready"] .image-skeleton-placeholder {
@@ -29,6 +28,10 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .image-skeleton[data-state="ready"] .image-skeleton-placeholder {
+    animation: image-skeleton-reveal calc(var(--duration) * 3) ease-in-out both;
+  }
+
   .image-skeleton-placeholder::after {
     content: "";
     position: absolute;
@@ -45,4 +48,9 @@
 @keyframes image-skeleton-sweep {
   from { transform: translateX(-100%); }
   to { transform: translateX(100%); }
+}
+
+@keyframes image-skeleton-reveal {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }

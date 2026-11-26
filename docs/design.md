@@ -88,7 +88,7 @@ Rules:
 
 **Snappy:** short and quick. `--duration-fast` (120ms) for presses and toggles, `--duration` (180ms) for panels and score changes, easing `--ease-out`. Loading indicators use `--duration-loading` (900ms). Nothing loops except loading indicators and the game board (see Game board below). Game events (eating, crashing, scoring) use the effect tokens in [Game feel](#game-feel). When the device asks for reduced motion, every duration becomes 0 (including `--duration-loading`), and the tokens file already handles this.
 
-The image skeleton uses `--color-sunken` for the warm fill and `--color-bg` for the cream highlight. The highlight sweeps at `--duration-loading` while the image loads. Once the image is decoded, the sweep pauses and the placeholder fades over the image using `--duration`.
+The image skeleton uses `--color-sunken` for the warm fill and `--color-bg` for the cream highlight. The highlight sweeps at `--duration-loading` while the image loads. Once the image is decoded, the sweep pauses and the placeholder fades over the image using `ease-in-out` over three times `--duration` (540ms). Reduced motion reveals the image immediately.
 
 ### Animated push mark
 
