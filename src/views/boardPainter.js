@@ -22,7 +22,6 @@ export function readPalette(element) {
     apple: token("--color-apple"),
     bodyWidth: 1 - 2 * parseFloat(token("--tile-inset")) / 100,
     team: { a: token("--color-team-a"), b: token("--color-team-b") },
-    teamSoft: { a: token("--color-team-a-soft"), b: token("--color-team-b-soft") },
     effectMs: parseFloat(token("--duration-effect")) || 0,   // bursts, the swallow bulge, the crash flash and shake
     popMs: parseFloat(token("--duration")) || 0,              // a new apple popping in
     shake: parseFloat(token("--shake-distance")) || 0,
@@ -361,31 +360,6 @@ function paintEyes(frame, snake) {
   });
 }
 
-// Leave the tail tip plain to keep Team B's paired spots distinct from its eyes.
-function paintMarkings(frame, snake) {
-  const { context, cell, palette, boardWidth, boardHeight } = frame;
-  const colour = palette.teamSoft[snake.team];
-  snake.points.slice(1, -1).forEach(function paintMarkCB(point, index) {
-    const before = snake.points[index];
-    const dx = before.x - point.x;
-    const dy = before.y - point.y;
-    const angle = Math.atan2(dy - acrossSeam(dy, boardHeight, cell), dx - acrossSeam(dx, boardWidth, cell));
-    atWrappedPoint(frame, point, cell * 0.22, function paintMarkAtEdgeCB() {
-      if (snake.team === "a") {
-        context.fillStyle = colour;
-        context.beginPath();
-        context.ellipse(point.x, point.y, cell * 0.085, cell * 0.21, angle, 0, Math.PI * 2);
-        context.fill();
-        return;
-      }
-      const sideX = -Math.sin(angle) * cell * 0.12;
-      const sideY = Math.cos(angle) * cell * 0.12;
-      circle(context, point.x - sideX, point.y - sideY, cell * 0.083, colour);
-      circle(context, point.x + sideX, point.y + sideY, cell * 0.083, colour);
-    });
-  });
-}
-
 // A rounded toy-piece head leans toward its heading while the pupils follow the team's input.
 function paintHead(frame, snake, colour) {
   const { context, cell } = frame;
@@ -413,7 +387,6 @@ function paintSnake(frame, snake) {
       circle(context, point.x, point.y, radius, colour);
     });
   });
-  paintMarkings(frame, snake);
   paintHead(frame, snake, colour);
 }
 
