@@ -154,13 +154,15 @@ export function makeRoomModel(sync, appModel) {
     function connectionAndRoomACB() { return [model.code, model.role, model.connected, model.user?.uid]; },
     async function registerInputACB([code, role, connected, uid]) {
       const registration = ++inputRegistration;
+      // Keep the last connected input location in case a queued write replays after reconnecting.
+      if (!connected) return;
       const next = code && role === "player" && uid ? { code, uid } : null;
       if (previousInput && connected && (previousInput.code !== next?.code || previousInput.uid !== next?.uid)
         && previousInput.uid === uid) {
         sync.clearInput(previousInput.code, uid).catch(reportRoomError());
       }
       previousInput = next;
-      if (!next || !connected) return;
+      if (!next) return;
       try {
         // Schedule server cleanup before accepting movement, including after reconnecting.
         await sync.trackInputDisconnect(code, uid);

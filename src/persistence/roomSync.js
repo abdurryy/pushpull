@@ -3,6 +3,7 @@ import { get, onDisconnect, onValue, ref, remove, runTransaction, serverTimestam
 
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const DAY_MS = 24 * 60 * 60 * 1000;
+const SEATS = ["s1", "s2", "s3", "s4"];
 
 export function normalizeRoomCode(code) {
   return String(code).trim().toUpperCase();
@@ -63,10 +64,26 @@ export function makeRoomSync(database) {
       if (!meta) throw new Error("No room with code " + code + ".");
       const offset = await serverOffset();
       if (meta.expiresAt <= Date.now() + offset) throw new Error("That room has expired.");
-      const player = roomRef(code, "/players/" + user.uid);
-      const existing = (await get(player)).val();
-      await set(player, { name: user.name?.trim().slice(0, 80) || "Player", side: existing?.side || "center" });
-      return code;
+      const room = roomRef(code);
+      const name = user.name?.trim().slice(0, 80) || "Player";
+      for (const seat of SEATS) {
+        const current = (await get(room)).val();
+        if (current?.players?.[user.uid]) return code;
+        if (current?.seats?.[seat]) continue;
+        try {
+          // Commit the seat and the player together. The rules reject an occupied seat.
+          await update(room, {
+            ["seats/" + seat]: user.uid,
+            ["players/" + user.uid]: { name, side: "center", seat },
+          });
+          return code;
+        } catch (error) {
+          const latest = (await get(room)).val();
+          if (latest?.players?.[user.uid]) return code;
+          if (!latest?.seats?.[seat]) throw error;
+        }
+      }
+      throw new Error("This room is full.");
     },
 
     watchRoom(code, receive, fail) {
@@ -101,6 +118,16 @@ export function makeRoomSync(database) {
 
     clearInput(code, uid) {
       return remove(roomRef(code, "/inputs/" + uid));
+    },
+
+    async removePlayer(code, uid) {
+      const player = (await get(roomRef(code, "/players/" + uid))).val();
+      if (!player) return;
+      await update(roomRef(code), {
+        ["inputs/" + uid]: null,
+        ["players/" + uid]: null,
+        ["seats/" + player.seat]: null,
+      });
     },
   };
 }

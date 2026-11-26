@@ -11,10 +11,16 @@
           "expiresAt": { ".validate": "newData.isNumber() && newData.val() > now && newData.val() <= now + 86400000" },
           "$other": { ".validate": false }
         },
+        "seats": {
+          "$seat": {
+            ".write": "auth != null && $seat.matches(/^s[1-4]$/) && root.child('rooms').child($code).child('meta/expiresAt').val() > now && ((!data.exists() && newData.val() == auth.uid && newData.parent().parent().child('players').child(auth.uid).child('seat').val() == $seat) || (data.val() == auth.uid && !newData.exists() && !newData.parent().parent().child('players').child(auth.uid).exists()))"
+          }
+        },
         "players": {
           "$uid": {
-            ".write": "auth != null && auth.uid == $uid && root.child('rooms').child($code).child('meta/expiresAt').val() > now",
-            ".validate": "newData.hasChildren(['name', 'side'])",
+            ".write": "auth != null && auth.uid == $uid && root.child('rooms').child($code).child('meta/expiresAt').val() > now && (newData.exists() || !newData.parent().parent().child('seats').child(data.child('seat').val()).exists())",
+            ".validate": "newData.hasChildren(['name', 'side', 'seat'])",
+            "seat": { ".validate": "newData.isString() && newData.val().matches(/^s[1-4]$/) && (!data.exists() || data.val() == newData.val()) && newData.parent().parent().parent().child('seats').child(newData.val()).val() == $uid" },
             "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80" },
             "side": { ".validate": "newData.val() == 'a' || newData.val() == 'b' || newData.val() == 'center'" },
             "$other": { ".validate": false }
@@ -22,7 +28,7 @@
         },
         "inputs": {
           "$uid": {
-            ".write": "auth != null && auth.uid == $uid && root.child('rooms').child($code).child('meta/expiresAt').val() > now && root.child('rooms').child($code).child('players').child($uid).exists()",
+            ".write": "auth != null && auth.uid == $uid && root.child('rooms').child($code).child('meta/expiresAt').val() > now && (!newData.exists() || newData.parent().parent().child('players').child($uid).exists())",
             ".validate": "newData.hasChildren(['stick'])",
             "stick": { ".validate": "newData.val() == 'idle' || newData.val() == 'up' || newData.val() == 'down' || newData.val() == 'left' || newData.val() == 'right'" },
             "button": { ".validate": "newData.val() == 'dash' || newData.val() == 'ping' || newData.val() == 'shed' || newData.val() == 'hold'" },

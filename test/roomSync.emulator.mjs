@@ -68,12 +68,35 @@ async function check() {
   phone.model.setStick("up");
   await eventually(() => host.model.room?.inputs?.phone?.stick === "up");
 
+  goOffline(phone.db);
+  await eventually(() => !phone.model.connected && !host.model.room?.inputs?.phone);
+  const queuedInput = set(ref(phone.db, roomPath + "/inputs/phone"), { stick: "left" });
   phone.model.leaveRoom();
+  goOnline(phone.db);
+  await queuedInput;
+  await eventually(() => phone.model.connected);
   await eventually(() => !host.model.room?.inputs?.phone);
+  const candidates = [other, client("third"), client("fourth"), client("fifth")];
+  await eventually(() => candidates.every(candidate => candidate.model.connected));
+  await Promise.all(candidates.map(candidate => candidate.model.joinRoom(code)));
+  const admitted = candidates.filter(candidate => candidate.model.code === code);
+  const rejected = candidates.filter(candidate => !candidate.model.code);
+  assert.equal(admitted.length, 3);
+  assert.equal(rejected.length, 1);
+  assert.match(rejected[0].model.error, /room is full/i);
+  await eventually(() => Object.keys(host.model.room.players).length === 4);
+
+  await phone.model.joinRoom(code);
+  assert.equal(phone.model.code, code);
+  assert.equal(host.model.room.players.phone.side, "a");
+  const leaving = admitted[0];
+  await makeRoomSync(leaving.db).removePlayer(code, leaving.session.user.uid);
+  leaving.model.leaveRoom();
+  await rejected[0].model.joinRoom(code);
+  assert.equal(rejected[0].model.code, code);
   await other.model.joinRoom("INVALID");
   assert.match(other.model.error, /four-character/);
-  assert.equal(other.model.room, null);
-  console.log("Room sync passed: host, join, sides, input, denied cross-user writes, disconnect and reconnect.");
+  console.log("Room sync passed: input, access rules, reconnect, concurrent admission, rejoin and seat reuse.");
 }
 
 try {
