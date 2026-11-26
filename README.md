@@ -114,6 +114,7 @@ _Required in the mid-project review._
 - Shared View components for the next screens (status lines, team seats, room code boxes, score bar, countdown, game board), shown in every state on `#/components`
 - Sound effects for every game event and music for the lobby, round, trivia and results, made in code with the Web Audio API
 - Agent skills in `.agents/skills/` so everyone's coding agent follows design.md, the MVP rules and the user-testing rules
+- A living game board drawn on a canvas: snakes glide and look where their team steers, both teammates' directions show at the head, rain, wind and night are visible, and the keyboard demo has effects, sound and music
 
 **Planned**
 - MobX model with the game rules, plus per-user persistence in Firebase
