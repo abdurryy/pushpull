@@ -6,7 +6,7 @@ import "./loginView.css";
 const ERROR_MESSAGES = {
   "auth/popup-closed-by-user": "The sign-in window was closed before you finished.",
   "auth/cancelled-popup-request": "The sign-in window was closed before you finished.",
-  "auth/popup-blocked": "Your browser blocked the sign-in window. Allow pop-ups for this site and try again.",
+  "auth/popup-blocked": "Pop-ups are blocked. Allow them and try again.",
   "auth/network-request-failed": "No connection to the sign-in service. Check your internet and try again.",
   "auth/operation-not-allowed": "Google sign-in isn't switched on for this app yet.",
   "auth/configuration-not-found": "Sign-in isn't set up for this app yet.",

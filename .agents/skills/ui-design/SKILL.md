@@ -129,6 +129,7 @@ Things that belong together sit closer than things that don't. Use this ladder:
 
 - Give every column one strong left edge. Left-align text. Centre only short things that stand alone: a lone status message, "Turn your phone sideways", a score.
 - Centre icons on their text with `display: flex; align-items: center; gap: var(--space-2)`.
+- Place the wordmark and account action on a shared row with aligned centers. Keep adjacent actions on the same grid track and use the same hit height. Let wrapping alerts occupy a separate row and verify alignment with idle, pending and error states.
 - Numbers that change (scores, timers, codes) use the `.numbers` class so the digits don't jump.
 - Keep paragraphs readable: `max-width: 42ch`, as `.home-lead` does.
 - Headings: `text-wrap: balance` so they don't leave one word alone on the last line.
@@ -237,7 +238,7 @@ When a screen feels off and you don't know why, try these in order:
 1. Start the dev server in the background: `npm run dev` (port 8080).
 2. Take screenshots: `npm run shots -- "#/your-route"` (the same as `node .agents/skills/ui-design/scripts/screenshot.mjs "#/your-route"`)
    - Sizes: small phone 360×640, phone 390×844, phone sideways 844×390, laptop 1280×720 and TV 1920×1080. Reduced motion is on, so animations don't blur the picture.
-   - It warns when a page scrolls sideways, when a TV-sized page scrolls at all, and when the page throws an error.
+   - It warns when a page scrolls sideways, when a TV-sized page scrolls at all, and when the page throws an error. On the landing route, also compare the page height with the viewport at phone sizes. Reduce the preview and spacing before touch targets, and keep content reachable when text is enlarged.
    - To see another state, run a model action first: `--js="myModel.setCityQuery('Stockholm'); myModel.findWeather()"`. `myModel` and `roomModel` are on `window` in dev. For a state that's hard to reach, change the starting value in the model locally, take the screenshot and **undo it before you commit**.
    - For a state behind a button, press it first by its text: `--click="Enter controller"` (repeat for more, in order). `npm run shots:controller` does this for the controller. A size where the button isn't shown is skipped with a note.
    - Each run saves into its own folder, named after the first route or `--name=<folder>`. The script prints the paths.
