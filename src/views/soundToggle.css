@@ -19,7 +19,3 @@
   transform: scale(var(--press-scale));
   transition: none;
 }
-
-.sound-toggle .icon {
-  font-size: 1.25em;
-}
