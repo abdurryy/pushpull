@@ -147,7 +147,7 @@ Rules:
 | Trivia tie-break | `trivia` | Thinking, with a ticking clock | 84 BPM | D minor |
 | Round results | `results` | Warm and proud | 100 BPM | C major |
 
-- **Melodies use the five notes of the key's pentatonic scale**, so an effect played on top never clashes with the music.
+- **Melodies use the five notes of the key's pentatonic scale.** Effects use only C, D, E, G and A (and Team B's, a fourth higher, F, G, A, C and D). All four keys contain these notes, so an effect never clashes with the music.
 - **Mix:** effects sit clearly above the music (music at about half their level). Every effect is about as loud as the others, and a limiter on the output stops clipping.
 - **Variation:** a sound that repeats (eating, ticks) shifts its pitch slightly each time, and the same sound never starts twice within 50ms. Twenty apples shouldn't sound like a machine gun.
 - **Turning sound on and off:** browsers only allow sound after a press, so the first press on the TV ("Create room", "Start round") turns it on. The TV always shows a sound button with an icon and a label ("Sound on" / "Sound off"). Whether sound is on is application state.

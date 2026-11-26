@@ -2,8 +2,10 @@
 // Each effect gets an output node, a start time, a pitch (1 is normal, soundPlayer varies it a little) and the team.
 import { instruments, noteFrequency } from "./instruments.js";
 
-// Team B's sounds are two semitones higher, so you can hear which team it was.
-const TEAM_B_LIFT = Math.pow(2, 2 / 12);
+// Team B's sounds are a fourth (five semitones) higher, so you can hear which team it was.
+// Effects use only C, D, E, G and A, which every track's key contains. A fourth up turns them into F, G, A, C and D,
+// which every key contains too, so neither team's sounds ever clash with the music.
+const TEAM_B_LIFT = Math.pow(2, 5 / 12);
 
 function pitchFor(team, pitch) {
   return team === "b" ? pitch * TEAM_B_LIFT : pitch;
