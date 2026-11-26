@@ -36,7 +36,7 @@ Needs Node.js 22.12 or newer (Vite 8 requires it).
 
 Copy `.env.example` to `.env.local` and fill in the Firebase web config (Firebase console > Project settings > Your apps, or ask the team). `.env.local` is git-ignored; never commit the real values.
 
-Without Firebase config, the home and weather screens still work; sign-in shows a setup message. After signing in, **Continue to join a room** opens the join destination. Room codes and team selection are being built separately in #25.
+Without Firebase config, the home and weather screens still work and sign-in shows a setup message. Sign in from the home page and choose **View profile** to see your account at `#/profile`. The phone sign-in screen still links to the join destination. Room codes and team selection are being built separately in #25.
 
 ```sh
 npm install
@@ -107,7 +107,8 @@ _Required in the mid-project review._
 - Design system: [docs/design.md](docs/design.md) and the CSS tokens
 - App skeleton: React + Vite, MobX model with actions, hash routes, API module for Open-Meteo and Open Trivia DB
 - First API data on screen: the TV shows the live weather for a city, with loading, empty and error states
-- Homepage: explains Double Snake and lets visitors choose the shared screen or phone
+- Homepage: explains Double Snake, links to the shared screen and phone setup, and offers Google sign-in
+- Account profile (`#/profile`): shows the current Google account and lets the player sign out
 - Local Double Snake demo: shared keyboard, two teams, apples, crashes, timer and replay
 - Firebase project and Google sign-in on the phone (`#/play/login`)
 - Game feel and sound designed in design.md: the picture, sound and phone buzz for every game event
@@ -118,7 +119,7 @@ _Required in the mid-project review._
 
 **Planned**
 - MobX model with the game rules, plus per-user persistence in Firebase
-- Screens on the phone: log in, join a room, controller, profile and stats
+- Screens on the phone: room joining, controller, profile settings and stats
 - Screens on the TV: lobby, game board, round results
 - First user test with paper controllers
 

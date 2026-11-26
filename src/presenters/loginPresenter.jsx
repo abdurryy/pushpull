@@ -1,25 +1,24 @@
-// Presenter for logging in on the phone. It only talks to the auth service (course rule);
-// the rest of the app learns about the sign-in through onAuthStateChanged, not from here.
+// Presenter for account actions. Firebase's auth listener updates the model after sign-in or sign-out.
 import { observer } from "mobx-react-lite";
 import { promiseStatus } from "../model/resolvePromise.js";
 import { signInWithGoogle, signOutUser } from "../persistence/firebaseAuth.js";
 import { LoginView } from "../views/loginView.jsx";
 
-export const LoginPresenter = observer(function LoginPresenter(props) {
+export const LoginPresenter = observer(function LoginPresenter({ model, view: View = LoginView }) {
   function signInRequestedACB() {
-    signInWithGoogle(props.model);
+    signInWithGoogle(model);
   }
 
   function signOutRequestedACB() {
-    signOutUser(props.model);
+    signOutUser(model);
   }
 
   return (
-    <LoginView
-      user={props.model.user}
-      authChecked={props.model.authChecked}
-      status={promiseStatus(props.model.authPromiseState)}
-      error={props.model.authPromiseState.error}
+    <View
+      user={model.user}
+      authChecked={model.authChecked}
+      status={promiseStatus(model.authPromiseState)}
+      error={model.authPromiseState.error}
       onSignIn={signInRequestedACB}
       onSignOut={signOutRequestedACB}
     />

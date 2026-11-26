@@ -7,10 +7,12 @@ import { JoinPresenter } from "./presenters/joinPresenter.jsx";
 import { DemoPresenter } from "./presenters/demoPresenter.jsx";
 import { ControllerPresenter } from "./presenters/controllerPresenter.jsx";
 import { GalleryPresenter } from "./presenters/galleryPresenter.jsx";
+import { ProfilePresenter } from "./presenters/profilePresenter.jsx";
 
 function makeRouter(model) {
   return createHashRouter([
-    { path: "/", element: <HomePresenter /> },
+    { path: "/", element: <HomePresenter model={model} /> },
+    { path: "/profile", element: <ProfilePresenter model={model} /> },
     { path: "/demo", element: <DemoPresenter model={model} /> },
     // The shared screen. Shows the weather check for now; the lobby and game board come later.
     { path: "/tv", element: <WeatherPresenter model={model} /> },
@@ -22,7 +24,7 @@ function makeRouter(model) {
     // Dev page: every shared component in every state.
     { path: "/components", element: <GalleryPresenter /> },
     // Unknown routes go back to the start screen.
-    { path: "*", element: <HomePresenter /> },
+    { path: "*", element: <HomePresenter model={model} /> },
   ]);
 }
 
