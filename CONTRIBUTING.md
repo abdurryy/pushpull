@@ -68,6 +68,28 @@ Commits:
 - Commit messages are short and imperative: `Add search view`, `Fix crash when API returns empty list`.
 - Never commit `node_modules/`, `dist/`, `.env*` or API keys. `.gitignore` already covers these.
 
+## Writing issues and pull requests
+
+CodeRabbit reads the linked issue and checks the PR against it, so **the issue is the spec**. Fill in every section of `.github/ISSUE_TEMPLATE/task.md`:
+
+- **Priority:** `P0` (blocks other work), `P1` (needed for the next milestone) or `P2` (if there's time).
+- **Target date:** `YYYY-MM-DD`, or empty to use the milestone's due date.
+- **View/presenter:** the pair it touches (`lobbyPresenter / lobbyView`), or `none: model` / `none: persistence`.
+- **Difficulty** and **Files to touch:** see the template's comments.
+- Also set a **milestone** (`--milestone "Mid-project review"` or `"Final submission"`) and the applicable **area label** (`--label "area: controller"` etc.).
+- **Brief:** one or two sentences on what changes and why.
+- **Description:** what exists today, what's missing, which screen or flow it touches. Link mock-ups, `docs/course/` pages and related issues.
+- **Approach:** the MVP layer of each part and the files you expect to touch: the model action, the presenter's props and events, the view with its loading, empty and error states, and any API call or saved data.
+- **Acceptance criteria:** checkable statements (`- [ ]`), including the states a View must handle and accessibility where it applies (labels, `alt`, real buttons).
+- **How to test:** numbered steps someone can follow, covering the loading, empty and error cases.
+- **Out of scope:** what this issue won't do, so the PR stays small.
+
+With the CLI: `gh issue create --title "<what>" --body-file <brief.md>`. If an existing issue is thin, fill in the missing sections before you start. If a task is too big for one small PR, split it into several issues and link them.
+
+**The pull request:** fill in `.github/pull_request_template.md`: `Closes #<issue>`, what changed per layer, each acceptance criterion with how it's met, the test steps you actually ran with what you saw, and the Visual work block. Don't tick a criterion you didn't verify. Say what's left instead.
+
+**Minor CodeRabbit findings:** fix them only if it's a one-line change in files you already touch. Don't open follow-up commits just to please a nitpick.
+
 ## Who owns what
 
 Split the work by **presenter/view pairs**. Then people work on different files and git conflicts are rare.
@@ -120,6 +142,15 @@ Deploy early and often (the course suggests Firebase Hosting). Don't deploy mini
 ## User testing
 
 Every time you test with users (paper mock-up or deployed app), add a file in [docs/user-testing/](docs/user-testing/README.md). The final submission requires it.
+
+## Adding course material
+
+When someone provides saved Canvas pages (`.mhtml`/`.html`), convert each one to clean Markdown:
+
+1. **Folder and name:** project pages go in `docs/course/project/<topic>.md`. Project assignments go in `docs/course/deliverables/NN-name.md`, numbered by due date. Use lowercase kebab-case and drop the Canvas course-name suffix.
+2. **Content:** keep only the page body (no Canvas menus or buttons). Start with YAML frontmatter: `title`, `type` (page/assignment), `source` (Canvas URL), `saved` (date), `tags`, a one-line `summary`, and for assignments `due` (Stockholm time), `grading` and `submission`. Turn links to pages already in `docs/course/` into relative links. Canvas is the authority: `source:` is the original page and `saved:` the snapshot date.
+3. **Update `docs/INDEX.md`:** add a row, update the deadlines for assignments, and remove the page from Gaps if it was listed.
+4. Keep raw `.mhtml`/`.html`/`.pdf` files out of the repo.
 
 ## Repo setup (once, by the repo owner)
 
