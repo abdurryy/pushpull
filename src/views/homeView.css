@@ -40,6 +40,7 @@
 .home-lead {
   max-width: 42ch;
   margin: 0;
+  overflow-wrap: anywhere;
   color: var(--color-muted);
 }
 
@@ -69,7 +70,7 @@
 
 .home-choice:hover,
 .home-choice:active,
-.home-demo-link:active {
+.home-extras a:active {
   text-decoration: underline;
   text-decoration-thickness: var(--focus-offset);
 }
@@ -82,10 +83,14 @@
   font-size: var(--text-large);
 }
 
-.home-demo-link {
+.home-extras {
+  display: grid;
+  justify-items: start;
+}
+
+.home-extras a {
   display: inline-flex;
   align-items: center;
-  justify-self: start;
   min-height: var(--hit-min);
   color: var(--color-ink);
 }
