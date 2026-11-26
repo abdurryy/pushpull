@@ -6,18 +6,20 @@ import { readFileSync } from "node:fs";
 const OWNER = process.env.PROJECT_OWNER || "abdurryy";
 const PROJECT_NUMBER = process.env.PROJECT_NUMBER || "2";
 const REPO = process.env.GITHUB_REPOSITORY || "abdurryy/pushpull";
+const PROJECT = "users/" + OWNER + "/projectsV2/" + PROJECT_NUMBER;
+// This is the issue field ID. The project's old text column has a different ID.
+const VIEW_FIELD_ID = Number(process.env.VIEW_PRESENTER_FIELD_ID || "50428070");
 
-// Runs the GitHub CLI without a shell, so text from the issue can't be run as a command.
-function gh(args) {
-  return execFileSync("gh", args, { encoding: "utf8" });
-}
+function request(endpoint, { method = "GET", body, filter } = {}) {
+  const args = ["api", endpoint, "-H", "X-GitHub-Api-Version: 2026-03-10", "--method", method];
+  if (body) args.push("--input", "-");
+  if (filter) args.push("--paginate", "--jq", filter);
 
-function graphql(query, variables) {
-  const args = ["api", "graphql", "-f", "query=" + query];
-  Object.entries(variables).forEach(function addVariableCB([name, value]) {
-    args.push("-f", name + "=" + value);
-  });
-  return JSON.parse(gh(args)).data;
+  const result = execFileSync("gh", args, {
+    encoding: "utf8",
+    input: body ? JSON.stringify(body) : undefined,
+  }).trim();
+  return result ? JSON.parse(result) : null;
 }
 
 // The first real line under "## <heading>" in the issue body, ignoring <!-- comments -->.
@@ -36,74 +38,90 @@ function sectionValue(body, heading) {
 }
 
 function loadIssue() {
-  const number = process.argv[2];
-  if (number !== undefined) {
-    if (!/^[1-9]\d*$/.test(number) || process.argv.length !== 3) {
-      throw new Error("Pass a single positive GitHub issue number.");
-    }
-    return JSON.parse(gh(["api", "repos/" + REPO + "/issues/" + number]));
+  let number = process.argv[2];
+  if (number === undefined && process.env.GITHUB_EVENT_PATH) {
+    const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8"));
+    number = event.issue?.number ?? event.inputs?.issue_number;
   }
-  if (!process.env.GITHUB_EVENT_PATH) {
+  if (!/^[1-9]\d*$/.test(String(number)) || process.argv.length > 3) {
     throw new Error("Usage: node .github/scripts/fillProjectFields.mjs <issue-number>");
   }
-  return JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8")).issue;
+  // Read the latest body, even when rerunning an older issue event.
+  return request("repos/" + REPO + "/issues/" + number);
+}
+
+function findProjectItem(issueId, fieldIds) {
+  const query = ".[] | select(.content.id == " + issueId + ")";
+  return request(PROJECT + "/items?per_page=100&fields=" + fieldIds.join(","), { filter: query });
+}
+
+function findOrAddProjectItem(issueId, fieldIds) {
+  const existing = findProjectItem(issueId, fieldIds);
+  if (existing) return existing;
+
+  try {
+    return request(PROJECT + "/items", { method: "POST", body: { type: "Issue", id: issueId } });
+  } catch (error) {
+    // The board's auto-add can win the race after the lookup.
+    if (!String(error.stderr).includes("Content already exists in this project")) throw error;
+    const added = findProjectItem(issueId, fieldIds);
+    if (!added) throw error;
+    return added;
+  }
+}
+
+function syncProjectFields(issue, priority, targetDate) {
+  const fields = request(PROJECT + "/fields?per_page=100");
+  const priorityField = fields.find(function priorityCB(field) { return field.name === "Priority"; });
+  const dateField = fields.find(function dateCB(field) { return field.name === "Target date"; });
+  if (!priorityField || !dateField) {
+    throw new Error("The board must have Priority and Target date fields.");
+  }
+
+  const item = findOrAddProjectItem(issue.id, [priorityField.id, dateField.id]);
+  const currentPriority = item.fields?.find(function priorityCB(field) { return field.id === priorityField.id; });
+  const currentDate = item.fields?.find(function dateCB(field) { return field.id === dateField.id; });
+  const option = priorityField.options.find(function matchesCB(choice) { return choice.name.raw === priority; });
+  const updates = [];
+  if (option && currentPriority?.value?.id !== option.id) {
+    updates.push({ id: priorityField.id, value: option.id });
+  }
+  if (targetDate && currentDate?.value?.slice(0, 10) !== targetDate) {
+    updates.push({ id: dateField.id, value: targetDate });
+  }
+  if (updates.length) {
+    request(PROJECT + "/items/" + item.id, { method: "PATCH", body: { fields: updates } });
+  }
+
+  console.log("Priority: " + (option?.name.raw || "not set (write P0, P1 or P2 under ## Priority)"));
+  console.log("Target date: " + (targetDate || "not set (no date and no milestone due date)"));
+}
+
+function syncViewField(number, text) {
+  if (!text) {
+    console.log("View/presenter: not set (write it under ## View/presenter)");
+    return;
+  }
+  const endpoint = "repos/" + REPO + "/issues/" + number + "/issue-field-values";
+  const fields = request(endpoint);
+  const existing = fields.find(function viewCB(field) { return field.issue_field_id === VIEW_FIELD_ID; });
+  if (existing?.value !== text) {
+    // POST updates this field without replacing the issue's other values.
+    request(endpoint, { method: "POST", body: { issue_field_values: [{ field_id: VIEW_FIELD_ID, value: text }] } });
+  }
+  console.log("View/presenter: " + text);
 }
 
 function main() {
   const issue = loadIssue();
+  if (issue.pull_request) throw new Error("Pass an issue number, not a pull request number.");
   const body = issue.body || "";
-
   const priority = sectionValue(body, "Priority").toUpperCase();
   const writtenDate = sectionValue(body, "Target date");
-  const milestoneDate = issue.milestone && issue.milestone.due_on ? issue.milestone.due_on.slice(0, 10) : "";
-  const targetDate = /^\d{4}-\d{2}-\d{2}$/.test(writtenDate) ? writtenDate : milestoneDate;
-  const viewPresenter = sectionValue(body, "View/presenter");
+  const targetDate = /^\d{4}-\d{2}-\d{2}$/.test(writtenDate) ? writtenDate : issue.milestone?.due_on?.slice(0, 10);
 
-  // Adding an issue that is already on the board just returns its existing item.
-  const project = JSON.parse(gh(["project", "view", PROJECT_NUMBER, "--owner", OWNER, "--format", "json"]));
-  const item = JSON.parse(gh(["project", "item-add", PROJECT_NUMBER, "--owner", OWNER, "--url", issue.html_url, "--format", "json"]));
-  const fields = JSON.parse(gh(["project", "field-list", PROJECT_NUMBER, "--owner", OWNER, "--format", "json"])).fields;
-  function fieldCB(name) {
-    return fields.find(function hasNameCB(field) { return field.name === name; });
-  }
-  const editItem = ["project", "item-edit", "--id", item.id, "--project-id", project.id];
-
-  const priorityField = fieldCB("Priority");
-  const option = priorityField && priorityField.options.find(function matchesCB(o) { return o.name === priority; });
-  if (option) {
-    gh([...editItem, "--field-id", priorityField.id, "--single-select-option-id", option.id]);
-    console.log("Priority: " + priority);
-  } else {
-    console.log("Priority: not set (write P0, P1 or P2 under ## Priority)");
-  }
-
-  const dateField = fieldCB("Target date");
-  if (dateField && targetDate) {
-    gh([...editItem, "--field-id", dateField.id, "--date", targetDate]);
-    console.log("Target date: " + targetDate + (targetDate === milestoneDate ? " (from the milestone)" : ""));
-  } else {
-    console.log("Target date: not set (no date and no milestone due date)");
-  }
-
-  // View/presenter is an issue field: it's stored on the issue itself, so it has its own mutation.
-  if (viewPresenter) {
-    const [owner, name] = REPO.split("/");
-    const repo = graphql(
-      "query($owner:String!,$name:String!){repository(owner:$owner,name:$name){issueFields(first:50){nodes{... on IssueFieldText{id name}}}}}",
-      { owner, name },
-    ).repository;
-    const viewField = repo.issueFields.nodes.find(function isViewFieldCB(field) { return field.name === "View/presenter"; });
-    if (viewField) {
-      // New issues may not have a value yet. This mutation creates it or updates it.
-      graphql(
-        "mutation($issue:ID!,$field:ID!,$text:String!){setIssueFieldValue(input:{issueId:$issue, issueFields:[{fieldId:$field, textValue:$text}]}){clientMutationId}}",
-        { issue: issue.node_id, field: viewField.id, text: viewPresenter },
-      );
-      console.log("View/presenter: " + viewPresenter);
-    }
-  } else {
-    console.log("View/presenter: not set (write it under ## View/presenter)");
-  }
+  syncProjectFields(issue, priority, targetDate);
+  syncViewField(issue.number, sectionValue(body, "View/presenter"));
 }
 
 main();
