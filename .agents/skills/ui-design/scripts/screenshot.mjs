@@ -2,6 +2,7 @@
 // Usage:  npm run shots -- "#/tv" "#/play/login" [--js="myModel.findWeather()"]
 // Options: --click="Enter controller" presses a button by its text first (repeat it for more, in order)
 //          --name=controller saves this run in its own folder (default: named after the first route)
+//          --sizes=laptop,tv takes only these sizes (default: all five, see SIZES)
 // Needs:  the dev server running (npm run dev) and Playwright's browser (see SKILL.md, step 5).
 import { createRequire } from "node:module";
 import { mkdirSync } from "node:fs";
@@ -33,9 +34,11 @@ function loadPlaywright() {
 
 // Splits the command line into routes and options: a script to run in the page, buttons to press, a folder name.
 function readArguments(args) {
-  const options = { routes: [], pageScript: "", clicks: [], name: "" };
+  const options = { routes: [], pageScript: "", clicks: [], name: "", sizes: "" };
   for (const arg of args) {
-    if (arg.startsWith("--js=")) {
+    if (arg.startsWith("--sizes=")) {
+      options.sizes = arg.slice("--sizes=".length);
+    } else if (arg.startsWith("--js=")) {
       options.pageScript = arg.slice("--js=".length);
     } else if (arg.startsWith("--click=")) {
       options.clicks.push(arg.slice("--click=".length));
@@ -47,6 +50,21 @@ function readArguments(args) {
   }
   if (options.routes.length === 0) options.routes.push("#/");
   return options;
+}
+
+function sizeNameCB(size) { return size.name; }
+
+// Every picture costs the agent reading it, so take only the sizes the screen is used at.
+function pickSizes(text) {
+  if (!text) return SIZES;
+  return text.split(",").map(function findSizeCB(name) {
+    const size = SIZES.find(function sameNameCB(candidate) { return candidate.name === name.trim(); });
+    if (!size) {
+      console.error('Unknown size "' + name + '". Use any of: ' + SIZES.map(sizeNameCB).join(", "));
+      process.exit(1);
+    }
+    return size;
+  });
 }
 
 // "#/play/controller" becomes "play-controller", safe as a file or folder name.
@@ -116,6 +134,7 @@ async function screenshotRoute(browser, route, size, options, folder) {
 
 async function main() {
   const options = readArguments(process.argv.slice(2));
+  const sizes = pickSizes(options.sizes);
   const { chromium } = loadPlaywright();
   // Each run gets its own folder, so the pictures of two scenarios never mix or overwrite each other.
   const folder = join(FOLDER, safeName(options.name || options.routes[0]));
@@ -124,7 +143,7 @@ async function main() {
   const browser = await chromium.launch();
   try {
     for (const route of options.routes) {
-      for (const size of SIZES) {
+      for (const size of sizes) {
         await screenshotRoute(browser, route, size, options, folder);
       }
     }
