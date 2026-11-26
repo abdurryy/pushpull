@@ -12,7 +12,7 @@ export function MusicTrack(props) {
   useEffect(function applySettingsACB() {
     setMuted(Boolean(props.muted));
     setMusicIntensity(props.intensity || 0);
-  }, [props.muted, props.intensity]);
+  }, [props.name, props.muted, props.intensity]);
 
   return null;
 }

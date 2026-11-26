@@ -63,7 +63,7 @@ function measure(samples) {
   const windowSize = Math.round(SAMPLE_RATE * 0.05);
   let peak = 0;
   let loudest = 0;
-  for (let start = 0; start + windowSize <= samples.length; start += windowSize) {
+  for (let start = 0; start + windowSize <= samples.length; start += Math.round(windowSize / 4)) {
     let sum = 0;
     for (let i = start; i < start + windowSize; i += 1) {
       sum += samples[i] * samples[i];
