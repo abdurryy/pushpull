@@ -10,7 +10,7 @@ import { join } from "node:path";
 const BASE_URL = process.env.BASE_URL || "http://localhost:8080/";
 const FOLDER = join(tmpdir(), "pushpull-audio");
 const SAMPLE_RATE = 44100;
-const CLIP_DB = -0.3;      // a peak above this is about to clip
+const CLIP_DB = -1;        // the skill's ceiling: no peak above -1 dBFS
 const SPREAD_DB = 6;       // effects further than this from the median loudness stand out too much
 
 function loadPlaywright() {
@@ -63,11 +63,12 @@ function measure(samples) {
   const windowSize = Math.round(SAMPLE_RATE * 0.05);
   let peak = 0;
   let loudest = 0;
+  // The peak checks every sample, including the last few that don't fill a whole window.
+  for (const sample of samples) peak = Math.max(peak, Math.abs(sample));
   for (let start = 0; start + windowSize <= samples.length; start += Math.round(windowSize / 4)) {
     let sum = 0;
     for (let i = start; i < start + windowSize; i += 1) {
       sum += samples[i] * samples[i];
-      peak = Math.max(peak, Math.abs(samples[i]));
     }
     loudest = Math.max(loudest, Math.sqrt(sum / windowSize));
   }
@@ -147,7 +148,7 @@ async function main() {
       const levels = measure(result.samples);
       writeFileSync(join(FOLDER, job.file + ".wav"), wavFile(result.samples));
       console.log(job.file.padEnd(34) + levels.peak.toFixed(1).padStart(9) + levels.loudness.toFixed(1).padStart(13));
-      if (levels.peak > CLIP_DB) console.log("  warning: peak is close to clipping");
+      if (levels.peak > CLIP_DB) console.log("  warning: peak is above " + CLIP_DB + " dBFS, too close to clipping");
       result.problems.forEach(function printProblemCB(problem) { console.log("  problem: " + problem); });
       if (job.kind === "effect") effectLoudness.push({ file: job.file, loudness: levels.loudness });
     }

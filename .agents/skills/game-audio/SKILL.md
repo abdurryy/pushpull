@@ -47,7 +47,7 @@ Picture:    the effect or words it pairs with
 | Neutral, information | One note or a repeated note | `count`, `tick`, `tie` |
 | Arrival, achievement | A run that lands on a chord | `go`, `win` |
 
-**Size grows with the event:** small events are 1 to 2 notes and under 0.2 s, medium ones 3 notes or a thud, big ones a run and a chord of up to about 1 s. Frequent sounds are the shortest and quietest.
+**Size grows with the event:** small events are 1 to 2 notes that all start within 0.2 s, medium ones 3 notes or a thud, big ones a run and a chord of up to about 1 s. A wooden note's tail may ring out after that, fading by itself, but the next note of the effect never comes later. Frequent sounds are the shortest and quietest.
 
 **Register:** effects live around C5 to C6, above the melodies (A4 to E5) and far above the bass, so they cut through without covering the music. Low sounds are only for crashes.
 
