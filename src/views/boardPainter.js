@@ -65,6 +65,13 @@ function strokePath(context, points, width, colour, gap) {
     else context.lineTo(point.x, point.y);
   });
   context.stroke();
+  // A part with no close neighbour (alone across an edge) has no line to draw, so it gets a dot of the same width.
+  points.forEach(function dotLonePartCB(point, index) {
+    const hasNeighbour = [points[index - 1], points[index + 1]].some(function isCloseCB(other) {
+      return other && Math.hypot(other.x - point.x, other.y - point.y) <= gap;
+    });
+    if (!hasNeighbour) circle(context, point.x, point.y, width / 2, colour);
+  });
 }
 
 // The centre of a cell, in canvas pixels.
@@ -79,9 +86,11 @@ function popIn(progress) {
 }
 
 // The point a fraction (0 = head, 1 = tail) of the way along the snake's body.
-function pointAlong(points, fraction) {
+// A jump across an edge (longer than gap) counts as no length, so the point never travels over empty board.
+function pointAlong(points, fraction, gap) {
   const lengths = points.slice(1).map(function segmentLengthCB(point, index) {
-    return Math.hypot(point.x - points[index].x, point.y - points[index].y);
+    const length = Math.hypot(point.x - points[index].x, point.y - points[index].y);
+    return length > gap ? 0 : length;
   });
   let remaining = lengths.reduce(function sumCB(sum, length) { return sum + length; }, 0) * fraction;
   for (let index = 0; index < lengths.length; index += 1) {
@@ -273,7 +282,7 @@ function paintSnake(frame, snake) {
   strokePath(context, snake.points.slice(1), cell * 0.18, palette.teamSoft[snake.team], cell * 1.5);
   context.globalAlpha = 1;
   snake.swallows.forEach(function paintSwallowCB(fraction) {
-    const point = pointAlong(snake.points, fraction);
+    const point = pointAlong(snake.points, fraction, cell * 1.5);
     circle(context, point.x, point.y, cell * (0.46 + 0.08 * Math.sin(fraction * Math.PI)), colour);
   });
   circle(context, snake.points[0].x, snake.points[0].y, cell * 0.5, colour);
