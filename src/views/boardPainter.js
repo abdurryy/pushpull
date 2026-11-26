@@ -377,7 +377,7 @@ function paintHead(frame, snake, colour) {
   });
 }
 
-// A small tile of offset, pointed scale edges. The team fill is part of the tile
+// A small tile of staggered, rounded scale edges. The team fill is part of the tile
 // so the body and the swallow bulge can use the same pattern without a clipping layer.
 function makeSkin(context, colour, scaleColour) {
   const tile = document.createElement("canvas");
@@ -387,16 +387,17 @@ function makeSkin(context, colour, scaleColour) {
   skin.fillStyle = colour;
   skin.fillRect(0, 0, 1, 1);
   skin.strokeStyle = scaleColour;
-  skin.globalAlpha = 0.32;
-  skin.lineWidth = 0.065;
-  skin.lineJoin = "round";
+  skin.globalAlpha = 0.23;
+  skin.lineWidth = 0.047;
+  skin.lineCap = "round";
   skin.beginPath();
-  for (const y of [-0.5, 0, 0.5, 1]) {
-    for (const x of [-0.5, 0, 0.5, 1]) {
-      const offset = y === 0 || y === 1 ? 0 : 0.25;
-      skin.moveTo(x + offset, y);
-      skin.quadraticCurveTo(x + offset + 0.04, y + 0.27, x + offset + 0.25, y + 0.5);
-      skin.quadraticCurveTo(x + offset + 0.46, y + 0.27, x + offset + 0.5, y);
+  for (const y of [0.12, 0.62]) {
+    const offset = y < 0.5 ? 0 : 0.25;
+    // The curve on the tile's left edge finishes on the next copy at the right edge.
+    for (const x of [-offset + 0.25, -offset + 0.75, -offset + 1.25]) {
+      skin.moveTo(x - 0.19, y);
+      skin.bezierCurveTo(x - 0.16, y + 0.08, x - 0.08, y + 0.24, x, y + 0.24);
+      skin.bezierCurveTo(x + 0.08, y + 0.24, x + 0.16, y + 0.08, x + 0.19, y);
     }
   }
   skin.stroke();
