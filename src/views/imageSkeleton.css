@@ -10,8 +10,8 @@
 .image-skeleton-placeholder {
   position: absolute;
   inset: 0;
-  background: var(--color-line);
-  filter: grayscale(1);
+  pointer-events: none;
+  background: var(--color-sunken);
   transition: opacity var(--duration) var(--ease-out);
 }
 
@@ -28,31 +28,21 @@
   object-fit: cover;
 }
 
-.image-skeleton[data-state="loading"] .image-skeleton-image {
-  opacity: 0;
-}
-
 @media (prefers-reduced-motion: no-preference) {
-  .image-skeleton[data-state="loading"] .image-skeleton-placeholder::after {
+  .image-skeleton-placeholder::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, transparent, var(--color-surface), transparent);
+    background: linear-gradient(90deg, transparent, var(--color-bg), transparent);
     opacity: 0.55;
     animation: image-skeleton-sweep var(--duration-loading) linear infinite;
   }
 
-  .image-skeleton[data-state="ready"] .image-skeleton-image {
-    animation: image-skeleton-reveal var(--duration) var(--ease-out) both;
+  .image-skeleton[data-state="ready"] .image-skeleton-placeholder::after {
+    animation-play-state: paused;
   }
 }
-
 @keyframes image-skeleton-sweep {
   from { transform: translateX(-100%); }
   to { transform: translateX(100%); }
-}
-
-@keyframes image-skeleton-reveal {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
