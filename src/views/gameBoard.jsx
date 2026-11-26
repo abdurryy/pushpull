@@ -13,6 +13,11 @@ function isCrashCB(effect) {
   return effect.kind === "crash";
 }
 
+// The same event list also feeds SoundCues, so only the events the board draws are kept here.
+function isBoardEffectCB(effect) {
+  return effect.kind === "eat" || effect.kind === "crash";
+}
+
 function renderSnakeCB(snake) {
   return snake.body.map(function renderTileCB(cell, index) {
     const head = index === 0 ? " game-board-head game-board-head-" + snake.heading : "";
@@ -48,7 +53,7 @@ function renderEffectCB(effect) {
 }
 
 export function GameBoard(props) {
-  const effects = props.effects || [];
+  const effects = (props.effects || []).filter(isBoardEffectCB);
   const crashes = effects.filter(isCrashCB);
   const lastCrash = crashes[crashes.length - 1];
 
