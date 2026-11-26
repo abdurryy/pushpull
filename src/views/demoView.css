@@ -8,14 +8,36 @@
   padding: var(--space-4) var(--tv-safe) var(--space-6);
 }
 
+.demo-intro,
+.demo-playfield,
+.demo-guide {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-3);
+}
+
 .demo-header {
   display: grid;
   gap: var(--space-1);
 }
 
-.demo-header a {
-  justify-self: start;
+.demo-links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-5);
+}
+
+.demo-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--hit-min);
   color: var(--color-ink);
+}
+
+.demo-header p,
+.demo-weather {
+  max-width: 42ch;
+  overflow-wrap: anywhere;
 }
 
 .demo h1,
@@ -126,6 +148,10 @@
   font-weight: var(--weight-bold);
 }
 
+.demo-start:active {
+  transform: scale(var(--press-scale));
+}
+
 .demo-keys {
   display: grid;
   gap: var(--space-2);
@@ -159,6 +185,29 @@
   border-radius: var(--radius-small);
   background: var(--color-sunken);
   font-family: var(--font-numbers);
+}
+
+@media (min-width: 45rem) and (orientation: landscape) {
+  .demo {
+    max-width: calc(var(--phone-max-width) * 3);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    grid-template-areas:
+      "intro playfield"
+      "guide playfield";
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    column-gap: var(--space-5);
+  }
+
+  .demo-intro { grid-area: intro; }
+  .demo-playfield { grid-area: playfield; }
+  .demo-guide { grid-area: guide; }
+}
+
+@media (min-width: 60rem) and (orientation: landscape) {
+  .demo-keys ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (min-width: 80rem) and (orientation: landscape) {

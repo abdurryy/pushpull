@@ -1,7 +1,7 @@
 // View (dev page, #/components): every shared component in every state, with sample props to copy.
 // The buttons only change what this page shows, so their state stays in the View (UI-only state,
 // see docs/course/project/keeping-presenter-simple.md). Real screens get their data from the model.
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { StatusMessage } from "./statusMessage.jsx";
 import { TeamChip } from "./teamChip.jsx";
 import { TeamRoster } from "./teamRoster.jsx";
@@ -47,6 +47,7 @@ const BO = { id: "u2", name: "Bo" };
 const LONG_NAME = { id: "u3", name: "Maximiliana Oxenstierna" };
 
 export function GalleryView() {
+  const soundHeading = useRef(null);
   const [retryKind, setRetryKind] = useState("error");
   const [typedCode, setTypedCode] = useState("");
   const [score, setScore] = useState({ a: 2, b: 1 });
@@ -55,6 +56,8 @@ export function GalleryView() {
   // One list of events feeds both GameBoard (pictures) and SoundCues (sounds), like the model's event list will.
   const [events, setEvents] = useState([]);
   const [soundOff, setSoundOff] = useState(false);
+  const [soundTeam, setSoundTeam] = useState("a");
+  const [lastSound, setLastSound] = useState("");
   const [track, setTrack] = useState(null);
   const [lastTenLayer, setLastTenLayer] = useState(false);
   const [snakes, setSnakes] = useState(SAMPLE_SNAKES);
@@ -98,13 +101,19 @@ export function GalleryView() {
   function trackClickACB(event) { setTrack(event.currentTarget.dataset.track); }
   function stopMusicACB() { setTrack(null); }
   function lastTenLayerACB() { setLastTenLayer(!lastTenLayer); }
-  function soundClickACB(event) { addEvent({ kind: event.currentTarget.dataset.sound, team: "a", x: 10, y: 5 }); }
+  function jumpToSoundACB() { soundHeading.current?.focus(); }
+  function soundTeamChangeACB(event) { setSoundTeam(event.target.value); }
+  function soundClickACB(event) {
+    const kind = event.currentTarget.dataset.sound;
+    addEvent({ kind, team: soundTeam });
+    setLastSound(kind + " · Team " + soundTeam.toUpperCase());
+  }
 
   function renderTrackButtonCB(name) {
     return <button key={name} type="button" data-track={name} aria-pressed={track === name} onClick={trackClickACB}>{name}</button>;
   }
   function renderSoundButtonCB(name) {
-    return <button key={name} type="button" data-sound={name} onClick={soundClickACB}>{name}</button>;
+    return <button key={name} type="button" data-sound={name} onClick={soundClickACB} disabled={soundOff}>{name}</button>;
   }
 
   return (
@@ -112,9 +121,15 @@ export function GalleryView() {
       <MusicTrack name={track} intensity={lastTenLayer ? 1 : 0} muted={soundOff} />
       <SoundCues cues={events} />
       <header className="gallery-header">
-        <a href="#/">Back to home</a>
-        <h1>Components</h1>
-        <p>Every shared piece in every state. Sample props are in <code>src/views/galleryView.jsx</code>, and design.md lists what each one is for.</p>
+        <nav className="gallery-nav" aria-label="Testing navigation">
+          <a href="#/">Back to home</a>
+          <a href="#/demo">Play the keyboard demo</a>
+        </nav>
+        <h1>Test components and sound</h1>
+        <p>Try room codes, team seats, the game board, music, and sound effects.</p>
+        <div className="gallery-row">
+          <button type="button" onClick={jumpToSoundACB}>Jump to sound tests</button>
+        </div>
       </header>
 
       <section className="gallery-section" aria-labelledby="gallery-status">
@@ -166,7 +181,8 @@ export function GalleryView() {
           secondsLeft={secondsLeft}
         />
         <div className="gallery-board">
-          <GameBoard columns={20} rows={12} snakes={snakes} apples={SAMPLE_APPLES} effects={events}
+          <GameBoard columns={20} rows={12} snakes={snakes} apples={SAMPLE_APPLES}
+            effects={events.filter(function hasPositionCB(event) { return event.x !== undefined; })}
             inputs={SAMPLE_INPUTS} weather={SAMPLE_WEATHER[weatherName]} tickMs={240}
             label="Team A's snake is 5 long, Team B's is 4 long" />
           <Countdown value={COUNTDOWN_STEPS[countdownStep]} />
@@ -188,8 +204,8 @@ export function GalleryView() {
       </section>
 
       <section className="gallery-section" aria-labelledby="gallery-sound">
-        <h2 id="gallery-sound">SoundToggle, MusicTrack and SoundCues</h2>
-        <p className="gallery-note">Browsers only play sound after a press, so press anything first. The board buttons above play their sounds too.</p>
+        <h2 id="gallery-sound" ref={soundHeading} tabIndex={-1}>Sound tests</h2>
+        <p className="gallery-note">Choose a track or effect to hear it. The board tests play sounds too.</p>
         <div className="gallery-row">
           <SoundToggle muted={soundOff} onToggle={toggleSoundACB} />
         </div>
@@ -197,12 +213,22 @@ export function GalleryView() {
         <div className="gallery-row">
           {TRACKS.map(renderTrackButtonCB)}
           <button type="button" onClick={stopMusicACB}>Stop music</button>
-          <button type="button" aria-pressed={lastTenLayer} onClick={lastTenLayerACB}>Last 10 seconds layer</button>
+          <button type="button" aria-pressed={lastTenLayer} onClick={lastTenLayerACB}>Round music: last 10 seconds</button>
         </div>
         <h3>Effects</h3>
+        <label className="gallery-sound-team">
+          <span>Team voice</span>
+          <select value={soundTeam} onChange={soundTeamChangeACB}>
+            <option value="a">Team A</option>
+            <option value="b">Team B</option>
+          </select>
+        </label>
         <div className="gallery-row">
           {SOUND_NAMES.map(renderSoundButtonCB)}
         </div>
+        <p className="gallery-note" role="status">
+          {soundOff ? "Sound is off." : lastSound && "Last effect: " + lastSound}
+        </p>
       </section>
     </main>
   );
