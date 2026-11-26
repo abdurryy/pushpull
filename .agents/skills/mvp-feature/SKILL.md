@@ -95,14 +95,23 @@ import { promiseStatus } from "../model/resolvePromise.js";
 import { WeatherView } from "../views/weatherView.jsx";
 
 export const WeatherPresenter = observer(function WeatherPresenter(props) {
+  const promiseState = props.model.weatherPromiseState;
+
+  function cityChangedACB(text) {
+    props.model.setCityQuery(text);   // exactly one model method per event
+  }
+
   function searchRequestedACB() {
-    props.model.findWeather();   // exactly one model method
+    props.model.findWeather();
   }
 
   return (
     <WeatherView
       city={props.model.cityQuery}
-      status={promiseStatus(props.model.weatherPromiseState)}
+      status={promiseStatus(promiseState)}
+      result={promiseState.data}
+      error={promiseState.error}
+      onCityChange={cityChangedACB}
       onSearch={searchRequestedACB}
     />
   );
