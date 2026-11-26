@@ -51,7 +51,7 @@ export const soundEffects = {
 
   // Each of the last 10 seconds: a small, quiet tick.
   tick(output, time, pitch) {
-    instruments.woodblock(output, time, noteFrequency("E6") * pitch, 1.05);
+    instruments.woodblock(output, time, noteFrequency("E6") * pitch, 1.2);
   },
 
   // Round won: a rising run that lands on a full chord with bass.
