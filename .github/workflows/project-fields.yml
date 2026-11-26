@@ -1,47 +1,40 @@
-# Fills Priority, Target date and View/presenter on the project board from each issue's Planning part.
+# Copies planning fields from issues to Pushpull Devroad.
 name: Project board fields
 
 on:
   issues:
     types: [opened, edited, milestoned, reopened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Issue number to sync again
+        required: true
+        type: string
 
 permissions:
   contents: read
 
+concurrency:
+  group: project-fields-${{ github.event.issue.number || inputs.issue_number }}
+  cancel-in-progress: false
+
 jobs:
   fill:
     name: Fill board fields
-    # Only the team's own issues, so outsiders can't use the board token.
-    if: contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.issue.author_association)
+    # The manual workflow is available to people with repository write access.
+    if: github.event_name == 'workflow_dispatch' || contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.issue.author_association)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for the board token
-        id: token
-        env:
-          PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
-        run: |
-          if [ -n "$PROJECT_TOKEN" ]; then
-            echo "present=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "present=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::PROJECT_TOKEN secret is missing, so the board fields were not filled. See CONTRIBUTING.md, Repo setup."
-          fi
-
       - name: Copy the issue's planning fields to the board
-        if: steps.token.outputs.present == 'true'
         env:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
           PROJECT_OWNER: abdurryy
           PROJECT_NUMBER: "2"
         run: |
-          if ! gh api user --silent; then
-            echo "::error::PROJECT_TOKEN could not authenticate. Update it in the repository's Actions secrets."
-            exit 1
-          fi
-          if ! gh project view "$PROJECT_NUMBER" --owner "$PROJECT_OWNER" --format json > /dev/null; then
-            echo "::error::PROJECT_TOKEN cannot access Pushpull Devroad. Use a classic token with project and public_repo scopes from an account with board write access."
-            exit 1
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::notice::PROJECT_TOKEN secret is missing, so the board fields were not filled. See CONTRIBUTING.md, Repo setup."
+            exit 0
           fi
           node .github/scripts/fillProjectFields.mjs
