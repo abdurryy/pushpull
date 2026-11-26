@@ -88,4 +88,4 @@ Nothing on GitHub may show that an AI agent was involved:
 - Stay inside your task's files. Each presenter/view pair, the model, the API module and persistence have one owner (`README.md`, Team). Say explicitly when a change needs new model data or methods.
 - Never commit `node_modules/`, `dist/`, `.env*` or API keys. Keep `minify: false` in `vite.config.js`.
 - Update the Status and Third-party components sections of `README.md` when relevant. Both are graded.
-- Use the model the repo sets up. Switch to a stronger one only for issues marked `Difficulty: hard` (`CONTRIBUTING.md`, Agent models and usage).
+- **Before starting an issue, check its `## Difficulty` against your model** (`CONTRIBUTING.md`, Agent models and usage). `easy` fits the repo's default. `hard` needs the stronger model or reasoning. On a mismatch, either way, say which to switch to and wait: the developer switches, or tells you to carry on.
