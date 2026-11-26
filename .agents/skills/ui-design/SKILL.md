@@ -17,7 +17,7 @@ Step 5 (look at it) is not optional. A screen you haven't looked at is not done.
 
 ## The rules in one list
 
-1. Read `docs/design.md`, `src/styles/tokens.css` and the nearest existing View before you start.
+1. Read "Rules at a glance" in `docs/design.md`, the sections your task needs (step 1), `src/styles/tokens.css` and the nearest existing View before you start.
 2. Write the brief (step 2) before any code.
 3. Use tokens only: `var(--token)` for every colour, font, size, space, radius and duration.
 4. Design every state: loading, empty, error, content, disabled and long text.
@@ -28,17 +28,30 @@ Step 5 (look at it) is not optional. A screen you haven't looked at is not done.
 
 ## Step 1: Load the context
 
-Read these, in this order:
+Read only what the task needs. Every extra file costs tokens for the whole team. In this order:
 
-1. `docs/design.md`, the whole file. Note the controller rules and the PR checklist.
+1. `docs/design.md`: **always** "Rules at a glance" and the PR checklist at the end. Then only the sections your task touches:
+
+   | Task | Sections |
+   |---|---|
+   | Any View | Components, Shared components |
+   | TV screen | + Layout and navigation, Typography (TV sizes) |
+   | Phone screen | + Layout and navigation, Components (buttons and inputs) |
+   | Controller | + Controller (all ten rules) |
+   | Colours, new tokens, team colour | + Colour (with the contrast table), Tokens |
+   | Animation or game effect | + Motion, Game feel (and the game-feel skill) |
+   | Sound on a screen | + Sound (and the game-audio skill) |
+   | The game board | + Components → Game board |
+
+   Read the whole file only for a new screen type or a design review.
 2. `src/styles/tokens.css`. These are the only values you may use.
-3. The closest existing View and its CSS, as a sample of the house style. Copy its patterns instead of inventing new ones:
+3. The closest existing View and its CSS, as a sample of the house style. For a change to an existing View, that View is enough. For a new View, copy the patterns of the closest one instead of inventing new ones:
    - `src/views/homeView.jsx` / `.css`: page layout, hierarchy, link cards, the board drawing, the wide-screen breakpoint.
    - `src/views/loginView.jsx` / `.css`: buttons, pressed and disabled states, status lines with `PushMark`, error messages.
    - `src/views/weatherView.jsx` / `.css`: a TV form with idle, loading, error, empty and content states.
    - `src/views/controllerView.jsx` / `.css`: touch zones, safe areas, the landscape-only controller.
 4. The **shared components** (design.md, Shared components). Open `#/components` to see each one in every state, and use them before writing your own: status lines, team chips and seats, room codes, the score bar, the countdown, the game board, and the sound components.
-5. `references/recipes.md` in this skill folder: ready-made patterns for buttons, cards, fields, status lines and the TV frame.
+5. `references/recipes.md` in this skill folder, only when you build a new button, card, field, status line or TV frame: ready-made patterns for each.
 6. The issue you are working on, especially its acceptance criteria.
 
 Other skills cover the rest: **game-feel** for effects on game events, **game-audio** for sound, and **mvp-feature** for the model and presenter side.
