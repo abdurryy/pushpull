@@ -2,7 +2,7 @@
 
 This is a group project (4 developers) for KTH DH2642/ID2216 HT26 *Developing Mobile Applications*. We're building an interactive app on top of an existing API, using Model-View-Presenter (MVP), reactive application state and per-user persistence (Firebase).
 
-**Status:** idea chosen (Push/Pull, see `README.md`), design decided (`docs/design.md`, values in `src/styles/tokens.css`), no app code yet. The rest of `src/` gets created when we scaffold (React + Vite, see `docs/course/project/minimal-react-web-setup.md`).
+**Status:** the app is scaffolded and deployed (React + Vite, MobX, Firebase; see Status in `README.md`). The design is decided (`docs/design.md`, values in `src/styles/tokens.css`), and the shared components are on `#/components`.
 
 ## Where things are
 
@@ -12,8 +12,8 @@ This is a group project (4 developers) for KTH DH2642/ID2216 HT26 *Developing Mo
 ├── .coderabbit.yaml     ← CodeRabbit review rules
 ├── .github/rulesets/    ← GitHub branch protection for main (import in repo settings)
 ├── .github/ISSUE_TEMPLATE/, pull_request_template.md  ← issue and PR templates
-├── .agents/skills/ui-design/  ← UI skill: workflow, taste rules, screenshot script (.claude/skills/ui-design links here)
-├── src/                 ← app code (not yet created; layout in README.md)
+├── .agents/skills/      ← skills: read the matching one before a task (see Skills below; .claude/skills links here)
+├── src/                 ← app code (layout in README.md)
 └── docs/
     ├── INDEX.md         ← START HERE: map of all docs + deadlines + gaps
     ├── design.md        ← design system: look, components, controller rules
@@ -23,6 +23,18 @@ This is a group project (4 developers) for KTH DH2642/ID2216 HT26 *Developing Mo
         ├── project/       ← brief, advice, MVP rules, setup, examples
         └── deliverables/  ← 01-… to 04-…, numbered by due date
 ```
+
+## Skills: read the matching one first
+
+Skills are step-by-step guides with checks and scripts, in `.agents/skills/<name>/SKILL.md` (`.claude/skills/<name>` links to the same folder). **Before you start a task, find every skill below that matches it, read its SKILL.md and follow it**, even when your tool didn't load it by itself. Say in your report which skills you used.
+
+| Skill | Read it before |
+|---|---|
+| `ui-design` | any View, CSS, on-screen text, layout or UI review |
+| `game-feel` | any animation or effect for a game event, or adding a game event |
+| `game-audio` | any sound effect, music, mix change or sound on a screen |
+| `mvp-feature` | any change to the model, a presenter, the API, persistence or routes |
+| `user-testing` | planning or writing up a user test, and any school text (reports, write-ups) |
 
 ## Finding information
 
