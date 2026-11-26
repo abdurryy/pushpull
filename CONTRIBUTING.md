@@ -9,6 +9,20 @@ git pull
 npm install      # only if package.json changed
 ```
 
+## One-time setup for the agent check scripts
+
+The skills' check scripts drive a real browser: the ui-design screenshots, the game-feel frame captures and the game-audio sound measurements (in `.agents/skills/*/scripts/`). They need Playwright and its Chromium. Install them once:
+
+```sh
+npm install --no-save playwright
+npx playwright install chromium
+```
+
+- `--no-save` keeps Playwright out of `package.json`, so it isn't part of the app or the build.
+- A plain `npm install` removes it again. If a script then says "Playwright is missing", run the first command again. The browser stays downloaded, so it only takes a few seconds.
+- The scripts also need the dev server: keep `npm run dev` running in its own terminal while they run.
+- If your coding agent asks for permission to use the network for these commands, allow it.
+
 ## Git and pull requests
 
 `main` is protected (see [Repo setup](#repo-setup-once-by-the-repo-owner)). You can't push to it directly, force-push it or delete it. Every change follows the same path: **issue → branch → pull request → review → auto-merge.**
