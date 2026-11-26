@@ -17,7 +17,7 @@ P1
 ## Difficulty
 <!-- easy: one View, one doc or a clear small fix. The agent's default model is enough.
      hard: game rules, Firebase sync, several layers at once, or visual design taste. Step up to the strong model
-     (see CONTRIBUTING.md, AI tools). -->
+     (see CONTRIBUTING.md, AI tools). Copied to the project board automatically. -->
 easy
 
 ## Files to touch
