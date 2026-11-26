@@ -88,7 +88,7 @@ node .agents/skills/game-audio/scripts/render-audio.mjs eat round  # only these
 
 It renders each effect (Team A and B) and each track (normal and last 10 seconds) offline in Chromium with the real mixer, saves WAV files in the system temp folder under `pushpull-audio`, and prints the peak and loudness (the loudest 50ms). It warns about peaks near clipping, effects more than 6 dB from the median, and bars that don't have 16 steps. Fix every warning and run it again.
 
-Today's reference levels: effects median about -18 dB loudness, music about -22 dB, the loudest peak -1.5 dBFS.
+Today's reference levels: effects median about -17 dB loudness, music about -22 dB, the loudest peak -1.5 dBFS.
 
 Then give a person something to listen to. Convert the files with `ffmpeg -i in.wav -b:a 128k out.mp3` and attach them, or point them to `#/components`. Ask them to check:
 
