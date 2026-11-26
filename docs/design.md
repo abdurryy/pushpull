@@ -225,6 +225,8 @@ Every component sizes its text from the parent's font size, so the same piece wo
 
 ### Controller (phone, landscape)
 
+The Enter controller setup button uses click activation so a touch tap can grant the browser permission to enter fullscreen. During play, the four game actions start on pointerdown.
+
 Players watch the TV, not their phone. In remote-control party games, on-screen buttons often feel dead: nothing moves, nothing buzzes, and you can't tell whether a press counted. These rules make every press feel like it landed:
 
 1. **Act on press, not on release.** Start the action on `pointerdown`. A `click` only fires when the finger lifts, which feels slow.

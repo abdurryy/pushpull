@@ -22,6 +22,7 @@ export function ControllerView({ onClear, onStick, onAction, direction, ...heldA
   const screen = useRef(null);
   const stickPointer = useRef(null);
   const buttonPointers = useRef(new Map());
+  const buttonKeys = useRef(new Map());
   const [mode, setMode] = useState("setup");
   const [stick, setStick] = useState(null);
 
@@ -29,6 +30,7 @@ export function ControllerView({ onClear, onStick, onAction, direction, ...heldA
     function clearACB() {
       stickPointer.current = null;
       buttonPointers.current.clear();
+      buttonKeys.current.clear();
       setStick(null);
       onClear();
     }
@@ -133,28 +135,42 @@ export function ControllerView({ onClear, onStick, onAction, direction, ...heldA
     const name = event.currentTarget.value;
     if (buttonPointers.current.get(name) !== event.pointerId) return;
     buttonPointers.current.delete(name);
-    onAction(name, false);
+    if (!buttonKeys.current.get(name)?.size) onAction(name, false);
   }
 
   function actionKeyDownACB(event) {
     if (event.repeat || (event.key !== " " && event.key !== "Enter")) return;
     event.preventDefault();
-    onAction(event.currentTarget.value, true);
+    const name = event.currentTarget.value;
+    const keys = buttonKeys.current.get(name) || new Set();
+    keys.add(event.key);
+    buttonKeys.current.set(name, keys);
+    onAction(name, true);
   }
 
   function actionKeyUpACB(event) {
     if (event.key !== " " && event.key !== "Enter") return;
     event.preventDefault();
-    onAction(event.currentTarget.value, false);
+    const name = event.currentTarget.value;
+    const keys = buttonKeys.current.get(name);
+    if (!keys?.delete(event.key) || keys.size) return;
+    buttonKeys.current.delete(name);
+    if (!buttonPointers.current.has(name)) onAction(name, false);
   }
 
   function actionBlurACB(event) {
     const name = event.currentTarget.value;
-    if (!buttonPointers.current.has(name)) onAction(name, false);
+    if (buttonKeys.current.delete(name) && !buttonPointers.current.has(name)) {
+      onAction(name, false);
+    }
   }
 
   function contextMenuACB(event) { event.preventDefault(); }
-  function continueACB() { setMode("active"); }
+  function continueACB(event) {
+    if (event.type === "pointerdown" && event.button !== 0) return;
+    if (event.type === "click" && event.detail !== 0) return;
+    setMode("active");
+  }
   const active = mode === "active" || mode === "fullscreen";
 
   return (
@@ -168,7 +184,7 @@ export function ControllerView({ onClear, onStick, onAction, direction, ...heldA
           {mode === "fallback" ? (
             <>
               <p role="status">Fullscreen is unavailable here. On iPhone, open this page in Safari and use Share → Add to Home Screen, then launch Push/Pull from the icon.</p>
-              <button type="button" onClick={continueACB}>Continue in browser</button>
+              <button type="button" onPointerDown={continueACB} onClick={continueACB}>Continue in browser</button>
             </>
           ) : <button type="button" onClick={enterACB}>Enter controller</button>}
         </div>
