@@ -183,7 +183,7 @@ export function GalleryView() {
         <h2 id="gallery-image-skeleton">ImageSkeleton</h2>
         <ImageSkeleton
           className="gallery-image-sample"
-          src={imagePreviewPending ? null : "/pushpull-icon-512.png"}
+          src="/pushpull-icon-512.png"
           alt="Push/Pull app icon"
           pending={imagePreviewPending}
         />

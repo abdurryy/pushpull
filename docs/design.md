@@ -88,7 +88,7 @@ Rules:
 
 **Snappy:** short and quick. `--duration-fast` (120ms) for presses and toggles, `--duration` (180ms) for panels and score changes, easing `--ease-out`. Loading indicators use `--duration-loading` (900ms). Nothing loops except loading indicators and the game board (see Game board below). Game events (eating, crashing, scoring) use the effect tokens in [Game feel](#game-feel). When the device asks for reduced motion, every duration becomes 0 (including `--duration-loading`), and the tokens file already handles this.
 
-The image skeleton uses a white gradient only while an image loads. The gray fill comes from `--color-line` rendered in grayscale. The sweep uses `--duration-loading` and the reveal uses `--duration`.
+The image skeleton uses `--color-sunken` for the warm fill and `--color-bg` for the cream highlight. The highlight sweeps at `--duration-loading` while the image loads. Once the image is decoded, the sweep pauses and the placeholder fades over the image using `--duration`.
 
 ### Animated push mark
 
@@ -189,7 +189,7 @@ Ready-made View components in `src/views/`. **Use them before writing your own**
 | Component | Props | For |
 |---|---|---|
 | `StatusMessage` | `kind` (`loading`, `waiting`, `searching`, `empty`, `success`, `error`), the sentence as children, `onRetry`, `retryLabel` | Every loading, empty and error state |
-| `ImageSkeleton` | `src`, `alt`, `width` and `height` (or dimensions from `className`), optional `fallback`, `referrerPolicy` and `pending` while waiting for a source | Reserves an image's space, sweeps a white shimmer over a neutral gray placeholder, then fades in the image. Try **Replay image loading** on `#/components`. Reduced motion uses a static placeholder and immediate reveal. |
+| `ImageSkeleton` | `src`, `alt`, `width` and `height` (or dimensions from `className`), optional `fallback`, `referrerPolicy` and `pending` | Reserves an image's space and shows a warm shimmer until the image is ready to paint. The placeholder then fades away. Try **Replay image loading** on `#/components`. Reduced motion uses a static placeholder and immediate reveal. |
 | `TeamChip` | `team` (`"a"` or `"b"`), a name as children (default "Team A") | Anywhere a team is shown |
 | `TeamRoster` | `team`, `players` (`[{ id, name }]`), `seats` (default 2), `youId`, `name` | Lobby (#24), join (#25) |
 | `RoomCode` | `code` (empty shows four dots). Its size follows the parent's font size | Lobby (#24) |

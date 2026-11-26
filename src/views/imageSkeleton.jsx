@@ -12,8 +12,14 @@ function ImageSkeletonContent({ src, alt, width, height, className = "", fallbac
   const imageState = src ? status : "error";
   const state = pending ? "loading" : imageState;
 
-  function imageLoadedACB() {
-    setStatus("ready");
+  async function imageLoadedACB(event) {
+    // Keep the placeholder visible until the browser has pixels ready to paint.
+    try {
+      await event.currentTarget.decode();
+      setStatus("ready");
+    } catch {
+      setStatus("error");
+    }
   }
 
   function imageFailedACB() {
@@ -24,7 +30,6 @@ function ImageSkeletonContent({ src, alt, width, height, className = "", fallbac
     <span className={`image-skeleton ${className}`} style={{ width, height }} data-state={state}>
       {state === "error" ? (fallback ?? alt) : (
         <>
-          <span className="image-skeleton-placeholder" aria-hidden="true" />
           {src && <img
             className="image-skeleton-image"
             src={src}
@@ -33,6 +38,7 @@ function ImageSkeletonContent({ src, alt, width, height, className = "", fallbac
             onLoad={imageLoadedACB}
             onError={imageFailedACB}
           />}
+          <span className="image-skeleton-placeholder" aria-hidden="true" />
         </>
       )}
     </span>
