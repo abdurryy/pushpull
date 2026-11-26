@@ -86,7 +86,7 @@ Rules:
 
 ## Motion
 
-**Snappy:** short and quick. `--duration-fast` (120ms) for presses and toggles, `--duration` (180ms) for panels and score changes, easing `--ease-out`. Loading indicators use `--duration-loading` (900ms). Nothing loops except loading indicators. When the device asks for reduced motion, every duration becomes 0 (including `--duration-loading`), and the tokens file already handles this.
+**Snappy:** short and quick. `--duration-fast` (120ms) for presses and toggles, `--duration` (180ms) for panels and score changes, easing `--ease-out`. Loading indicators use `--duration-loading` (900ms). Nothing loops except loading indicators. Game events (eating, crashing, scoring) use the effect tokens in [Game feel](#game-feel). When the device asks for reduced motion, every duration becomes 0 (including `--duration-loading`), and the tokens file already handles this.
 
 ### Animated push mark
 
@@ -103,6 +103,55 @@ Use `PushMark` from `src/views/pushMark.jsx` alongside a visible heading or stat
 | `game-start` | The outlines trace before the arrows fill | When the TV lobby starts a round (issue #24) |
 
 Loading and searching repeat only while the request is pending. The other variants play once per appearance. Start the round and enable controls on their normal schedule, independently of the animation.
+
+## Game feel
+
+Every game event answers on three channels at once: something moves on the TV, the TV plays a sound, and the phones of the players involved buzz. A player looking at their phone still hears it, and a muted TV still shows it. Never use one channel alone for something that matters.
+
+| Event | On the TV | TV sound | Phone |
+|---|---|---|---|
+| Apple eaten | The apple bursts into six dots in the team colour and a ring grows from its cell | `eat`: two quick rising wooden notes, a little higher for Team B | Short buzz for both teammates |
+| Snake crashes | A spark at the crashed head and the board shakes once | `crash`: a low thud that slides down | Long buzz for the team that crashed |
+| Score changes | The score number pops once | `point`: three rising notes | None |
+| Round starts | "3", "2", "1", "Go!" in the middle of the board, one per second | `count` on each number, `go` on "Go!" | Short buzz on "Go!" |
+| Last 10 seconds | The timer turns `--color-warning` and pops each second | `tick` each second, and the music adds its last-10-seconds layer | None |
+| Round won or tied | The winning team's chip grows into a banner with the team name | `win` (or `tie`) jingle | Long buzz for the winners |
+| Player joins or leaves the lobby | The seat fills with a pop, or empties | `join` or `leave` | Short buzz on the phone that joined |
+| Dash, Ping, Shed, Hold up | A short effect at the snake head, defined with the action rules (#27) | `dash` whoosh, `ping` bloop, `shed` snip, `hold` thunk | Short buzz (Controller rule 3) |
+| Press during a cooldown | Nothing | None | `denied`: two short buzzes and a shake (Controller rule 5) |
+
+A short buzz is `--press-vibration-ms`. A long buzz is three times that.
+
+Rules:
+
+1. **The board stays readable.** Effects never cover a snake head or the apple for longer than one tick. At most eight particles per effect, small, gone within `--duration-effect`.
+2. **Short.** Event effects last `--duration-effect` or less, shorter than two ticks, so they never queue up. Only round-level moments (the countdown, the winner banner) take longer.
+3. **Team colour for team events, ink for the rest.** An orange burst means Team A did it. As everywhere, the team name or letter is never far away.
+4. **Bigger event, bigger effect.** Eating is small, a crash is medium, winning a round is the biggest. If everything is loud, nothing is.
+5. **Safe flashing.** No full-screen flashes, and nothing flashes more than three times a second (WCAG 2.3.1).
+6. **Reduced motion.** The effect tokens become 0: no particles, no shake, no pops. The board change and the sound still tell what happened.
+7. **The model says what happened, the View shows it.** The model keeps a short list of recent events (`{ id, kind, team, x, y }`) and the View animates each new `id` once. A View never works out events by comparing the old and new board.
+
+## Sound
+
+**Toy box sound:** wooden, warm and plucky, like a marimba, a kalimba, wood blocks and a soft felt drum. No harsh beeps, no realistic recordings, no voices. Sound is a reward and a signal: a group should be able to play for an hour without anyone asking to turn it off.
+
+- **Only the TV plays sound.** Four phones beeping in four hands is noise, so the phones buzz instead (Controller rule 3).
+- **Made in code.** Every sound and every track is built with the Web Audio API, the same way the graphics are drawn with CSS. No audio files, nothing to license and nothing to download.
+- **One track per screen:**
+
+| Screen | Track | Feel | Tempo | Key |
+|---|---|---|---|---|
+| Lobby | `lobby` | Relaxed, waiting for friends | 92 BPM | F major |
+| Round | `round` | Bouncy and driving. In the last 10 seconds it adds a fast hi-hat and the melody jumps an octave | 124 BPM | A minor |
+| Trivia tie-break | `trivia` | Thinking, with a ticking clock | 84 BPM | D minor |
+| Round results | `results` | Warm and proud | 100 BPM | C major |
+
+- **Melodies use the five notes of the key's pentatonic scale**, so an effect played on top never clashes with the music.
+- **Mix:** effects sit clearly above the music (music at about half their level). Every effect is about as loud as the others, and a limiter on the output stops clipping.
+- **Variation:** a sound that repeats (eating, ticks) shifts its pitch slightly each time, and the same sound never starts twice within 50ms. Twenty apples shouldn't sound like a machine gun.
+- **Turning sound on and off:** browsers only allow sound after a press, so the first press on the TV ("Create room", "Start round") turns it on. The TV always shows a sound button with an icon and a label ("Sound on" / "Sound off"). Whether sound is on is application state.
+- **Never sound alone.** Every sound has a picture that says the same thing (see the Game feel table), so deaf players and muted TVs miss nothing.
 
 ## Components
 
@@ -159,6 +208,7 @@ All values are in [`src/styles/tokens.css`](../src/styles/tokens.css). Import it
 - [ ] Controller: actions fire on `pointerdown`, the pressed state shows instantly, and it works with the stick and a button pressed together
 - [ ] Checked on a phone-sized screen (and on a real phone for controller changes)
 - [ ] Looked at screenshots at phone and TV size, in every state (`node .agents/skills/ui-design/scripts/screenshot.mjs "#/route"` takes them)
+- [ ] Game events have the picture, sound and buzz from the Game feel table, and nothing flashes more than three times a second
 
 ## Sources
 

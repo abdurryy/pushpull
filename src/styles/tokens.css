@@ -75,6 +75,12 @@
   --duration-loading: 900ms;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 
+  /* Effects for game events (docs/design.md, "Game feel") */
+  --duration-effect: 420ms;     /* bursts, pops and shakes: shorter than two ticks */
+  --pop-scale: 1.25;            /* a number that just changed grows to this, then settles */
+  --shake-distance: 6px;        /* how far the board moves when a snake crashes */
+  --burst-distance: 90%;        /* how far apple burst dots fly, measured in cells */
+
   /* Touch */
   --hit-min: 48px;
   --phone-max-width: 480px;
@@ -92,6 +98,10 @@
     --duration-fast: 0ms;
     --duration: 0ms;
     --duration-loading: 0ms;
+    --duration-effect: 0ms;
+    --pop-scale: 1;
+    --shake-distance: 0px;
+    --burst-distance: 0%;
   }
 }
 
