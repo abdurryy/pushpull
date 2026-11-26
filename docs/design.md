@@ -207,6 +207,7 @@ All values are in [`src/styles/tokens.css`](../src/styles/tokens.css). Import it
 - [ ] TV view: no text smaller than `--tv-text`, nothing inside the 5% edge
 - [ ] Controller: actions fire on `pointerdown`, the pressed state shows instantly, and it works with the stick and a button pressed together
 - [ ] Checked on a phone-sized screen (and on a real phone for controller changes)
+- [ ] Looked at screenshots at phone and TV size, in every state (`node .agents/skills/ui-design/scripts/screenshot.mjs "#/route"` takes them)
 - [ ] Game events have the picture, sound and buzz from the Game feel table, and nothing flashes more than three times a second
 
 ## Sources

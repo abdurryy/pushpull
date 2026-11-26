@@ -67,6 +67,8 @@ Full list: [keeping your presenter simple](docs/course/project/keeping-presenter
 
 The course allows GenAI for code, **but you must understand everything you commit.** AI agents read [AGENTS.md](AGENTS.md) for the project rules.
 
+For anything a player sees, the agent should use the **ui-design skill** ([.agents/skills/ui-design/SKILL.md](.agents/skills/ui-design/SKILL.md)). AGENTS.md already tells it to, but you can also name it in your prompt ("use the ui-design skill"). It makes the agent write a short brief, follow design.md, and take screenshots and look at them before it calls the work done.
+
 When you let an agent commit, push, open PRs or merge for you:
 
 - It commits with **your** git identity.
