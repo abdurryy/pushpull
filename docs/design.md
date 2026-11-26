@@ -152,6 +152,8 @@ Rules:
 - **Variation:** a sound that repeats (eating, ticks) shifts its pitch slightly each time, and the same sound never starts twice within 50ms. Twenty apples shouldn't sound like a machine gun.
 - **Turning sound on and off:** browsers only allow sound after a press, so the first press on the TV ("Create room", "Start round") turns it on. The TV always shows a sound button with an icon and a label ("Sound on" / "Sound off"). Whether sound is on is application state.
 - **Never sound alone.** Every sound has a picture that says the same thing (see the Game feel table), so deaf players and muted TVs miss nothing.
+- **Where it lives:** `src/sound/` (`instruments.js`, `effects.js` with one function per event, `music.js` with the tracks as note patterns, `soundPlayer.js` with the mix and the music clock). Sound is output, like a View: Views use it through `MusicTrack`, `SoundCues` and `SoundToggle` (Shared components), and the model never imports it. Try every sound on `#/components`.
+- **Check levels before you ship a sound:** `node .agents/skills/game-audio/scripts/render-audio.mjs` renders every effect and track to WAV files and warns about clipping and effects that are much louder or quieter than the rest.
 
 ## Components
 
@@ -183,7 +185,10 @@ Ready-made View components in `src/views/`. **Use them before writing your own**
 | `RoomCodeInput` | `value`, `onCodeChange(code)`, `disabled`, `invalid`, `label`. Put it inside a `<form>` so Enter submits | Join (#25) |
 | `ScoreBar` | `scoreA`, `scoreB`, `teamAName`, `teamBName`, `title`, `secondsLeft` | Game board (#28) |
 | `Countdown` | `value` (`"3"`, `"2"`, `"1"`, `"Go!"` or nothing). The parent needs `position: relative` | Game board (#28) |
-| `GameBoard` | `columns`, `rows`, `snakes` (`[{ team, heading, body }]`), `apples`, `effects` (`[{ id, kind: "eat" or "crash", team, x, y }]`), `label` | Game board (#28) |
+| `GameBoard` | `columns`, `rows`, `snakes` (`[{ team, heading, body }]`), `apples`, `effects` (`[{ id, kind: "eat" or "crash", team, x, y }]`, other kinds are ignored), `label` | Game board (#28) |
+| `SoundCues` | `cues`: the same event list as `GameBoard`. Plays each new `id` once; `kind` is a sound name from `src/sound/effects.js` | Every TV screen with events |
+| `MusicTrack` | `name` (`lobby`, `round`, `trivia`, `results` or nothing), `intensity` (1 in the last 10 seconds), `muted`. One per screen | Every TV screen |
+| `SoundToggle` | `muted`, `onToggle` | Every TV screen |
 
 Every component sizes its text from the parent's font size, so the same piece works on the phone and, inside a parent with `font-size: var(--tv-text)`, on the TV.
 

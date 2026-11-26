@@ -77,8 +77,9 @@ Building a screen? Open http://localhost:8080/#/components first: it shows every
 │   │   ├── weatherView.jsx/.css  # city search with loading, empty and error states
 │   │   ├── galleryView.jsx/.css  # #/components: every shared component in every state
 │   │   └── statusMessage, teamChip, teamRoster, roomCode, roomCodeInput, scoreBar,
-│   │       countdown, gameBoard  # shared components, listed in docs/design.md
+│   │       countdown, gameBoard, soundCues, musicTrack, soundToggle  # shared components, listed in docs/design.md
 │   ├── styles/tokens.css         # design tokens (colours, fonts, sizes) used by every View
+│   ├── sound/                    # synthesized sound effects and music, played by Views (docs/design.md, Sound)
 │   └── persistence/
 │       ├── firebaseConfig.js     # starts Firebase with the config from .env.local
 │       └── firebaseAuth.js       # Google sign-in/out, and onAuthStateChanged -> model.setUser

@@ -10,6 +10,10 @@ import { RoomCodeInput } from "./roomCodeInput.jsx";
 import { ScoreBar } from "./scoreBar.jsx";
 import { Countdown } from "./countdown.jsx";
 import { GameBoard } from "./gameBoard.jsx";
+import { SoundToggle } from "./soundToggle.jsx";
+import { MusicTrack } from "./musicTrack.jsx";
+import { SoundCues } from "./soundCues.jsx";
+import { SOUND_NAMES } from "../sound/effects.js";
 import "./galleryView.css";
 
 const SAMPLE_SNAKES = [
@@ -18,6 +22,7 @@ const SAMPLE_SNAKES = [
 ];
 const SAMPLE_APPLES = [{ x: 10, y: 5 }, { x: 11, y: 9 }];
 const COUNTDOWN_STEPS = ["3", "2", "1", "Go!", null];
+const TRACKS = ["lobby", "round", "trivia", "results"];
 
 const AYA = { id: "u1", name: "Aya" };
 const BO = { id: "u2", name: "Bo" };
@@ -29,24 +34,57 @@ export function GalleryView() {
   const [score, setScore] = useState({ a: 2, b: 1 });
   const [secondsLeft, setSecondsLeft] = useState(42);
   const [countdownStep, setCountdownStep] = useState(4);
-  const [effects, setEffects] = useState([]);
+  // One list of events feeds both GameBoard (pictures) and SoundCues (sounds), like the model's event list will.
+  const [events, setEvents] = useState([]);
+  const [soundOff, setSoundOff] = useState(false);
+  const [track, setTrack] = useState(null);
+  const [lastTenLayer, setLastTenLayer] = useState(false);
 
   function retryACB() { setRetryKind("loading"); }
-  function scoreAACB() { setScore({ a: score.a + 1, b: score.b }); }
-  function scoreBACB() { setScore({ a: score.a, b: score.b + 1 }); }
-  function nextSecondACB() { setSecondsLeft(Math.max(0, secondsLeft - 1)); }
-  function lastTenACB() { setSecondsLeft(10); }
-  function countdownACB() { setCountdownStep((countdownStep + 1) % COUNTDOWN_STEPS.length); }
-
-  function addEffect(effect) {
-    setEffects([...effects, { ...effect, id: effects.length + 1 }]);
+  function addEvent(event) {
+    setEvents([...events, { ...event, id: events.length + 1 }]);
   }
-  function teamAEatsACB() { addEffect({ kind: "eat", team: "a", x: 10, y: 5 }); }
-  function teamBEatsACB() { addEffect({ kind: "eat", team: "b", x: 11, y: 9 }); }
-  function crashACB() { addEffect({ kind: "crash", team: "b", x: 13, y: 6 }); }
+  function teamAEatsACB() { addEvent({ kind: "eat", team: "a", x: 10, y: 5 }); }
+  function teamBEatsACB() { addEvent({ kind: "eat", team: "b", x: 11, y: 9 }); }
+  function crashACB() { addEvent({ kind: "crash", team: "b", x: 13, y: 6 }); }
+
+  function scoreAACB() {
+    setScore({ a: score.a + 1, b: score.b });
+    addEvent({ kind: "point", team: "a" });
+  }
+  function scoreBACB() {
+    setScore({ a: score.a, b: score.b + 1 });
+    addEvent({ kind: "point", team: "b" });
+  }
+  function nextSecondACB() {
+    const next = Math.max(0, secondsLeft - 1);
+    setSecondsLeft(next);
+    if (next <= 10) addEvent({ kind: "tick" });
+  }
+  function lastTenACB() { setSecondsLeft(10); }
+  function countdownACB() {
+    const next = (countdownStep + 1) % COUNTDOWN_STEPS.length;
+    setCountdownStep(next);
+    if (COUNTDOWN_STEPS[next]) addEvent({ kind: COUNTDOWN_STEPS[next] === "Go!" ? "go" : "count" });
+  }
+
+  function toggleSoundACB() { setSoundOff(!soundOff); }
+  function trackClickACB(event) { setTrack(event.currentTarget.dataset.track); }
+  function stopMusicACB() { setTrack(null); }
+  function lastTenLayerACB() { setLastTenLayer(!lastTenLayer); }
+  function soundClickACB(event) { addEvent({ kind: event.currentTarget.dataset.sound, team: "a", x: 10, y: 5 }); }
+
+  function renderTrackButtonCB(name) {
+    return <button key={name} type="button" data-track={name} aria-pressed={track === name} onClick={trackClickACB}>{name}</button>;
+  }
+  function renderSoundButtonCB(name) {
+    return <button key={name} type="button" data-sound={name} onClick={soundClickACB}>{name}</button>;
+  }
 
   return (
     <main className="gallery">
+      <MusicTrack name={track} intensity={lastTenLayer ? 1 : 0} muted={soundOff} />
+      <SoundCues cues={events} />
       <header className="gallery-header">
         <a href="#/">Back to home</a>
         <h1>Components</h1>
@@ -102,7 +140,7 @@ export function GalleryView() {
           secondsLeft={secondsLeft}
         />
         <div className="gallery-board">
-          <GameBoard columns={20} rows={12} snakes={SAMPLE_SNAKES} apples={SAMPLE_APPLES} effects={effects}
+          <GameBoard columns={20} rows={12} snakes={SAMPLE_SNAKES} apples={SAMPLE_APPLES} effects={events}
             label="Team A's snake is 5 long, Team B's is 4 long" />
           <Countdown value={COUNTDOWN_STEPS[countdownStep]} />
         </div>
@@ -115,6 +153,24 @@ export function GalleryView() {
           <button type="button" onClick={nextSecondACB}>Next second</button>
           <button type="button" onClick={lastTenACB}>Last 10 seconds</button>
           <button type="button" onClick={countdownACB}>Next countdown step</button>
+        </div>
+      </section>
+
+      <section className="gallery-section" aria-labelledby="gallery-sound">
+        <h2 id="gallery-sound">SoundToggle, MusicTrack and SoundCues</h2>
+        <p className="gallery-note">Browsers only play sound after a press, so press anything first. The board buttons above play their sounds too.</p>
+        <div className="gallery-row">
+          <SoundToggle muted={soundOff} onToggle={toggleSoundACB} />
+        </div>
+        <h3>Music</h3>
+        <div className="gallery-row">
+          {TRACKS.map(renderTrackButtonCB)}
+          <button type="button" onClick={stopMusicACB}>Stop music</button>
+          <button type="button" aria-pressed={lastTenLayer} onClick={lastTenLayerACB}>Last 10 seconds layer</button>
+        </div>
+        <h3>Effects</h3>
+        <div className="gallery-row">
+          {SOUND_NAMES.map(renderSoundButtonCB)}
         </div>
       </section>
     </main>

@@ -96,6 +96,16 @@
   transition: none;
 }
 
+.gallery-row button[aria-pressed="true"] {
+  background: var(--color-ink);
+  color: var(--color-surface);
+}
+
+.gallery h3 {
+  margin: 0;
+  font-size: var(--text-body);
+}
+
 @media (min-width: 60rem) {
   .gallery {
     padding: var(--space-6) var(--tv-safe) var(--space-7);
