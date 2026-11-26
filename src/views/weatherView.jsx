@@ -58,7 +58,7 @@ export function WeatherView(props) {
     const arrowStyle = { transform: "rotate(" + (weather.windDirection + 180) + "deg)" };
     return (
       <article className="weather-card">
-        <h3 className="weather-city">{city.name}, {city.country}</h3>
+        <h2 className="weather-city">{city.name}, {city.country}</h2>
         <ul className="weather-facts">
           <li className="weather-fact">
             <span className="icon weather-fact-icon" aria-hidden="true" style={arrowStyle}>navigation</span>
@@ -82,8 +82,11 @@ export function WeatherView(props) {
 
   return (
     <main className="weather">
-      <h2 className="weather-title">Where are you playing?</h2>
-      <p className="weather-lead">The live weather in your city changes every round.</p>
+      <header className="weather-header">
+        <a href="#/">Back to home</a>
+        <h1 className="weather-title">Where are you playing?</h1>
+        <p className="weather-lead">The live weather in your city changes every round.</p>
+      </header>
 
       <form className="weather-form" onSubmit={submitACB}>
         <label className="weather-label" htmlFor="weather-city">City</label>

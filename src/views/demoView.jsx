@@ -87,78 +87,87 @@ export function DemoView(props) {
     <main className="demo">
       <MusicTrack name={musicFor(playing, round)} intensity={playing && seconds <= 10 ? 1 : 0} muted={!props.soundOn} />
       <SoundCues cues={props.events} />
-      <header className="demo-header">
-        <a href="#/">Back to home</a>
-        <h1>Double Snake demo</h1>
-        <p>Four players, one keyboard. Hold a direction to move. Teammates who push in opposite directions stop the snake.</p>
-      </header>
-      <div className="demo-score">
-        <strong className="demo-team demo-a">Team A <span className="numbers">{score.a}</span></strong>
-        <strong className="numbers" aria-label={seconds + " seconds left"}>{seconds}s</strong>
-        <strong className="demo-team demo-b">Team B <span className="numbers">{score.b}</span></strong>
+      <div className="demo-intro">
+        <header className="demo-header">
+          <nav className="demo-links" aria-label="Demo navigation">
+            <a href="#/">Back to home</a>
+            <a href="#/components">Test components and sound</a>
+          </nav>
+          <h1>Double Snake demo</h1>
+          <p>Four players, one keyboard. Hold a direction to move. Teammates who push in opposite directions stop the snake.</p>
+        </header>
+        <div className="demo-actions">
+          {playing ? (
+            <p key={roundNumber} className="demo-round" role="status">
+              <PushMark variant="game-start" /> Round {roundNumber}
+            </p>
+          ) : (
+            <button ref={start} className="demo-start" type="button" onClick={props.onStart}>
+              {round ? "Play another round" : "Start round"}
+            </button>
+          )}
+          {playing && (props.teamACancelled || props.teamBCancelled) && (
+            <span>{props.teamACancelled && "Team A stopped. "}{props.teamBCancelled && "Team B stopped."}</span>
+          )}
+          <SoundToggle muted={!props.soundOn} onToggle={toggleSoundACB} />
+        </div>
       </div>
-      <div className="demo-arena" ref={arena} tabIndex={playing ? 0 : -1} aria-label="Game board keyboard controls"
-        onKeyDown={keyDownACB} onKeyUp={keyUpACB} onBlur={onClearKeys}>
-        <GameBoard
-          columns={props.columns}
-          rows={props.rows}
-          snakes={props.snakes}
-          apples={props.apples}
-          effects={props.events}
-          inputs={playing ? props.inputs : {}}
-          weather={playing ? weather : null}
-          tickMs={props.tickMs}
-          label={boardLabel(props.snakes)}
-        />
-        {!round && <p className="demo-overlay">Start a round to place both snakes on the board.</p>}
-        {round?.outcome && <p className="demo-overlay" role="status">{outcomeText(round.outcome)}</p>}
-      </div>
-      {playing && weather && (
-        <p className="demo-weather-summary">
-          {weather.city} · {weather.night ? "Night" : "Daylight"}
-          {weather.wet ? " · Wet: snakes slide one extra square" : " · Dry"}
-          {weather.wind ? " · Wind: apples drift " + weather.wind : " · Calm"}
-        </p>
-      )}
-      {!playing && (
-        <form className="demo-weather" onSubmit={searchACB}>
-          <label htmlFor="demo-city">Weather city (optional)</label>
-          <div className="demo-weather-form">
-            <input id="demo-city" value={props.cityQuery} onChange={cityChangeACB} />
-            <button type="submit" disabled={!props.cityQuery.trim() || props.weatherStatus === "loading"}>Check weather</button>
-          </div>
-          <p role="status">{renderWeatherStatus(props.weatherStatus, props.weatherCity)}</p>
-        </form>
-      )}
-      <div className="demo-actions">
-        {playing ? (
-          <p key={roundNumber} className="demo-round" role="status">
-            <PushMark variant="game-start" /> Round {roundNumber}
+      <div className="demo-playfield">
+        <div className="demo-score">
+          <strong className="demo-team demo-a">Team A <span className="numbers">{score.a}</span></strong>
+          <strong className="numbers" aria-label={seconds + " seconds left"}>{seconds}s</strong>
+          <strong className="demo-team demo-b">Team B <span className="numbers">{score.b}</span></strong>
+        </div>
+        <div className="demo-arena" ref={arena} tabIndex={playing ? 0 : -1} aria-label="Game board keyboard controls"
+          onKeyDown={keyDownACB} onKeyUp={keyUpACB} onBlur={onClearKeys}>
+          <GameBoard
+            columns={props.columns}
+            rows={props.rows}
+            snakes={props.snakes}
+            apples={props.apples}
+            effects={props.events}
+            inputs={playing ? props.inputs : {}}
+            weather={playing ? weather : null}
+            tickMs={props.tickMs}
+            label={boardLabel(props.snakes)}
+          />
+          {!round && <p className="demo-overlay">Start a round to place both snakes on the board.</p>}
+          {round?.outcome && <p className="demo-overlay" role="status">{outcomeText(round.outcome)}</p>}
+        </div>
+        {playing && weather && (
+          <p className="demo-weather-summary">
+            {weather.city} · {weather.night ? "Night" : "Daylight"}
+            {weather.wet ? " · Wet: snakes slide one extra square" : " · Dry"}
+            {weather.wind ? " · Wind: apples drift " + weather.wind : " · Calm"}
           </p>
-        ) : (
-          <button ref={start} className="demo-start" type="button" onClick={props.onStart}>
-            {round ? "Play another round" : "Start round"}
-          </button>
         )}
-        {playing && (props.teamACancelled || props.teamBCancelled) && (
-          <span>{props.teamACancelled && "Team A stopped. "}{props.teamBCancelled && "Team B stopped."}</span>
-        )}
-        <SoundToggle muted={!props.soundOn} onToggle={toggleSoundACB} />
       </div>
-      <section className="demo-keys" aria-labelledby="demo-keys-title">
-        <h2 id="demo-keys-title">Keyboard controls</h2>
-        <p>Each row lists up, left, down, right.</p>
-        <ul>
-          {props.keyGroups.map(function renderKeysCB(group) {
-            return (
-              <li key={group.player}>
-                <strong>Player {group.player}</strong>
-                <span>{group.keys.map(function keyCB(key) { return <kbd key={key}>{key}</kbd>; })}</span>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
+      <div className="demo-guide">
+        {!playing && (
+          <form className="demo-weather" onSubmit={searchACB}>
+            <label htmlFor="demo-city">Weather city (optional)</label>
+            <div className="demo-weather-form">
+              <input id="demo-city" value={props.cityQuery} onChange={cityChangeACB} />
+              <button type="submit" disabled={!props.cityQuery.trim() || props.weatherStatus === "loading"}>Check weather</button>
+            </div>
+            <p role="status">{renderWeatherStatus(props.weatherStatus, props.weatherCity)}</p>
+          </form>
+        )}
+        <section className="demo-keys" aria-labelledby="demo-keys-title">
+          <h2 id="demo-keys-title">Keyboard controls</h2>
+          <p>Each row lists up, left, down, right.</p>
+          <ul>
+            {props.keyGroups.map(function renderKeysCB(group) {
+              return (
+                <li key={group.player}>
+                  <strong>Player {group.player}</strong>
+                  <span>{group.keys.map(function keyCB(key) { return <kbd key={key}>{key}</kbd>; })}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      </div>
     </main>
   );
 }

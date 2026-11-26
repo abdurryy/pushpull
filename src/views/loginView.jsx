@@ -72,6 +72,7 @@ export function LoginView(props) {
 
   return (
     <main className="login">
+      <a className="login-home-link" href="#/">Back to home</a>
       <h1 className="login-logo">
         <PushMark variant={props.user && props.status === "done" ? "success" : "static"} />
         PUSH/PULL
