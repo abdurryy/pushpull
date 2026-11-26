@@ -14,6 +14,16 @@ P1
 ## View/presenter
 <!-- The pair this touches, e.g. "lobbyPresenter / lobbyView", or "none: model" / "none: persistence". -->
 
+## Difficulty
+<!-- easy: one View, one doc or a clear small fix. The agent's default model is enough.
+     hard: game rules, Firebase sync, several layers at once, or visual design taste. Step up to the strong model
+     (see CONTRIBUTING.md, AI tools). -->
+easy
+
+## Files to touch
+<!-- The files to open first, one per line, e.g. src/views/lobbyView.jsx. Saves the agent searching the repo. -->
+- 
+
 ## Brief
 <!-- One or two sentences: what should change and why it matters to the player or the team. -->
 
