@@ -67,7 +67,13 @@ Full list: [keeping your presenter simple](docs/course/project/keeping-presenter
 
 The course allows GenAI for code, **but you must understand everything you commit.** AI agents read [AGENTS.md](AGENTS.md) for the project rules.
 
-For anything a player sees, the agent should use the **ui-design skill** ([.agents/skills/ui-design/SKILL.md](.agents/skills/ui-design/SKILL.md)). AGENTS.md already tells it to, but you can also name it in your prompt ("use the ui-design skill"). It makes the agent write a short brief, follow design.md, and take screenshots and look at them before it calls the work done.
+Agents also have **skills**: step-by-step guides with checks and scripts in [.agents/skills/](.agents/skills/). AGENTS.md tells every agent to read the matching one first, and you can also name one in your prompt ("use the game-audio skill"):
+
+- **ui-design:** any screen or CSS. Brief first, design.md rules, then screenshots it must look at.
+- **game-feel:** effects for game events. It captures an animation frame by frame so the agent can see it.
+- **game-audio:** sound effects and music. It measures every sound, and asks a person to listen.
+- **mvp-feature:** model, presenter, API and persistence work, with checks for the graded MVP rules.
+- **user-testing:** planning and writing up user tests, plus the writing rules for school text.
 
 When you let an agent commit, push, open PRs or merge for you:
 

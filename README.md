@@ -92,7 +92,7 @@ Building a screen? Open http://localhost:8080/#/components first: it shows every
 ├── .github/rulesets/     # branch protection for main (imported in repo settings)
 ├── .coderabbit.yaml      # automated code review rules
 ├── AGENTS.md             # instructions for AI coding agents
-├── .agents/skills/       # agent skills; ui-design is read before any UI work
+├── .agents/skills/       # agent skills (ui-design, game-feel, game-audio, mvp-feature, user-testing), see AGENTS.md
 └── CONTRIBUTING.md       # how we work: git, PRs, reviews, code rules
 ```
 
@@ -110,6 +110,10 @@ _Required in the mid-project review._
 - Homepage: explains Double Snake and lets visitors choose the shared screen or phone
 - Local Double Snake demo: shared keyboard, two teams, apples, crashes, timer and replay
 - Firebase project and Google sign-in on the phone (`#/play/login`)
+- Game feel and sound designed in design.md: the picture, sound and phone buzz for every game event
+- Shared View components for the next screens (status lines, team seats, room code boxes, score bar, countdown, game board), shown in every state on `#/components`
+- Sound effects for every game event and music for the lobby, round, trivia and results, made in code with the Web Audio API
+- Agent skills in `.agents/skills/` so everyone's coding agent follows design.md, the MVP rules and the user-testing rules
 
 **Planned**
 - MobX model with the game rules, plus per-user persistence in Firebase

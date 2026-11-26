@@ -94,6 +94,16 @@ reviews:
         (--color-team-a) used as a text colour, and team colour shown without a team name or letter.
         In controller views, flag actions bound to click instead of pointerdown. Don't suggest new
         colours, fonts or visual effects.
+    - path: "src/sound/**"
+      instructions: |
+        Sound is output that sits next to the Views (docs/design.md, Sound). Flag imports of src/sound/ from
+        src/model, src/presenters or src/persistence, audio files or new audio libraries, and sound effects
+        that use notes other than C, D, E, G and A. Levels are checked with
+        .agents/skills/game-audio/scripts/render-audio.mjs.
+    - path: ".agents/skills/**"
+      instructions: |
+        Agent skills: step-by-step guides and dev scripts, not app code. Only flag contradictions with
+        docs/design.md, AGENTS.md or the course pages, broken paths, and scripts that would fail to run.
     - path: "src/model/**"
       instructions: |
         The model holds all application state and the logic that changes it. One user action should be

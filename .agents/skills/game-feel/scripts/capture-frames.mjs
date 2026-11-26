@@ -1,0 +1,94 @@
+// Dev tool (not app code): saves frames of an animation so an effect can be checked by eye, like a flipbook.
+// It presses a button (or runs a script), pauses every CSS animation and moves them to exact times before each picture.
+// Usage:  node .agents/skills/game-feel/scripts/capture-frames.mjs "#/components" --click="Team A eats" --selector=".gallery-board"
+// Options: --js="code to run instead of a click"  --times="0,60,120,200,300,450" (milliseconds)
+// Needs:  the dev server running (npm run dev) and Playwright (see the ui-design skill, step 5).
+import { createRequire } from "node:module";
+import { mkdirSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+const BASE_URL = process.env.BASE_URL || "http://localhost:8080/";
+const FOLDER = join(tmpdir(), "pushpull-frames");
+
+function loadPlaywright() {
+  const require = createRequire(import.meta.url);
+  try {
+    return require("playwright");
+  } catch {
+    console.error("Playwright is missing. Run: npm install --no-save playwright && npx playwright install chromium");
+    process.exit(1);
+  }
+}
+
+// --name=value pairs, plus the route as the one argument without "--".
+function readArguments(args) {
+  const options = { route: "#/", click: "", js: "", selector: "", times: "0,60,120,200,300,450" };
+  for (const arg of args) {
+    const match = arg.match(/^--(\w+)=(.*)$/);
+    if (match) options[match[1]] = match[2];
+    else options.route = arg;
+  }
+  options.times = options.times.split(",").map(Number);
+  return options;
+}
+
+// Runs in the page: hold every running animation still at the given time.
+function seekAnimationsCB(milliseconds) {
+  document.getAnimations().forEach(function seekCB(animation) {
+    animation.pause();
+    animation.currentTime = milliseconds;
+  });
+}
+
+async function trigger(page, options) {
+  if (options.click) await page.getByRole("button", { name: options.click, exact: true }).click();
+  if (options.js) await page.evaluate(options.js);
+}
+
+async function picture(page, options, path) {
+  const target = options.selector ? page.locator(options.selector).first() : page;
+  await target.screenshot({ path });
+  console.log(path);
+}
+
+async function openPage(browser, options, reducedMotion) {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 }, reducedMotion });
+  await page.goto(new URL(options.route, BASE_URL).href, { waitUntil: "load" });
+  await page.evaluate(async function waitForFontsCB() { await document.fonts.ready; });
+  if (options.selector) await page.locator(options.selector).first().scrollIntoViewIfNeeded();
+  return page;
+}
+
+async function main() {
+  const options = readArguments(process.argv.slice(2));
+  if (!options.click && !options.js) {
+    console.error('Say what starts the effect: --click="Button name" or --js="code".');
+    process.exit(1);
+  }
+  const { chromium } = loadPlaywright();
+  mkdirSync(FOLDER, { recursive: true });
+  const browser = await chromium.launch();
+  try {
+    // With motion: one frame per time.
+    const page = await openPage(browser, options, "no-preference");
+    await trigger(page, options);
+    for (const time of options.times) {
+      await page.evaluate(seekAnimationsCB, time);
+      await picture(page, options, join(FOLDER, "frame-" + String(time).padStart(4, "0") + "ms.png"));
+    }
+    // With reduced motion: the effect should add nothing on top of the normal change.
+    const calmPage = await openPage(browser, options, "reduce");
+    await trigger(calmPage, options);
+    await calmPage.waitForTimeout(50);
+    await picture(calmPage, options, join(FOLDER, "frame-reduced-motion.png"));
+  } catch (error) {
+    const offline = error.message.includes("ERR_CONNECTION_REFUSED");
+    console.error(offline ? "Can't reach " + BASE_URL + ". Start the dev server with: npm run dev" : error.message);
+    process.exitCode = 1;
+  } finally {
+    await browser.close();
+  }
+}
+
+main();
