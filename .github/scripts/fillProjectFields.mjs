@@ -2,6 +2,7 @@
 // Run by .github/workflows/project-fields.yml with a token (PROJECT_TOKEN) that can edit the board.
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
+import { setTimeout as delay } from "node:timers/promises";
 
 const OWNER = process.env.PROJECT_OWNER || "abdurryy";
 const PROJECT_NUMBER = process.env.PROJECT_NUMBER || "2";
@@ -55,7 +56,7 @@ function findProjectItem(issueId, fieldIds) {
   return request(PROJECT + "/items?per_page=100&fields=" + fieldIds.join(","), { filter: query });
 }
 
-function findOrAddProjectItem(issueId, fieldIds) {
+async function findOrAddProjectItem(issueId, fieldIds) {
   const existing = findProjectItem(issueId, fieldIds);
   if (existing) return existing;
 
@@ -64,13 +65,17 @@ function findOrAddProjectItem(issueId, fieldIds) {
   } catch (error) {
     // The board's auto-add can win the race after the lookup.
     if (!String(error.stderr).includes("Content already exists in this project")) throw error;
-    const added = findProjectItem(issueId, fieldIds);
-    if (!added) throw error;
-    return added;
+    // A recently added card may take a few seconds to appear in the items list.
+    for (const waitMs of [500, 1000, 2000, 4000]) {
+      await delay(waitMs);
+      const added = findProjectItem(issueId, fieldIds);
+      if (added) return added;
+    }
+    throw new Error("The board accepted the issue but its card is not visible yet. Rerun this issue when the card appears.");
   }
 }
 
-function syncProjectFields(issue, priority, targetDate) {
+async function syncProjectFields(issue, priority, targetDate) {
   const fields = request(PROJECT + "/fields?per_page=100");
   const priorityField = fields.find(function priorityCB(field) { return field.name === "Priority"; });
   const dateField = fields.find(function dateCB(field) { return field.name === "Target date"; });
@@ -78,7 +83,7 @@ function syncProjectFields(issue, priority, targetDate) {
     throw new Error("The board must have Priority and Target date fields.");
   }
 
-  const item = findOrAddProjectItem(issue.id, [priorityField.id, dateField.id]);
+  const item = await findOrAddProjectItem(issue.id, [priorityField.id, dateField.id]);
   const currentPriority = item.fields?.find(function priorityCB(field) { return field.id === priorityField.id; });
   const currentDate = item.fields?.find(function dateCB(field) { return field.id === dateField.id; });
   const option = priorityField.options.find(function matchesCB(choice) { return choice.name.raw === priority; });
@@ -112,7 +117,7 @@ function syncViewField(number, text) {
   console.log("View/presenter: " + text);
 }
 
-function main() {
+async function main() {
   const issue = loadIssue();
   if (issue.pull_request) throw new Error("Pass an issue number, not a pull request number.");
   const body = issue.body || "";
@@ -120,8 +125,8 @@ function main() {
   const writtenDate = sectionValue(body, "Target date");
   const targetDate = /^\d{4}-\d{2}-\d{2}$/.test(writtenDate) ? writtenDate : issue.milestone?.due_on?.slice(0, 10);
 
-  syncProjectFields(issue, priority, targetDate);
+  await syncProjectFields(issue, priority, targetDate);
   syncViewField(issue.number, sectionValue(body, "View/presenter"));
 }
 
-main();
+await main();
