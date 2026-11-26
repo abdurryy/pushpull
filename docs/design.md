@@ -167,10 +167,10 @@ Rules:
 
 **Game board.** The board is where the fun is, so it is the one place that is always a little alive. `GameBoard` draws it on a canvas (`src/views/boardPainter.js`), with colours and timings read from the tokens:
 
-- **Floor:** `--color-board` with a dot on every cell (`--color-board-dot`).
-- **Snakes** are creatures, not loose blocks: one continuous body in the team colour, 84% of a cell thick (8% space on each side, like `--tile-inset`) with round corners, a stripe of the team's soft colour along the back, and a round head with white eyes that blink now and then. The pupils look where the team is steering, even before the snake turns, so players see their input land at once. When teammates pull apart the snake goes cross-eyed, and a crashed snake gets "x" eyes. Eyes turn smoothly, never snap.
-- **Movement:** snakes glide from cell to cell over one tick instead of jumping.
-- **Apples** are ink, with a stalk, a leaf and a small white shine. They pop in when they appear and bob gently.
+- **Floor:** `--color-board` with faint seams and a dot in each cell, both using `--color-board-dot`.
+- **Snakes** have continuous, rounded bodies in their team colours, 84% of a cell thick (`--tile-inset` on each side). Short, staggered rows of scales follow the direction of the body through turns, using each team's soft colour. The head stays smooth, with both eyes easy to find. The heads angle into turns, and pupils look where the team steers, even before the body turns. When teammates pull apart the snake goes cross-eyed. A crashed snake has ink crosses on white eyes so they stay visible during the crash flash.
+- **Movement:** snakes glide from cell to cell over one tick. The gallery's wrapping snakes cross the rim smoothly and stay connected on both sides.
+- **Apples** are ink, with a two-lobed silhouette, a curved stalk, a leaf and a small white shine. They pop in when they appear and bob gently.
 - **Both teammates' sticks** show as ink chevrons by the head. Two the same way make a double chevron and opposite ones point apart, so everyone can see why a snake stopped.
 - **Weather from Open-Meteo is visible:** rain falls in slanted streaks, wind blows streaks the way the apples drift, and at night the board goes dark except for a light around each head.
 - **Reduced motion:** snakes jump cell to cell, and nothing moves on its own (no gliding, bobbing, blinking, rain, wind or effects). Night stays dark.
