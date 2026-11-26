@@ -2,6 +2,24 @@
 
 **Status: decided (2026-11-25).** The team picked every value below. The values live in [`src/styles/tokens.css`](../src/styles/tokens.css). Views use `var(--token)` and never hard-code a colour, font, size, radius or duration.
 
+## Rules at a glance
+
+Read this first. It sums up the rules below without changing them. For the details, open only the sections your task touches (the ui-design skill, step 1, says which).
+
+- **Tokens only.** Every colour, font, size, space, radius, shadow and duration is a `var(--token)` from `tokens.css`. If one is missing, add it in its own small PR. ([Tokens](#tokens))
+- **Toy box look:** light, flat, warm. Surfaces are separated by fill (`--color-bg` → `--color-surface` → `--color-sunken`), never by shadows or card borders. ([Spacing, shape and depth](#spacing-shape-and-depth))
+- **Fonts:** Unbounded for the logo, headings and scores. Atkinson Hyperlegible Next for everything else. `--font-numbers` for codes, scores and timers. ([Typography](#typography))
+- **Team colours:** orange is never a text colour (ink on orange, white on blue), and a team colour always comes with the team's name or letter. ([Colour](#colour))
+- **Icons:** Material Symbols Rounded only, with the meaning in text or `aria-label`. No photos. ([Icons and images](#icons-and-images))
+- **States:** every View that shows data has loading (`StatusMessage` with a sentence; the rest of the screen stays usable), empty and error (with a retry). ([Components](#components))
+- **Shared components first:** check `#/components` and the table in [Shared components](#shared-components) before writing your own.
+- **Accessibility:** a visible label on every input, `alt` on every image, the focus ring is never removed, and only the contrast pairs in the Colour table.
+- **TV:** 1920×1080, nothing inside the 5% edge (`--tv-safe`), no text smaller than `--tv-text`, nothing scrolls. ([Layout and navigation](#layout-and-navigation))
+- **Controller:** landscape only. Act on `pointerdown`, an instant pressed state, a buzz where supported, confirmation from the TV, big zones, multi-touch by `pointerId`, `touch-action: none`. ([Controller](#controller-phone-landscape), rules 1–10)
+- **Motion:** short (`--duration-fast`, `--duration`), only when something changes, and nothing extra with reduced motion. ([Motion](#motion))
+- **Game events** answer on three channels: picture, TV sound and phone buzz. Effects are short, never cover a head or apple for more than a tick, and never flash more than three times a second. ([Game feel](#game-feel), [Sound](#sound))
+- **Before the PR:** the [PR checklist for UI changes](#pr-checklist-for-ui-changes).
+
 ## Direction
 
 Push/Pull is a party game for four friends with one TV and their own phones. It should feel **warm, playful and chunky, like a board game on the living-room table** ("Toy box"), but calm enough that the snakes and the score are always the loudest thing on screen.
