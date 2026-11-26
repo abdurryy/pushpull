@@ -92,7 +92,7 @@ Building a screen? Open http://localhost:8080/#/components first: it shows every
 ├── .github/rulesets/     # branch protection for main (imported in repo settings)
 ├── .coderabbit.yaml      # automated code review rules
 ├── AGENTS.md             # instructions for AI coding agents
-├── .agents/skills/       # agent skills; ui-design is read before any UI work
+├── .agents/skills/       # agent skills (ui-design, game-feel, game-audio, mvp-feature, user-testing), see AGENTS.md
 └── CONTRIBUTING.md       # how we work: git, PRs, reviews, code rules
 ```
 

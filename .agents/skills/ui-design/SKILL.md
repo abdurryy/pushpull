@@ -37,8 +37,11 @@ Read these, in this order:
    - `src/views/loginView.jsx` / `.css`: buttons, pressed and disabled states, status lines with `PushMark`, error messages.
    - `src/views/weatherView.jsx` / `.css`: a TV form with idle, loading, error, empty and content states.
    - `src/views/controllerView.jsx` / `.css`: touch zones, safe areas, the landscape-only controller.
-4. `references/recipes.md` in this skill folder: ready-made patterns for buttons, cards, fields, status lines and the TV frame.
-5. The issue you are working on, especially its acceptance criteria.
+4. The **shared components** (design.md, Shared components). Open `#/components` to see each one in every state, and use them before writing your own: status lines, team chips and seats, room codes, the score bar, the countdown, the game board, and the sound components.
+5. `references/recipes.md` in this skill folder: ready-made patterns for buttons, cards, fields, status lines and the TV frame.
+6. The issue you are working on, especially its acceptance criteria.
+
+Other skills cover the rest: **game-feel** for effects on game events, **game-audio** for sound, and **mvp-feature** for the model and presenter side.
 
 ## Step 2: Write the brief
 
@@ -260,7 +263,7 @@ Score each from 1 to 5. Ship at 4 or more on every line.
 
 1. Go through the PR checklist in `docs/design.md`.
 2. Look for hard-coded values in the CSS you touched. This should print nothing:
-   `grep -nE "#[0-9a-fA-F]{3,8}\b|box-shadow|linear-gradient|font-size: *[0-9]|[0-9]+ms" src/views/*.css`
+   `grep -nE "#[0-9a-fA-F]{3,8}\b|box-shadow|linear-gradient|font-size: *[0-9.]+(px|rem)|[0-9]+ms" src/views/*.css`
 3. Run `npm run build`.
 4. Report to the developer:
    - the brief,
