@@ -1,5 +1,6 @@
 // View (phone): sign in with Google. Shows checking, signed-out, signing-in, error and signed-in states.
 import "./loginView.css";
+import { AccountAvatar } from "./accountAvatar.jsx";
 import { AccountSignIn } from "./accountSignIn.jsx";
 import { PushMark } from "./pushMark.jsx";
 import { StatusMessage } from "./statusMessage.jsx";
@@ -13,9 +14,7 @@ export function LoginView(props) {
     return (
       <div className="login-card">
         <div className="login-user">
-          {props.user.photoUrl
-            ? <img className="login-avatar" src={props.user.photoUrl} alt="" referrerPolicy="no-referrer" />
-            : <span className="login-avatar login-avatar-letter" aria-hidden="true">{(props.user.name || "?").charAt(0)}</span>}
+          <AccountAvatar name={props.user.name} photoUrl={props.user.photoUrl} />
           <p className="login-text">Signed in as <strong>{props.user.name}</strong></p>
         </div>
         <a className="login-button" href="#/play/join">Continue to join a room</a>

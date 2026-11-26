@@ -1,8 +1,9 @@
 // View (dev page, #/components): every shared component in every state, with sample props to copy.
 // The buttons only change what this page shows, so their state stays in the View (UI-only state,
 // see docs/course/project/keeping-presenter-simple.md). Real screens get their data from the model.
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StatusMessage } from "./statusMessage.jsx";
+import { ImageSkeleton } from "./imageSkeleton.jsx";
 import { TeamChip } from "./teamChip.jsx";
 import { TeamRoster } from "./teamRoster.jsx";
 import { RoomCode } from "./roomCode.jsx";
@@ -60,6 +61,7 @@ const TRACKS = ["lobby", "round", "trivia", "results"];
 const AYA = { id: "u1", name: "Aya" };
 const BO = { id: "u2", name: "Bo" };
 const LONG_NAME = { id: "u3", name: "Maximiliana Oxenstierna" };
+const IMAGE_PREVIEW_DELAY_MS = 1500;
 
 export function GalleryView() {
   const soundHeading = useRef(null);
@@ -77,6 +79,17 @@ export function GalleryView() {
   const [lastTenLayer, setLastTenLayer] = useState(false);
   const [snakes, setSnakes] = useState(SAMPLE_SNAKES);
   const [weatherName, setWeatherName] = useState("clear");
+  const [imagePreviewPending, setImagePreviewPending] = useState(false);
+
+  useEffect(function waitForImagePreviewACB() {
+    if (!imagePreviewPending) return;
+
+    function revealImageACB() { setImagePreviewPending(false); }
+    const timeout = setTimeout(revealImageACB, IMAGE_PREVIEW_DELAY_MS);
+    return () => clearTimeout(timeout);
+  }, [imagePreviewPending]);
+
+  function replayImageLoadingACB() { setImagePreviewPending(true); }
 
   function retryACB() { setRetryKind("loading"); }
   function addEvent(event) {
@@ -164,6 +177,21 @@ export function GalleryView() {
         <StatusMessage kind={retryKind} onRetry={retryACB}>
           {retryKind === "error" ? "Couldn't reach the room. Check your connection." : "Trying again…"}
         </StatusMessage>
+      </section>
+
+      <section className="gallery-section" aria-labelledby="gallery-image-skeleton">
+        <h2 id="gallery-image-skeleton">ImageSkeleton</h2>
+        <ImageSkeleton
+          className="gallery-image-sample"
+          src={imagePreviewPending ? null : "/pushpull-icon-512.png"}
+          alt="Push/Pull app icon"
+          pending={imagePreviewPending}
+        />
+        <div className="gallery-row">
+          <button type="button" onClick={replayImageLoadingACB} disabled={imagePreviewPending}>
+            {imagePreviewPending ? "Loading image…" : "Replay image loading"}
+          </button>
+        </div>
       </section>
 
       <section className="gallery-section" aria-labelledby="gallery-teams">

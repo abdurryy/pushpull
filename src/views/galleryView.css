@@ -67,6 +67,12 @@
   gap: var(--space-2);
 }
 
+.gallery-image-sample {
+  width: calc(var(--space-8) * 2);
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+}
+
 .gallery-columns {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));

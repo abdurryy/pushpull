@@ -1,0 +1,58 @@
+/* View styles: keep the placeholder and photo inside the same reserved box. */
+.image-skeleton {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.image-skeleton-placeholder {
+  position: absolute;
+  inset: 0;
+  background: var(--color-line);
+  filter: grayscale(1);
+  transition: opacity var(--duration) var(--ease-out);
+}
+
+.image-skeleton[data-state="ready"] .image-skeleton-placeholder {
+  opacity: 0;
+}
+
+.image-skeleton-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-skeleton[data-state="loading"] .image-skeleton-image {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .image-skeleton[data-state="loading"] .image-skeleton-placeholder::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, var(--color-surface), transparent);
+    opacity: 0.55;
+    animation: image-skeleton-sweep var(--duration-loading) linear infinite;
+  }
+
+  .image-skeleton[data-state="ready"] .image-skeleton-image {
+    animation: image-skeleton-reveal var(--duration) var(--ease-out) both;
+  }
+}
+
+@keyframes image-skeleton-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+@keyframes image-skeleton-reveal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

@@ -151,7 +151,7 @@ Things that belong together sit closer than things that don't. Use this ladder:
 
 ### Depth and shape
 
-- **Flat.** No shadows, no borders around cards, no gradients, no blur or glass, no glow.
+- **Flat.** Avoid shadows, card borders, decorative gradients, blur, glass and glow. The image skeleton uses a gradient to indicate loading.
 - `--radius` for cards, buttons, inputs and chips. `--radius-small` for small parts inside them. `--radius-round` only for circles.
 - A rounded thing inside a rounded thing gets a smaller radius than its parent, or the corners look uneven.
 
@@ -159,6 +159,7 @@ Things that belong together sit closer than things that don't. Use this ladder:
 
 - Every press shows a change **at once**: the pressed state has no transition (see the controller rules in design.md).
 - While waiting, **say what is happening in words**: `PushMark` plus a sentence like "Joining room 4KQ7…". Disable only the button that is waiting. The rest of the screen keeps working (a course requirement for grade C and up).
+- For asynchronously loaded images, reuse `ImageSkeleton` from `src/views/imageSkeleton.jsx`. Reserve space with `width` and `height` or a layout class, supply `alt` and give it a suitable fallback. Keep decorative avatars quiet when the name is already visible. Check slow, failed and reduced-motion states.
 - After success, show the result **where the player is already looking**. No pop-up toasts.
 - An error says what went wrong in the player's words, what to do next, and has a "Try again" button. Keep whatever they typed.
 - Never a blank screen, a silent failure, `alert()`, or a raw error code.
@@ -201,7 +202,7 @@ These make a screen look machine-made. Never use them here.
 
 | Don't | Do instead |
 |---|---|
-| Gradients, gradient text, glass blur, glow, neon | Flat token fills |
+| Decorative gradients, gradient text, glass blur, glow, neon | Flat token fills |
 | Shadows on cards, a border around every box | Separate surfaces by fill colour |
 | A card inside a card inside a card | One surface level, grouped with spacing |
 | Emoji as icons | Material Symbols Rounded, with the meaning in text |
@@ -265,7 +266,8 @@ Score each from 1 to 5. Ship at 4 or more on every line.
 
 1. Go through the PR checklist in `docs/design.md`.
 2. Look for hard-coded values in the CSS you touched. This should print nothing:
-   `grep -nE "#[0-9a-fA-F]{3,8}\b|box-shadow|linear-gradient|font-size: *[0-9.]+(px|rem)|[0-9]+ms" src/views/*.css`
+   `grep -nE "#[0-9a-fA-F]{3,8}\b|box-shadow|font-size: *[0-9.]+(px|rem)|[0-9]+ms" src/views/*.css`
+   The image skeleton is the documented exception for gradients.
 3. Run `npm run build`.
 4. Report to the developer:
    - the brief,
