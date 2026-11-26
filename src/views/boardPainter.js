@@ -361,61 +361,87 @@ function paintEyes(frame, snake) {
   });
 }
 
-// A rounded toy-piece head leans toward its heading while the pupils follow the team's input.
+// The snout is a half ellipse with the same width and tangent as the neck.
 function paintHead(frame, snake, colour) {
-  const { context, cell } = frame;
-  const head = snake.points[0];
-  const angle = snake.face.facing;
+  const { context, cell, palette } = frame;
+  const [head, neck] = snake.points;
+  const link = neck && scaleLink(frame, head, neck);
+  const angle = link ? Math.atan2(-link.y, -link.x) : snake.face.facing;
   atWrappedPoint(frame, head, cell * 0.5, function paintHeadAtEdgeCB() {
-    const x = head.x + Math.cos(angle) * cell * 0.04;
-    const y = head.y + Math.sin(angle) * cell * 0.04;
     context.fillStyle = colour;
     context.beginPath();
-    context.ellipse(x, y, cell * 0.46, cell * 0.445, angle, 0, Math.PI * 2);
+    context.ellipse(head.x, head.y, cell * 0.5, cell * palette.bodyWidth / 2, angle, -Math.PI / 2, Math.PI / 2);
     context.fill();
     paintEyes(frame, snake);
   });
 }
 
-// Each row follows the direction of the nearby body, so the curves turn with the snake.
-function paintScaleRow(frame, point, angle, offsets) {
+function addScaleRow(frame, point, angle, offsets, spread = 1) {
   const { context, cell } = frame;
   atWrappedPoint(frame, point, cell * 0.38, function addScaleRowAtEdgeCB() {
     context.save();
     context.translate(point.x, point.y);
     context.rotate(angle);
-    context.scale(cell, cell);
+    context.scale(cell, cell * spread);
+    const halfScale = 0.065;
     for (const side of offsets) {
-      context.moveTo(0, side - 0.088);
-      context.quadraticCurveTo(0.24, side, 0, side + 0.088);
+      context.moveTo(0, side - halfScale);
+      context.quadraticCurveTo(0.19, side, 0, side + halfScale);
     }
     context.restore();
   });
 }
 
+function scaleLink(frame, from, to) {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const x = dx - acrossSeam(dx, frame.boardWidth, frame.cell);
+  const y = dy - acrossSeam(dy, frame.boardHeight, frame.cell);
+  const length = Math.hypot(x, y);
+  if (length < frame.cell * 0.5 || length > frame.cell * 1.5) return null;
+  return { x, y, length };
+}
+
+// Place each row on the same rounded bend, from the middle of the incoming link
+// to the middle of the outgoing link. The tangent gives the row its orientation.
+function addBendScaleRow(frame, centre, incoming, outgoing, t, offsets, spread) {
+  const fromWeight = (1 - t) ** 2 / 2;
+  const toWeight = t ** 2 / 2;
+  const point = {
+    x: wrap(centre.x - incoming.x * fromWeight + outgoing.x * toWeight, frame.boardWidth),
+    y: wrap(centre.y - incoming.y * fromWeight + outgoing.y * toWeight, frame.boardHeight),
+  };
+  const angle = Math.atan2(lerp(incoming.y, outgoing.y, t), lerp(incoming.x, outgoing.x, t));
+  addScaleRow(frame, point, angle, offsets, spread);
+}
+
 function paintScales(frame, snake) {
-  if (snake.flashing) return;
-  const { context, cell, palette, boardWidth, boardHeight } = frame;
+  if (snake.flashing || snake.points.length < 2) return;
+  const { context, cell, palette } = frame;
+  const points = snake.points;
+  const wideRow = [-0.23, 0, 0.23];
+  const narrowRow = [-0.13, 0.13];
   context.strokeStyle = palette.teamSoft[snake.team];
   context.globalAlpha = 0.23;
-  context.lineWidth = cell * 0.041;
+  context.lineWidth = cell * 0.035;
   context.lineCap = "round";
   context.beginPath();
-  for (let index = 1; index < snake.points.length; index += 1) {
-    const from = snake.points[index - 1];
-    const to = snake.points[index];
-    const dx = to.x - from.x;
-    const dy = to.y - from.y;
-    const stepX = dx - acrossSeam(dx, boardWidth, cell);
-    const stepY = dy - acrossSeam(dy, boardHeight, cell);
-    const length = Math.hypot(stepX, stepY);
-    // Skip very short links while a new tail segment grows in or a turn compresses it.
-    if (length < cell * 0.5 || length > cell * 1.5) continue;
-    const angle = Math.atan2(stepY, stepX);
-    const link = [from, to];
-    // The neck starts with one row, leaving space around the face.
-    if (index > 1) paintScaleRow(frame, pointAlong(frame, link, 0.27), angle, [-0.13, 0.13]);
-    paintScaleRow(frame, pointAlong(frame, link, 0.73), angle, [-0.23, 0, 0.23]);
+  let incoming = scaleLink(frame, points[0], points[1]);
+  for (let index = 1; index < points.length - 1; index += 1) {
+    const outgoing = scaleLink(frame, points[index], points[index + 1]);
+    if (incoming && outgoing) {
+      const alignment = (incoming.x * outgoing.x + incoming.y * outgoing.y) / (incoming.length * outgoing.length);
+      // Narrow the rows as the snake turns so they cannot crowd the inside of a tight bend.
+      const spread = lerp(0.70, 1, Math.max(0, Math.min(1, alignment)));
+      addBendScaleRow(frame, points[index], incoming, outgoing, 0.22, wideRow, spread);
+      addBendScaleRow(frame, points[index], incoming, outgoing, 0.78, narrowRow, spread);
+    }
+    incoming = outgoing;
+  }
+  if (incoming) {
+    const tail = points.slice(-2);
+    const angle = Math.atan2(incoming.y, incoming.x);
+    addScaleRow(frame, pointAlong(frame, tail, 0.73), angle, wideRow);
   }
   context.stroke();
   context.globalAlpha = 1;
