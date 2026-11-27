@@ -6,6 +6,8 @@ import { LuckyBoxNotice } from "./luckyBoxNotice.jsx";
 import { SoundCues } from "./soundCues.jsx";
 import { MusicTrack } from "./musicTrack.jsx";
 import { SoundToggle } from "./soundToggle.jsx";
+import { StatusMessage } from "./statusMessage.jsx";
+import { TeamRoster } from "./teamRoster.jsx";
 import "./demoView.css";
 
 function outcomeText(outcome) {
@@ -61,10 +63,11 @@ export function DemoView(props) {
   }, [onClearKeys, onExit]);
 
   const start = useRef(null);
+  const roomMode = Boolean(props.roomCode);
   useEffect(function focusRoundACB() {
-    if (playing) arena.current?.focus();
+    if (playing && !roomMode) arena.current?.focus();
     if (props.round?.outcome) start.current?.focus();
-  }, [playing, props.round?.outcome]);
+  }, [playing, roomMode, props.round?.outcome]);
 
   function handleKeyACB(event, down) {
     const isGameKey = props.keyGroups.some(function hasKeyCB(group) { return group.codes.includes(event.code); });
@@ -77,7 +80,7 @@ export function DemoView(props) {
   // Clicking the sound button takes focus away from the board. During a round, give it back so the keys keep steering.
   function toggleSoundACB() {
     props.onToggleSound();
-    if (playing) arena.current?.focus();
+    if (playing && !roomMode) arena.current?.focus();
   }
 
   function keyDownACB(event) { handleKeyACB(event, true); }
@@ -98,11 +101,17 @@ export function DemoView(props) {
       <div className="demo-intro">
         <header className="demo-header">
           <nav className="demo-links" aria-label="Demo navigation">
-            <a href="#/">Back to home</a>
-            <a href="#/components">Test components and sound</a>
+            {roomMode ? <a href="#/room">Back to room</a> : (
+              <>
+                <a href="#/">Back to home</a>
+                <a href="#/components">Test components and sound</a>
+              </>
+            )}
           </nav>
-          <h1>Double Snake demo</h1>
-          <p>Four players, one keyboard. Hold a direction to move. Teammates who push in opposite directions stop the snake.</p>
+          <h1>{roomMode ? "Double Snake" : "Double Snake demo"}</h1>
+          {roomMode
+            ? <p>Room <strong className="numbers">{props.roomCode}</strong></p>
+            : <p>Four players, one keyboard. Hold a direction to move. Teammates who push in opposite directions stop the snake.</p>}
         </header>
         <div className="demo-actions">
           {playing ? (
@@ -110,7 +119,7 @@ export function DemoView(props) {
               <PushMark variant="game-start" /> Round {roundNumber}
             </p>
           ) : (
-            <button ref={start} className="button" type="button" onClick={props.onStart}>
+            <button ref={start} className="button" type="button" onClick={props.onStart} disabled={!props.canStart}>
               {round ? "Play another round" : "Start round"}
             </button>
           )}
@@ -119,6 +128,10 @@ export function DemoView(props) {
           )}
           <SoundToggle muted={!props.soundOn} onToggle={toggleSoundACB} />
         </div>
+        {props.reconnecting && <StatusMessage kind="waiting">Reconnecting to the room…</StatusMessage>}
+        {roomMode && !playing && !props.canStart && !props.reconnecting && (
+          <StatusMessage kind="empty">Two players on each team can start the round.</StatusMessage>
+        )}
       </div>
       <div className="demo-playfield">
         <div className="demo-score">
@@ -127,8 +140,10 @@ export function DemoView(props) {
           <strong className="demo-team demo-b">Team B <span className="numbers">{score.b}</span></strong>
         </div>
         <LuckyBoxNotice event={props.luckyResult} box={playing && props.box} playing={playing} />
-        <div className="demo-arena" ref={arena} tabIndex={playing ? 0 : -1} aria-label="Game board keyboard controls"
-          onKeyDown={keyDownACB} onKeyUp={keyUpACB} onBlur={onClearKeys}>
+        <div className="demo-arena" ref={arena} tabIndex={!roomMode && playing ? 0 : -1}
+          aria-label={roomMode ? undefined : "Game board keyboard controls"}
+          onKeyDown={roomMode ? undefined : keyDownACB} onKeyUp={roomMode ? undefined : keyUpACB}
+          onBlur={roomMode ? undefined : onClearKeys}>
           <GameBoard
             columns={props.columns}
             rows={props.rows}
@@ -153,7 +168,7 @@ export function DemoView(props) {
         )}
       </div>
       <div className="demo-guide">
-        {!playing && (
+        {!roomMode && !playing && (
           <form className="demo-weather" onSubmit={searchACB}>
             <label htmlFor="demo-city">Weather city (optional)</label>
             <div className="demo-weather-form">
@@ -164,7 +179,12 @@ export function DemoView(props) {
             <p role="status">{renderWeatherStatus(props.weatherStatus, props.weatherCity)}</p>
           </form>
         )}
-        <section className="demo-keys" aria-labelledby="demo-keys-title">
+        {roomMode ? (
+          <>
+            <TeamRoster team="a" players={props.teams.a} />
+            <TeamRoster team="b" players={props.teams.b} />
+          </>
+        ) : <section className="demo-keys" aria-labelledby="demo-keys-title">
           <h2 id="demo-keys-title">Keyboard controls</h2>
           <p>Each row lists up, left, down, right.</p>
           <ul>
@@ -177,7 +197,7 @@ export function DemoView(props) {
               );
             })}
           </ul>
-        </section>
+        </section>}
       </div>
     </main>
   );

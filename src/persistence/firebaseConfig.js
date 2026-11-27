@@ -1,9 +1,16 @@
 // Persistence: starts Firebase. The config comes from .env.local (see .env.example), so no keys are committed.
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getDatabase } from "firebase/database";
+import { connectAuthEmulator, getAuth } from "firebase/auth";
+import { connectDatabaseEmulator, getDatabase } from "firebase/database";
 
-const firebaseConfig = {
+const useEmulators = import.meta.env.DEV && import.meta.env.VITE_USE_FIREBASE_EMULATORS === "true";
+const firebaseConfig = useEmulators ? {
+  apiKey: "demo",
+  authDomain: "demo-pushpull.firebaseapp.com",
+  projectId: "demo-pushpull",
+  appId: "demo",
+  databaseURL: "https://demo-pushpull-default-rtdb.firebaseio.com",
+} : {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
@@ -20,3 +27,8 @@ const hasAuthConfig = Boolean(firebaseConfig.apiKey && firebaseConfig.authDomain
 export const app = hasAuthConfig ? initializeApp(firebaseConfig) : null;
 export const auth = app ? getAuth(app) : null;
 export const database = app && firebaseConfig.databaseURL ? getDatabase(app) : null;
+
+if (useEmulators) {
+  connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+  connectDatabaseEmulator(database, "127.0.0.1", 9000);
+}

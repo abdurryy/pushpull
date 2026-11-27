@@ -7,6 +7,7 @@ import { connectAuthToModel } from "./persistence/firebaseAuth.js";
 import { database } from "./persistence/firebaseConfig.js";
 import { makeRoomSync } from "./persistence/roomSync.js";
 import { makeRoomModel } from "./model/RoomModel.js";
+import { makeControllerModel } from "./model/ControllerModel.js";
 import "./styles/tokens.css";
 import "./styles/buttons.css";
 
@@ -20,7 +21,10 @@ connectAuthToModel(reactiveModel);
 const { model: roomModel, dispose: disposeRoom } = makeRoomModel(makeRoomSync(database), reactiveModel);
 if (import.meta.hot) import.meta.hot.dispose(disposeRoom);
 
-createRoot(document.getElementById("root")).render(<ReactRoot model={reactiveModel} />);
+const roomController = makeControllerModel(roomModel);
+createRoot(document.getElementById("root")).render(
+  <ReactRoot model={reactiveModel} roomModel={roomModel} roomController={roomController} />,
+);
 
 // Handy for debugging in the browser console: type `myModel` to see the application state.
 window.myModel = reactiveModel;

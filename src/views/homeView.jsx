@@ -87,6 +87,7 @@ export function HomeView(props) {
             </a>
           </nav>
           <nav className="home-extras" aria-label="Demo and testing">
+            <a href="#/room">Host a room playtest</a>
             <a href="#/demo">Keyboard demo</a>
             <a href="#/components">Component gallery</a>
           </nav>

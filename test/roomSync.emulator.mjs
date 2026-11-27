@@ -41,6 +41,8 @@ async function check() {
   const code = host.model.code;
   const roomPath = "rooms/" + code;
   await eventually(() => host.model.room?.code === code);
+  await eventually(() => host.model.room?.hostOnline === true);
+  assert.equal(host.model.canStart, false);
   await phone.model.joinRoom(" " + code.toLowerCase() + " ");
   assert.equal(phone.model.code, code, phone.model.error);
   await eventually(() => phone.model.inputReady && host.model.room?.players?.phone?.name === "phone");
@@ -59,6 +61,8 @@ async function check() {
   await assert.rejects(set(ref(other.db, roomPath + "/inputs/other"), { stick: "left" }), /permission.denied/i);
   await assert.rejects(set(ref(phone.db, roomPath + "/inputs/phone/stick"), "diagonal"), /permission.denied/i);
   await assert.rejects(set(ref(phone.db, roomPath + "/meta/hostUid"), "phone"), /permission.denied/i);
+  await assert.rejects(set(ref(phone.db, roomPath + "/hostOnline"), false), /permission.denied/i);
+  await assert.rejects(set(ref(phone.db, roomPath), null), /permission.denied/i);
 
   goOffline(phone.db);
   await eventually(() => !phone.model.connected && !host.model.room?.inputs?.phone);
@@ -96,7 +100,34 @@ async function check() {
   assert.equal(rejected[0].model.code, code);
   await other.model.joinRoom("INVALID");
   assert.match(other.model.error, /four-character/);
-  console.log("Room sync passed: input, access rules, reconnect, concurrent admission, rejoin and seat reuse.");
+
+  const players = [phone, ...admitted.slice(1), rejected[0]];
+  await eventually(() => players.every(player => player.model.inputReady));
+  players[1].model.pickSide("a");
+  players[2].model.pickSide("b");
+  players[3].model.pickSide("b");
+  await eventually(() => host.model.canStart);
+  assert.deepEqual(host.model.steering, [null, null, null, null]);
+  players[0].model.setStick("up");
+  players[1].model.setStick("down");
+  players[2].model.setStick("left");
+  players[3].model.setStick("left");
+  await eventually(() => host.model.steering.every(Boolean));
+  assert.deepEqual(host.model.steering.slice(0, 2).sort(), ["down", "up"]);
+  assert.deepEqual(host.model.steering.slice(2), ["left", "left"]);
+
+  goOffline(host.db);
+  await eventually(() => phone.model.room?.hostOnline === false);
+  assert.equal(host.model.canStart, false);
+  assert.deepEqual(host.model.steering, [null, null, null, null]);
+  goOnline(host.db);
+  await eventually(() => host.model.canStart);
+
+  await host.model.departRoom();
+  assert.equal(host.model.code, null);
+  await eventually(() => phone.model.room === null);
+  assert.match(phone.model.error, /no longer available/);
+  console.log("Room sync passed: access rules, reconnect, concurrent admission, seat reuse, team steering and closure.");
 }
 
 try {

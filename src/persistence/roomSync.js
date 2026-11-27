@@ -100,6 +100,16 @@ export function makeRoomSync(database) {
       });
     },
 
+    async trackHostConnection(code) {
+      const presence = roomRef(code, "/hostOnline");
+      await onDisconnect(presence).set(false);
+      await set(presence, true);
+    },
+
+    closeRoom(code) {
+      return remove(roomRef(code));
+    },
+
     setSide(code, uid, side) {
       return set(roomRef(code, "/players/" + uid + "/side"), side);
     },
