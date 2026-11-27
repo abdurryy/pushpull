@@ -50,6 +50,10 @@ Tip: in the browser console, `myModel` shows the current application state.
 
 Building a screen? Open http://localhost:8080/#/components first: it shows every shared component (status lines, team chips and seats, room code boxes, score bar, countdown and the game board with its effects) in every state.
 
+### Double Snake rules tests
+
+Run `node --test test/doubleSnakeRules.test.mjs` from the project root. The tests use fixed boards and inputs to check steering, crashes, apple growth and timeouts with Node alone.
+
 ## Project structure
 
 ```
