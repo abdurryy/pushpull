@@ -8,9 +8,9 @@
     "serve": "vite preview",
     "test:room": "node scripts/roomPlaytest.mjs",
     "shots": "node .agents/skills/ui-design/scripts/screenshot.mjs",
-    "shots:controller": "node .agents/skills/ui-design/scripts/screenshot.mjs \"#/play/controller\" --click=\"Enter controller\" --name=controller --sizes=phone-sideways",
+    "shots:controller": "node .agents/skills/ui-design/scripts/screenshot.mjs \"/play/controller\" --click=\"Enter controller\" --name=controller --sizes=phone-sideways",
     "frames": "node .agents/skills/game-feel/scripts/capture-frames.mjs",
-    "frames:crash": "node .agents/skills/game-feel/scripts/capture-frames.mjs \"#/components\" --click=Crash --selector=.gallery-board --name=crash",
+    "frames:crash": "node .agents/skills/game-feel/scripts/capture-frames.mjs \"/components\" --click=Crash --selector=.gallery-board --name=crash",
     "sounds": "node .agents/skills/game-audio/scripts/render-audio.mjs"
   },
   "devDependencies": {

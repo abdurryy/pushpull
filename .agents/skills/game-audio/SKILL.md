@@ -23,7 +23,7 @@ Read with it: `docs/design.md` (Sound and Game feel), and the code in `src/sound
 
 1. design.md: the Sound section (feel, tracks, mix rules) and the Game feel table (which event gets which sound).
 2. `src/sound/effects.js` and `music.js`: the existing sounds are the house style. Copy their patterns.
-3. `#/components`: every effect and track can be played there.
+3. `/components`: every effect and track can be played there.
 
 ## Step 2: Write the sound brief
 
@@ -55,7 +55,7 @@ Picture:    the effect or words it pairs with
 
 **Repetition:** `playSound` already varies the pitch by up to 3% and blocks the same sound within 50ms. Don't add your own randomness on top.
 
-To add an effect: write a function in the `soundEffects` object in `effects.js` with the signature `(output, time, pitch, team)`, using `melody(...)` and `pitchFor(team, pitch)` like the others. `SOUND_NAMES` and the `#/components` buttons pick it up by themselves.
+To add an effect: write a function in the `soundEffects` object in `effects.js` with the signature `(output, time, pitch, team)`, using `melody(...)` and `pitchFor(team, pitch)` like the others. `SOUND_NAMES` and the `/components` buttons pick it up by themselves.
 
 ## Step 4: Write or change music
 
@@ -90,7 +90,7 @@ It renders each effect (Team A and B) and each track (normal and last 10 seconds
 
 Today's reference levels: effects median about -17 dB loudness, music about -22 dB, the loudest peak -1.5 dBFS.
 
-Then give a person something to listen to. Convert the files with `ffmpeg -i in.wav -b:a 128k out.mp3` and attach them, or point them to `#/components`. Ask them to check:
+Then give a person something to listen to. Convert the files with `ffmpeg -i in.wav -b:a 128k out.mp3` and attach them, or point them to `/components`. Ask them to check:
 
 1. Can you tell what happened from the sound alone, without looking?
 2. Can you tell Team A from Team B?

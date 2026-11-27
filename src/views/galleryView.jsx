@@ -1,7 +1,8 @@
-// View (dev page, #/components): every shared component in every state, with sample props to copy.
+// View (dev page, /components): every shared component in every state, with sample props to copy.
 // The buttons only change what this page shows, so their state stays in the View (UI-only state,
 // see docs/course/project/keeping-presenter-simple.md). Real screens get their data from the model.
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { StatusMessage } from "./statusMessage.jsx";
 import { ImageSkeleton } from "./imageSkeleton.jsx";
 import { TeamChip } from "./teamChip.jsx";
@@ -224,8 +225,8 @@ export function GalleryView() {
         <p>Try room codes, team seats, the game board, music, and sound effects.</p>
         <nav className="gallery-row" aria-label="Gallery shortcuts">
           <button className="button" type="button" onClick={jumpToSoundACB}>Jump to sound tests</button>
-          <a className="button button-secondary" href="#/demo">Play keyboard demo</a>
-          <a className="button button-text" href="#/">Back to home</a>
+          <Link className="button button-secondary" to="/demo">Play keyboard demo</Link>
+          <Link className="button button-text" to="/">Back to home</Link>
         </nav>
       </header>
 

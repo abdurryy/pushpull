@@ -4,9 +4,9 @@ A party game for four friends, two teams and one shared screen. Group project fo
 
 **Live app:** [pushpull.live](https://pushpull.live)
 
-**Keyboard demo:** Open `#/demo` on the shared computer. Four players can try Double Snake using one keyboard.
+**Keyboard demo:** Open `/demo` on the shared computer. Four players can try Double Snake using one keyboard.
 
-**Phone controller preview:** Open [the controller](https://pushpull.live/#/play/controller), turn the phone sideways, and tap **Enter controller**. When browser fullscreen is unavailable, open it from the Home Screen to remove the browser address bar. The phone still controls its system bars and gestures. This preview tests touch input locally while room sync is being built.
+**Phone controller preview:** Open [the controller](https://pushpull.live/play/controller), turn the phone sideways, and tap **Enter controller**. When browser fullscreen is unavailable, open it from the Home Screen to remove the browser address bar. The phone still controls its system bars and gestures. This preview tests touch input locally while room sync is being built.
 
 ## About
 
@@ -36,7 +36,7 @@ Needs Node.js 22.12 or newer (Vite 8 requires it).
 
 Copy `.env.example` to `.env.local` and fill in the Firebase web config (Firebase console > Project settings > Your apps, or ask the team). `.env.local` is git-ignored; never commit the real values.
 
-Without Firebase config, the home screen and the TV weather search still work and sign-in shows a setup message. Rooms also need `VITE_FIREBASE_DATABASE_URL`. Sign in from the home page and choose **View profile** to see your account at `#/profile`.
+Without Firebase config, the home screen and the TV weather search still work and sign-in shows a setup message. Rooms also need `VITE_FIREBASE_DATABASE_URL`. Sign in from the home page and choose **View profile** to see your account at `/profile`.
 
 ```sh
 npm install
@@ -44,11 +44,11 @@ npm run dev      # http://localhost:8080
 npm run build    # production build in dist/ (not minified, a course rule)
 ```
 
-Open http://localhost:8080 and pick **Play on TV**, or go straight to http://localhost:8080/#/tv. Sign in on that screen with **Continue with Google**, press **Create room**, and join on phones with the room code or QR code. Type a city and press **Check weather** to see live data from Open-Meteo.
+Open http://localhost:8080 and pick **Play on TV**, or go straight to http://localhost:8080/tv. Sign in on that screen with **Continue with Google**, press **Create room**, and join on phones with the room code or QR code. Type a city and press **Check weather** to see live data from Open-Meteo.
 
 Tip: in the browser console, `myModel` shows the current application state.
 
-Building a screen? Open http://localhost:8080/#/components first: it shows every shared component (status lines, team chips and seats, room code boxes, score bar, countdown and the game board with its effects) in every state.
+Building a screen? Open http://localhost:8080/components first: it shows every shared component (status lines, team chips and seats, room code boxes, score bar, countdown and the game board with its effects) in every state.
 
 ### Room playtest
 
@@ -59,6 +59,8 @@ For a local run, start the Firebase Auth and Realtime Database emulators with `n
 When a phone drops offline, its last direction becomes idle once Firebase detects the disconnect. A player can leave the room to free their seat. Closing the room from the host lobby gives players a link back to room setup.
 
 For the hosted playtest, publish the matching Realtime Database rules from `main` with `npx firebase-tools deploy --only database --project pushpull-1df2e`. The Hosting workflow publishes the web build.
+
+A deploy reaches everyone on their next page load. The `headers` in `firebase.json` set this: the page and the manifest are `no-cache`, so the browser asks for them every time and Hosting sends them, about 400 bytes compressed for the page. The files in `/assets/` are cached for a year instead, because Vite puts the content's hash in their names, and they answer `304 Not Modified` when a browser checks. Without these headers, Hosting's default of one hour meant a fix could take an hour to reach a phone or a teammate who had opened the site already.
 
 ### Double Snake rules tests
 
@@ -73,7 +75,7 @@ Run `node --test test/doubleSnakeRules.test.mjs` from the project root. The test
 ├── .env.example                  # names of the Firebase config values (real ones go in .env.local)
 ├── src/
 │   ├── index.jsx                 # bootstrapping: makes the model reactive (MobX), mounts the root
-│   ├── reactRoot.jsx             # navigation: maps each route (#/, #/tv) to its presenter
+│   ├── reactRoot.jsx             # navigation: maps each route (/, /tv) to its presenter
 │   ├── model/
 │   │   ├── PushPullModel.js      # application state and one action per user action
 │   │   └── resolvePromise.js     # keeps a promise's data/error in the model (lab pattern)
@@ -89,7 +91,7 @@ Run `node --test test/doubleSnakeRules.test.mjs` from the project root. The test
 │   │   ├── homeView.jsx/.css     # pick this device's role
 │   │   ├── loginView.jsx/.css    # Continue with Google, with checking, signing-in and error states
 │   │   ├── lobbyView.jsx/.css    # TV lobby: room code, QR code, teams, weather search
-│   │   ├── galleryView.jsx/.css  # #/components: every shared component in every state
+│   │   ├── galleryView.jsx/.css  # /components: every shared component in every state
 │   │   └── statusMessage, teamChip, teamRoster, roomCode, roomCodeInput, scoreBar,
 │   │       countdown, gameBoard, soundCues, musicTrack, soundToggle  # shared components, listed in docs/design.md
 │   ├── styles/tokens.css         # design tokens (colours, fonts, sizes) used by every View
@@ -119,21 +121,21 @@ _Required in the mid-project review._
 - Picked the idea and wrote the project proposal
 - Set up the repo: automated code reviews, a protected `main` branch and CI that builds every pull request
 - Design system: [docs/design.md](docs/design.md) and the CSS tokens
-- App skeleton: React + Vite, MobX model with actions, hash routes, API module for Open-Meteo and Open Trivia DB
+- App skeleton: React + Vite, MobX model with actions, path routes (`/tv`, `/play/join`), API module for Open-Meteo and Open Trivia DB
 - First API data on screen: the TV shows the live weather for a city, with loading, empty and error states
 - Homepage: explains Double Snake, links to the shared screen and phone setup, and offers Google sign-in
-- Account profile (`#/profile`): shows the current Google account and lets the player sign out
+- Account profile (`/profile`): shows the current Google account and lets the player sign out
 - Local Double Snake demo: shared keyboard, two teams, apples, eight Lucky Box outcomes, crashes, timer and replay. Open it from the homepage.
-- Firebase project and Google sign-in on the phone (`#/play/login`)
+- Firebase project and Google sign-in on the phone (`/play/login`)
 - Phone room join by typing or pasting a code or opening an invite link, with live team selection and open seats
 - Room-code playtest with four signed-in phone controllers and the shared Double Snake board
 - Game feel and sound designed in design.md: the picture, sound and phone buzz for every game event
-- Shared View components for the next screens (status lines, team seats, room code boxes, score bar, countdown, game board), shown in every state on `#/components`
+- Shared View components for the next screens (status lines, team seats, room code boxes, score bar, countdown, game board), shown in every state on `/components`
 - Sound effects for every game event and music for the lobby, round, trivia and results, made in code with the Web Audio API
 - Agent skills in `.agents/skills/` so everyone's coding agent follows design.md, the MVP rules and the user-testing rules
 - A living game board drawn on a canvas: snakes glide and look where their team steers, both teammates' directions show at the head, rain, wind and night are visible, and the keyboard demo has effects, sound and music
 - Visual direction for the full-screen revamp: four annotated reference screens (TV lobby, mode intro, scoreboard, phone join) in [docs/visual-direction](docs/visual-direction/README.md)
-- TV lobby (`#/tv`): the host signs in on the TV itself, creates a room and sees its code and QR code, players fill Team A and Team B live, the weather search keeps working while they join, and Start round stays disabled (and says why) until each team has two players
+- TV lobby (`/tv`): the host signs in on the TV itself, creates a room and sees its code and QR code, players fill Team A and Team B live, the weather search keeps working while they join, and Start round stays disabled (and says why) until each team has two players
 
 **Planned**
 - MobX model with the game rules, plus per-user persistence in Firebase
