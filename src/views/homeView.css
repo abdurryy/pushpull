@@ -96,6 +96,17 @@
   padding: var(--space-2);
 }
 
+/* Each choice names the device, then what that device becomes during a game. */
+.home-choice-label {
+  display: grid;
+  min-width: 0;
+}
+
+.home-choice-role {
+  font-size: var(--text-small);
+  font-weight: var(--weight-regular);
+}
+
 .home-extras a:active {
   text-decoration-thickness: var(--focus-offset);
 }
@@ -218,6 +229,11 @@
     gap: var(--space-2);
   }
 
+  /* The two-line choices keep their 48px hit area on padding this tight. */
+  .home-choices .button {
+    padding-block: var(--space-1);
+  }
+
   .home-preview {
     gap: var(--space-1);
     padding: var(--space-2);
@@ -270,10 +286,13 @@
 }
 
 @media (min-width: 80rem) and (orientation: landscape) {
+  /* Read from a sofa: nothing drops below the TV text minimum, so the role line
+     under each choice separates itself by weight rather than by size. */
   .home,
   .home-logo,
   .home-preview-header > span,
-  .home-choice > .icon {
+  .home-choice > .icon,
+  .home-choice-role {
     font-size: var(--tv-text);
   }
 
