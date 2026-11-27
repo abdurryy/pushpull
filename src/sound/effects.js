@@ -43,7 +43,7 @@ export const soundEffects = {
   count(output, time, pitch) {
     const frequency = noteFrequency("A5") * pitch;
     instruments.woodblock(output, time, frequency, 0.9);
-    instruments.pluck(output, time + 0.014, frequency, 0.31);
+    instruments.pluck(output, time + 0.014, frequency, 0.38);
   },
 
   // "Go!": the marimba jumps from G to C and lands on a bright major chord.
