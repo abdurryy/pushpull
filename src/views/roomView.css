@@ -20,29 +20,14 @@
 }
 
 .room-share,
-.room-form,
-.room-teams,
-.room-team {
+.room-teams {
   display: grid;
   gap: var(--space-3);
   justify-self: stretch;
 }
 
 .room-share .room-code { font-size: var(--text-title); }
-.room-form .button,
-.room-team .button { justify-self: start; }
-
-.room:not(.room-host) .team-roster {
-  gap: var(--space-2);
-  padding: var(--space-3);
-}
-
-.room:not(.room-host) .team-roster-seat {
-  min-height: 0;
-  padding-block: var(--space-1);
-}
-
-.room:not(.room-host) .team-roster-avatar { display: none; }
+.room-share .button { justify-self: start; }
 
 .room-actions {
   display: flex;

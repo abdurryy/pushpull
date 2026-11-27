@@ -26,7 +26,7 @@
             ".validate": "newData.hasChildren(['name', 'side', 'seat'])",
             "seat": { ".validate": "newData.isString() && newData.val().matches(/^s[1-4]$/) && (!data.exists() || data.val() == newData.val()) && newData.parent().parent().parent().child('seats').child(newData.val()).val() == $uid" },
             "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80" },
-            "side": { ".validate": "newData.val() == 'a' || newData.val() == 'b' || newData.val() == 'center'" },
+            "side": { ".validate": "newData.val() == 'center' || ((newData.val() == 'a' || newData.val() == 'b') && (newData.val() == data.val() || ((newData.parent().parent().parent().child('seats/s1').exists() && newData.parent().parent().parent().child('players').child(newData.parent().parent().parent().child('seats/s1').val()).child('side').val() == newData.val()) ? 1 : 0) + ((newData.parent().parent().parent().child('seats/s2').exists() && newData.parent().parent().parent().child('players').child(newData.parent().parent().parent().child('seats/s2').val()).child('side').val() == newData.val()) ? 1 : 0) + ((newData.parent().parent().parent().child('seats/s3').exists() && newData.parent().parent().parent().child('players').child(newData.parent().parent().parent().child('seats/s3').val()).child('side').val() == newData.val()) ? 1 : 0) + ((newData.parent().parent().parent().child('seats/s4').exists() && newData.parent().parent().parent().child('players').child(newData.parent().parent().parent().child('seats/s4').val()).child('side').val() == newData.val()) ? 1 : 0) <= 2))" },
             "$other": { ".validate": false }
           }
         },

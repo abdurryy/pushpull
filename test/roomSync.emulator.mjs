@@ -102,15 +102,24 @@ async function check() {
   assert.match(other.model.error, /four-character/);
 
   const players = [phone, ...admitted.slice(1), rejected[0]];
-  await eventually(() => players.every(player => player.model.inputReady));
-  players[1].model.pickSide("a");
-  players[2].model.pickSide("b");
-  players[3].model.pickSide("b");
+  await eventually(() => players.every(player => player.model.inputReady && player.model.joined));
+  const contenders = players.slice(1, 3);
+  assert.deepEqual(contenders.map(player => player.model.openTeamSeats.a), [1, 1]);
+  await Promise.all(contenders.map(player => player.model.pickSide("a")));
+  await eventually(() => host.model.teams.a.length === 2);
+  const blocked = contenders.find(player => player.model.error);
+  assert.match(blocked?.model.error || "", /team a is full/i);
+  await eventually(() => blocked.model.openTeamSeats.a === 0 && blocked.model.side === "center");
+  const blockedSide = roomPath + "/players/" + blocked.session.user.uid + "/side";
+  await assert.rejects(set(ref(blocked.db, blockedSide), "a"), /permission.denied/i);
+  await blocked.model.pickSide("b");
+  await players[3].model.pickSide("b");
   await eventually(() => host.model.canStart);
   assert.deepEqual(host.model.steering, [null, null, null, null]);
   players[0].model.setStick("up");
-  players[1].model.setStick("down");
-  players[2].model.setStick("left");
+  const teammate = contenders.find(player => player !== blocked);
+  teammate.model.setStick("down");
+  blocked.model.setStick("left");
   players[3].model.setStick("left");
   await eventually(() => host.model.steering.every(Boolean));
   assert.deepEqual(host.model.steering.slice(0, 2).sort(), ["down", "up"]);
@@ -127,7 +136,7 @@ async function check() {
   assert.equal(host.model.code, null);
   await eventually(() => phone.model.room === null);
   assert.match(phone.model.error, /no longer available/);
-  console.log("Room sync passed: access rules, reconnect, concurrent admission, seat reuse, team steering and closure.");
+  console.log("Room sync passed: access rules, reconnect, concurrent admission and team picks, seat reuse, team steering and closure.");
 }
 
 try {

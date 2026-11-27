@@ -52,7 +52,7 @@ Building a screen? Open http://localhost:8080/#/components first: it shows every
 
 ### Room playtest
 
-On the host screen, choose **Host a room playtest**, sign in with Google, and create a room. On four phones, choose **Use phone**, sign in with four separate accounts, and enter the host's code. Put two players on each team and open their controllers. On the host, open the game board and start the round. Hold opposite directions on one team to stop its snake.
+On the host screen, choose **Host a room playtest**, sign in with Google, and create a room. On four phones, choose **Use phone**, sign in with four separate accounts, and enter the host's code. You can also share **Open phone invite** from the host lobby to prefill the code on a phone. Put two players on each team and open their controllers. On the host, open the game board and start the round. Hold opposite directions on one team to stop its snake.
 
 For a local run, start the Firebase Auth and Realtime Database emulators with `npx firebase-tools emulators:start --project demo-pushpull --only auth,database`. Set `VITE_USE_FIREBASE_EMULATORS=true` in your shell before starting Vite. Open the app in separate browser profiles or contexts and use the emulator's mock Google accounts. The emulator flag applies only to the dev server and uses the local demo project.
 
@@ -125,6 +125,7 @@ _Required in the mid-project review._
 - Account profile (`#/profile`): shows the current Google account and lets the player sign out
 - Local Double Snake demo: shared keyboard, two teams, apples, eight Lucky Box outcomes, crashes, timer and replay. Open it from the TV weather screen or the homepage.
 - Firebase project and Google sign-in on the phone (`#/play/login`)
+- Phone room join by typing or pasting a code or opening an invite link, with live team selection and open seats
 - Room-code playtest with four signed-in phone controllers and the shared Double Snake board
 - Game feel and sound designed in design.md: the picture, sound and phone buzz for every game event
 - Shared View components for the next screens (status lines, team seats, room code boxes, score bar, countdown, game board), shown in every state on `#/components`
