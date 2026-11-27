@@ -1,5 +1,6 @@
 // View: shares the host's room code and tracks the live team rosters.
 import { Link } from "react-router-dom";
+import { CloseRoomButton } from "./closeRoomButton.jsx";
 import { RoomCode } from "./roomCode.jsx";
 import { StatusMessage } from "./statusMessage.jsx";
 import { TeamRoster } from "./teamRoster.jsx";
@@ -19,12 +20,10 @@ export function RoomView(props) {
           <TeamRoster team="b" players={props.teams.b} youId={props.userId} />
         </div>
         <div className="room-actions">
-          {props.ready
+          {!props.loading && (props.ready
             ? <Link className="button" to="/room/game">Open game board</Link>
-            : <StatusMessage kind="empty">Two players on each team can start the round.</StatusMessage>}
-          <button type="button" className="button button-text" disabled={props.loading || !props.connected} onClick={props.onLeave}>
-            Close room
-          </button>
+            : <StatusMessage kind="empty">Two players on each team can start the round.</StatusMessage>)}
+          <CloseRoomButton disabled={props.loading || !props.connected} onCloseRoom={props.onCloseRoom} />
         </div>
       </>
     );

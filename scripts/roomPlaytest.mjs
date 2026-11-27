@@ -41,7 +41,7 @@ async function joinTeam(browser, baseUrl, invite, player) {
   context.setDefaultTimeout(15_000);
   const phone = await context.newPage();
   await signIn(phone, baseUrl, "#/play/login", player.name);
-  await phone.goto(baseUrl + invite);
+  await phone.goto(new URL(invite, baseUrl).href);
   await phone.getByRole("button", { name: "Join room" }).tap();
   await phone.getByRole("button", { name: `Team ${player.team}`, exact: true }).tap();
   await phone.getByText(`You're on Team ${player.team}.`, { exact: true }).waitFor();
@@ -100,7 +100,7 @@ async function playRoom(browser, baseUrl) {
     await rosterB.getByText("0 of 2").waitFor();
     assert.equal(await boardLink.count(), 0, "The board opened before any players joined");
     const href = await host.getByRole("link", { name: "Open phone invite" }).getAttribute("href");
-    assert.match(href, /^#\/play\/join\?code=[A-Z2-9]{4}$/);
+    assert.match(href, /^\/play\/join\?code=[A-Z2-9]{4}$/);
     return href;
   });
   const code = invite.slice(-4);
@@ -157,6 +157,7 @@ async function playRoom(browser, baseUrl) {
   await step("Close the test room", async function closeRoomACB() {
     await host.getByRole("link", { name: "Back to room" }).click();
     await host.getByRole("button", { name: "Close room" }).click();
+    await host.getByRole("dialog", { name: "Close this room?" }).getByRole("button", { name: "Close room" }).click();
     await host.getByRole("button", { name: "Create room" }).waitFor();
   });
   console.log(`Room ${code} passed. Team B won 0–1 and the score carried into Round 2.`);
