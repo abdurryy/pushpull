@@ -113,7 +113,7 @@ The image skeleton uses `--color-sunken` for the warm fill and `--color-bg` for 
 
 ### Animated push mark
 
-Use `PushMark` from `src/views/pushMark.jsx` alongside a visible heading or status message. The two arrows use the team color tokens, and the status effects use the existing palette. The SVG is decorative. With reduced motion, every variant renders as the static two-arrow mark.
+Use `PushMark` from `src/views/pushMark.jsx` alongside a visible heading or status message. The two arrows, loading ring, search beam and round-start traces use `--color-mark`. The success halo and error spark use the status palette. The SVG is decorative. With reduced motion, every variant renders as the static two-arrow mark.
 
 | Variant | Motion | Use |
 |---|---|---|

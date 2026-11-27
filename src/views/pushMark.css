@@ -7,8 +7,11 @@
   vertical-align: middle;
 }
 
-.push-mark-left { fill: var(--color-team-a); transform-origin: 6px 6px; }
-.push-mark-right { fill: var(--color-team-b); transform-origin: 18px 6px; }
+.push-mark-left,
+.push-mark-right { fill: var(--color-mark); }
+
+.push-mark-left { transform-origin: 6px 6px; }
+.push-mark-right { transform-origin: 18px 6px; }
 
 .push-mark-entry .push-mark-left,
 .push-mark-entry .push-mark-right {
@@ -27,7 +30,7 @@
 .push-mark-loading .push-mark-right { --mark-travel: 2px; }
 
 .push-mark-searching .push-mark-beam {
-  fill: var(--color-team-b);
+  fill: var(--color-mark);
   animation: push-mark-sweep var(--duration-loading) ease-in-out infinite;
 }
 
@@ -70,7 +73,7 @@
 
 .push-mark-ring {
   fill: none;
-  stroke: var(--color-team-b);
+  stroke: var(--color-mark);
   animation: push-mark-meet var(--duration-loading) ease-out infinite;
 }
 
@@ -92,13 +95,11 @@
 
 .push-mark-trace {
   fill: none;
+  stroke: var(--color-mark);
   stroke-dasharray: 1;
   opacity: 0;
   animation: push-mark-trace var(--duration) var(--ease-out);
 }
-
-.push-mark-trace-left { stroke: var(--color-team-a); }
-.push-mark-trace-right { stroke: var(--color-team-b); }
 
 .push-mark-game-start .push-mark-left,
 .push-mark-game-start .push-mark-right {
