@@ -109,7 +109,7 @@ _Required in the mid-project review._
 - First API data on screen: the TV shows the live weather for a city, with loading, empty and error states
 - Homepage: explains Double Snake, links to the shared screen and phone setup, and offers Google sign-in
 - Account profile (`#/profile`): shows the current Google account and lets the player sign out
-- Local Double Snake demo: shared keyboard, two teams, apples, crashes, timer and replay
+- Local Double Snake demo: shared keyboard, two teams, apples, eight Lucky Box outcomes, crashes, timer and replay. Open it from the TV weather screen or the homepage.
 - Firebase project and Google sign-in on the phone (`#/play/login`)
 - Game feel and sound designed in design.md: the picture, sound and phone buzz for every game event
 - Shared View components for the next screens (status lines, team seats, room code boxes, score bar, countdown, game board), shown in every state on `#/components`

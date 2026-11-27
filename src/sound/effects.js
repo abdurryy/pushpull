@@ -24,6 +24,19 @@ export const soundEffects = {
     melody(instruments.marimba, output, time, pitchFor(team, pitch), 0.5, [["E5", 0], ["A5", 0.07]]);
   },
 
+  // The crate's wooden taps use pitch direction to signal what happened.
+  luckyGain(output, time, pitch, team) {
+    melody(instruments.marimba, output, time, pitchFor(team, pitch), 0.3, [["C5", 0], ["G5", 0.06], ["C6", 0.13]]);
+  },
+
+  luckyLoss(output, time, pitch, team) {
+    melody(instruments.marimba, output, time, pitchFor(team, pitch), 0.3, [["A5", 0], ["E5", 0.07], ["C5", 0.14]]);
+  },
+
+  luckyTrade(output, time, pitch, team) {
+    melody(instruments.woodblock, output, time, pitchFor(team, pitch), 0.88, [["G5", 0], ["G5", 0.09]]);
+  },
+
   // Snake crashed: a low thud and a falling tone.
   crash(output, time, pitch) {
     instruments.kick(output, time, 0, 0.9);

@@ -11,29 +11,7 @@ export const keyGroups = [
 ];
 const directionsByKey = ["up", "left", "down", "right"];
 const KEPT_EVENTS = 8;
-
-// The teams whose snake crashed, from a round's outcome. A tie from a step means both crashed.
-function crashedTeams(outcome) {
-  if (outcome === "a") return ["b"];
-  if (outcome === "b") return ["a"];
-  return ["a", "b"];
-}
-
-// Game feel events (design.md): what one tick changed, for the board's effects and the sounds.
-function eventsBetween(before, after) {
-  const events = [];
-  ["a", "b"].forEach(function checkTeamCB(team) {
-    if (after[team].body.length > before[team].body.length) {
-      events.push({ kind: "eat", team, ...after[team].body[0] });
-    }
-  });
-  if (after.outcome && !before.outcome) {
-    crashedTeams(after.outcome).forEach(function addCrashCB(team) {
-      events.push({ kind: "crash", team, ...after[team].body[0] });
-    });
-  }
-  return events;
-}
+const LUCKY_NOTICE_TICKS = 18;
 
 // True when two teammates push opposite ways, so their snake stops.
 function sticksCancel(first, second) {
@@ -54,6 +32,7 @@ export const demoModel = makeAutoObservable({
   weather: null,
   events: [],
   eventCount: 0,
+  luckyResult: null,
   crashed: [],
   soundOn: true,
 
@@ -88,8 +67,8 @@ export const demoModel = makeAutoObservable({
         team,
         ...snake,
         crashed: crashed.includes(team),
-        looking: combineSticks(first, second, snake.heading) || snake.heading,
-        torn: sticksCancel(first, second),
+        looking: snake.frozenTicks ? snake.heading : combineSticks(first, second, snake.heading) || snake.heading,
+        torn: !snake.frozenTicks && sticksCancel(first, second),
       };
     });
   },
@@ -119,6 +98,7 @@ export const demoModel = makeAutoObservable({
     this.round = createRound(this.round?.score);
     this.roundNumber += 1;
     this.crashed = [];
+    this.luckyResult = null;
     this.addEvents([{ kind: "go" }]);
   },
 
@@ -130,6 +110,8 @@ export const demoModel = makeAutoObservable({
     });
     this.eventCount += events.length;
     this.events = [...this.events, ...numbered].slice(-KEPT_EVENTS);
+    const lucky = numbered.findLast(function isLuckyCB(event) { return event.outcome; });
+    if (lucky) this.luckyResult = { ...lucky, until: this.ticks + LUCKY_NOTICE_TICKS };
   },
 
   toggleSound() {
@@ -153,27 +135,22 @@ export const demoModel = makeAutoObservable({
     this.seconds = ROUND_SECONDS;
     this.roundNumber = 0;
     this.weather = null;
+    this.luckyResult = null;
   },
 
   tick() {
     if (!this.playing) return;
     this.seconds = Math.max(0, Math.ceil((this.deadline - performance.now()) / 1000));
-    const before = this.round;
     if (this.seconds === 0) {
       this.round = timeOutRound(this.round);
     } else {
       this.ticks += 1;
+      if (this.luckyResult?.until <= this.ticks) this.luckyResult = null;
       this.round = weatherStep(this.round, this.inputs, this.weather, this.ticks);
     }
-    this.noteChanges(before, this.seconds === 0);
-  },
-
-  // Turns what a tick changed into Game feel events, and remembers which snakes crashed.
-  noteChanges(before, timeIsUp) {
-    const events = timeIsUp ? [] : eventsBetween(before, this.round);
-    if (events.some(function isCrashCB(event) { return event.kind === "crash"; })) {
-      this.crashed = crashedTeams(this.round.outcome);
-    }
+    const events = [...this.round.stepEvents];
+    this.crashed = events.filter(function isCrashCB(event) { return event.kind === "crash"; })
+      .map(function teamCB(event) { return event.team; });
     if (this.round.outcome) events.push(outcomeEvent(this.round.outcome));
     if (events.length) this.addEvents(events);
   },

@@ -116,9 +116,12 @@ async function listJobs(page, wanted) {
     return { effects: SOUND_NAMES, tracks: Object.keys(tracks) };
   });
   const jobs = [];
+  const teamEffects = ["eat", "point", "join", "leave", "luckyGain", "luckyLoss", "luckyTrade"];
   names.effects.forEach(function addEffectCB(name) {
     jobs.push({ kind: "effect", name, team: "a", file: name });
-    if (["eat", "point", "join", "leave"].includes(name)) jobs.push({ kind: "effect", name, team: "b", file: name + "-team-b" });
+    if (teamEffects.includes(name)) {
+      jobs.push({ kind: "effect", name, team: "b", file: name + "-team-b" });
+    }
   });
   names.tracks.forEach(function addTrackCB(name) {
     jobs.push({ kind: "music", name, loops: 2, intensity: 0, file: "music-" + name });

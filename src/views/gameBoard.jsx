@@ -15,8 +15,8 @@ function snakesSignature(snakes) {
   }).join("|");
 }
 
-function appleKeyCB(apple) {
-  return apple.x + ":" + apple.y;
+function cellKeyCB({ x, y }) {
+  return x + ":" + y;
 }
 
 // Keeps only the entries whose key is still on the board, and adds new ones with the current time.
@@ -31,7 +31,7 @@ function rememberStarts(starts, keys, now) {
 
 export function GameBoard(props) {
   const canvas = useRef(null);
-  const memory = useRef({ board: null, previousBoard: null, changedAt: 0, effectStarts: new Map(), appleBirths: new Map(), faces: {} });
+  const memory = useRef({ board: null, previousBoard: null, changedAt: 0, effectStarts: new Map(), appleBirths: new Map(), boxBornAt: 0, faces: {} });
 
   // After every render: store the newest board. When the snakes moved, the old board becomes "previous" to slide from.
   useEffect(function rememberBoardACB() {
@@ -44,6 +44,7 @@ export function GameBoard(props) {
       snakes,
       signature: snakesSignature(snakes),
       apples: props.apples || [],
+      box: props.box ?? null,
       effects: props.effects || [],
       weather: props.weather || null,
       inputs: props.inputs || {},
@@ -55,9 +56,13 @@ export function GameBoard(props) {
       remembered.previousBoard = remembered.board;
       remembered.changedAt = now;
     }
+    const oldBox = remembered.board?.box;
+    if (board.box && (!oldBox || cellKeyCB(oldBox) !== cellKeyCB(board.box))) {
+      remembered.boxBornAt = now;
+    }
     remembered.board = board;
     rememberStarts(remembered.effectStarts, board.effects.map(function idCB(effect) { return effect.id; }), effectsStartAt);
-    rememberStarts(remembered.appleBirths, board.apples.map(appleKeyCB), now);
+    rememberStarts(remembered.appleBirths, board.apples.map(cellKeyCB), now);
   });
 
   // Once: paint a frame on every screen refresh, and keep the canvas as sharp as the screen when it changes size.

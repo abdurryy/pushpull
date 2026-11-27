@@ -2,6 +2,9 @@
 // It only decides how the board looks. Where everything is comes from the model through GameBoard's props.
 // Colours and timings are read from the design tokens, so the canvas follows design.md just like the CSS does.
 
+import { APPLE_ART, CRATE_ART, pickupColors } from "./pickupArt.js";
+
+const pickupPaths = new WeakMap();
 const DIRECTIONS = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
 const ANGLES = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
 const TURN_MS = 70;        // eyes and head turn most of the way to a new direction in about this long
@@ -19,12 +22,14 @@ export function readPalette(element) {
     dot: token("--color-board-dot"),
     ink: token("--color-ink"),
     surface: token("--color-surface"),
-    apple: token("--color-apple"),
+    pickup: Object.fromEntries(Object.entries(pickupColors).map(function readColorCB([name, property]) {
+      return [name, token(property)];
+    })),
     bodyWidth: 1 - 2 * parseFloat(token("--tile-inset")) / 100,
     team: { a: token("--color-team-a"), b: token("--color-team-b") },
     teamSoft: { a: token("--color-team-a-soft"), b: token("--color-team-b-soft") },
     effectMs: parseFloat(token("--duration-effect")) || 0,   // bursts, the swallow bulge, the crash flash and shake
-    popMs: parseFloat(token("--duration")) || 0,              // a new apple popping in
+    popMs: parseFloat(token("--duration")) || 0,              // a new pickup popping in
     shake: parseFloat(token("--shake-distance")) || 0,
     burst: (parseFloat(token("--burst-distance")) || 0) / 100,
   };
@@ -201,13 +206,14 @@ function shakeOffset(frame, effects) {
 function paintBurst(frame, effect) {
   const { context, palette, cell } = frame;
   const progress = effect.age / palette.effectMs;
-  if (progress >= 1 || (effect.kind !== "eat" && effect.kind !== "crash")) return;
-  const centre = toPixels(frame, effect);
+  const lucky = Boolean(effect.outcome);
   const crash = effect.kind === "crash";
+  if (progress >= 1 || (!lucky && !crash && effect.kind !== "eat")) return;
+  const centre = toPixels(frame, effect);
   const colour = crash ? palette.ink : palette.team[effect.team];
-  const dots = crash ? 8 : 6;
-  // The crash starts outside the face so the crossed eyes stay visible at impact.
-  const ringStart = crash ? 0.52 : 0.25;
+  const dots = lucky ? 0 : (crash ? 8 : 6);
+  // Crashes and crate openings start outside the face so the eyes stay visible.
+  const ringStart = crash || lucky ? 0.52 : 0.25;
   const dotStart = crash ? 0.52 : 0.3;
   context.globalAlpha = progress < 0.5 ? 1 : 2 - progress * 2;
   context.strokeStyle = colour;
@@ -259,39 +265,31 @@ function paintFloor(frame, board) {
   context.fill();
 }
 
-// An ink apple with a stalk, a leaf and a small shine. It pops in when it appears and bobs gently.
-function paintApple(frame, apple, bornAt) {
+function paintPickup(frame, position, bornAt, art, bob = 0) {
   const { context, cell, palette, now, calm } = frame;
   const size = calm || !palette.popMs ? 1 : Math.max(0, popIn((now - bornAt) / palette.popMs));
   if (!size) return;
-  const bob = calm ? 0 : Math.sin(now / 450 + apple.x) * cell * 0.04;
-  const centre = toPixels(frame, apple);
-  // Draw the apple around its own centre so the fruit and leaf pop in together.
-  const scale = cell * size;
+  const centre = toPixels(frame, position);
+  const scale = cell * size / 32;
   context.save();
-  context.translate(centre.x, centre.y + bob);
+  context.translate(centre.x - 16 * scale, centre.y - 16 * scale + bob);
   context.scale(scale, scale);
-  context.fillStyle = palette.apple;
-  context.beginPath();
-  context.moveTo(0, -0.13);
-  context.bezierCurveTo(0.38, -0.32, 0.43, 0.24, 0.15, 0.33);
-  context.quadraticCurveTo(0.07, 0.35, 0, 0.31);
-  context.quadraticCurveTo(-0.07, 0.35, -0.15, 0.33);
-  context.bezierCurveTo(-0.43, 0.24, -0.38, -0.32, 0, -0.13);
-  context.fill();
-  context.strokeStyle = palette.apple;
-  context.lineWidth = 0.055;
   context.lineCap = "round";
-  context.beginPath();
-  context.moveTo(0, -0.12);
-  context.quadraticCurveTo(0, -0.25, -0.08, -0.33);
-  context.stroke();
-  context.beginPath();
-  context.moveTo(0, -0.21);
-  context.quadraticCurveTo(0.07, -0.41, 0.26, -0.37);
-  context.quadraticCurveTo(0.2, -0.19, 0, -0.21);
-  context.fill();
-  circle(context, -0.14, -0.04, 0.052, palette.surface);
+  context.lineJoin = "round";
+  art.forEach(function paintShapeCB(shape) {
+    // Keep the geometry in memory so redrawing the board never reparses the paths.
+    if (!pickupPaths.has(shape)) pickupPaths.set(shape, new Path2D(shape.d));
+    const path = pickupPaths.get(shape);
+    if (shape.fill) {
+      context.fillStyle = palette.pickup[shape.fill];
+      context.fill(path);
+    }
+    if (shape.stroke) {
+      context.strokeStyle = palette.pickup[shape.stroke];
+      context.lineWidth = shape.width;
+      context.stroke(path);
+    }
+  });
   context.restore();
 }
 
@@ -539,7 +537,7 @@ function paintWind(frame, wind) {
 
 // After sunset the board goes dark except for a soft light around each snake head.
 // The dark layer is drawn on its own canvas, so the lights can cut holes in it without touching the board.
-function paintNight(frame, memory, snakes) {
+function paintNight(frame, memory, snakes, box) {
   const { context, cell, width, height, palette } = frame;
   if (!memory.nightLayer) memory.nightLayer = document.createElement("canvas");
   const layer = memory.nightLayer;
@@ -555,9 +553,10 @@ function paintNight(frame, memory, snakes) {
   night.fillRect(0, 0, width, height);
   night.globalAlpha = 1;
   night.globalCompositeOperation = "destination-out";
-  snakes.forEach(function lightHeadCB(snake) {
-    const head = snake.points[0];
-    const light = night.createRadialGradient(head.x, head.y, cell * 1.5, head.x, head.y, cell * 3.5);
+  const lights = snakes.map(function headLightCB(snake) { return snake.points[0]; });
+  if (box) lights.push(toPixels(frame, box));
+  lights.forEach(function paintLightCB(point) {
+    const light = night.createRadialGradient(point.x, point.y, cell * 1.5, point.x, point.y, cell * 3.5);
     light.addColorStop(0, "rgba(0, 0, 0, 1)");
     light.addColorStop(1, "rgba(0, 0, 0, 0)");
     night.fillStyle = light;
@@ -600,13 +599,18 @@ export function paintBoard(context, memory, palette, now, calm) {
   context.translate(shakeOffset(frame, effects), 0);
   paintFloor(frame, board);
   board.apples.forEach(function paintAppleCB(apple) {
-    paintApple(frame, apple, memory.appleBirths.get(apple.x + ":" + apple.y) ?? now);
+    const bob = calm ? 0 : Math.sin(now / 450 + apple.x) * cell * 0.04;
+    const bornAt = memory.appleBirths.get(apple.x + ":" + apple.y) ?? now;
+    paintPickup(frame, apple, bornAt, APPLE_ART, bob);
   });
+  if (board.box) paintPickup(frame, board.box, memory.boxBornAt, CRATE_ART);
   snakes.forEach(function paintSnakeCB(snake) { paintSnake(frame, snake); });
-  snakes.forEach(function paintInputsCB(snake) { paintInputs(frame, snake, board.inputs[snake.team]); });
+  snakes.forEach(function paintInputsCB(snake) {
+    if (!snake.frozenTicks) paintInputs(frame, snake, board.inputs[snake.team]);
+  });
   effects.forEach(function paintEffectCB(effect) { paintBurst(frame, effect); });
   if (!calm && board.weather?.wet) paintRain(frame, board.weather.wind);
   if (!calm && board.weather?.wind) paintWind(frame, board.weather.wind);
-  if (board.weather?.night) paintNight(frame, memory, snakes);
+  if (board.weather?.night) paintNight(frame, memory, snakes, board.box);
   context.restore();
 }

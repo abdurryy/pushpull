@@ -108,6 +108,7 @@ export function WeatherView(props) {
       <div className="weather-status" role="status" aria-live="polite">
         {renderStatus()}
       </div>
+      <a className="weather-play" href="#/demo">Play Double Snake on this screen</a>
     </main>
   );
 }
