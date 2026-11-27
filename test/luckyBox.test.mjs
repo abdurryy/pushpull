@@ -88,6 +88,16 @@ test("a freeze blocks the wet slide and then five complete ticks", () => {
   assert.equal(round.b.body[0].y, 3);
 });
 
+test("regular round steps also expire a freeze", () => {
+  const up = [null, null, "up", null];
+  let round = stepRound(setup(), RIGHT, roll(6));
+  for (let tick = 0; tick < 5; tick += 1) {
+    round = stepRound(round, up, roll(0));
+    assert.equal(round.b.body[0].y, 6);
+  }
+  assert.equal(stepRound(round, up, roll(0)).b.body[0].y, 5);
+});
+
 test("a delivery moves the apple to a closer free square", () => {
   const next = stepRound(setup(), RIGHT, roll(7));
   assert.equal(next.stepEvents[0].outcome, "appleDelivery");

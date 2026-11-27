@@ -1,6 +1,6 @@
 // Game model: applies the selected city's weather to a keyboard demo tick.
 import { COLUMNS, directions, ROWS, stepRound } from "./doubleSnakeRules.js";
-import { advanceLuckyBox, hasCell, sameCell } from "./luckyBoxRules.js";
+import { hasCell, sameCell } from "./luckyBoxRules.js";
 
 const windDestinations = ["down", "left", "up", "right"];
 const DRIFT_EVERY_TICKS = 5;
@@ -31,12 +31,7 @@ function driftApple(round, wind) {
 }
 
 export function weatherStep(round, inputs, weather, ticks, random = Math.random) {
-  let next = stepRound(round, inputs, random);
-  // Rain checks the intermediate square and keeps the events from both moves.
-  if (weather?.wet && !next.outcome) {
-    const slide = stepRound(next, inputs, random);
-    next = { ...slide, stepEvents: [...next.stepEvents, ...slide.stepEvents] };
-  }
-  if (!next.outcome && ticks % DRIFT_EVERY_TICKS === 0) next = driftApple(next, weather?.wind);
-  return advanceLuckyBox(next, COLUMNS, ROWS, random);
+  const next = stepRound(round, inputs, random, { slide: weather?.wet });
+  if (!next.outcome && ticks % DRIFT_EVERY_TICKS === 0) return driftApple(next, weather?.wind);
+  return next;
 }

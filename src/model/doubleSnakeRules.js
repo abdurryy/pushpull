@@ -1,4 +1,4 @@
-// Game model rules: each substep returns a new board from the same pair of team inputs.
+// Game model rules: each tick returns a new board from the same pair of team inputs.
 import { advanceLuckyBox, freeCells, hasCell, openLuckyBox, pickCell, sameCell, snakeLength } from "./luckyBoxRules.js";
 
 export const COLUMNS = 20;
@@ -99,8 +99,7 @@ export function timeOutRound(round) {
   return finishRound(round, "tie");
 }
 
-export function stepRound(round, inputs, random = Math.random) {
-  if (round.outcome) return round;
+function moveRound(round, inputs, random) {
   const aDirection = combineSticks(inputs[0], inputs[1], round.a.heading);
   const bDirection = combineSticks(inputs[2], inputs[3], round.b.heading);
   const a = moveSnake(round.a, aDirection, round.apple);
@@ -132,4 +131,15 @@ export function stepRound(round, inputs, random = Math.random) {
   }
   if (!next.apple) next.apple = spawnApple(next, random);
   return next.apple || next.box ? next : { ...timeOutRound(next), stepEvents: next.stepEvents };
+}
+
+export function stepRound(round, inputs, random = Math.random, { slide = false } = {}) {
+  if (round.outcome) return round;
+  let next = moveRound(round, inputs, random);
+  // Rain checks the intermediate square and keeps the events from both moves.
+  if (slide && !next.outcome) {
+    const second = moveRound(next, inputs, random);
+    next = { ...second, stepEvents: [...next.stepEvents, ...second.stepEvents] };
+  }
+  return advanceLuckyBox(next, COLUMNS, ROWS, random);
 }
