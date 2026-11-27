@@ -17,8 +17,8 @@ export function LoginView(props) {
           <AccountAvatar name={props.user.name} photoUrl={props.user.photoUrl} />
           <p className="login-text">Signed in as <strong>{props.user.name}</strong></p>
         </div>
-        <a className="login-button" href="#/play/join">Continue to join a room</a>
-        <button className="login-button login-button-secondary" type="button" onClick={signOutClickACB} disabled={props.status === "loading"}>
+        <a className="button" href="#/play/join">Continue to join a room</a>
+        <button className="button button-secondary" type="button" onClick={signOutClickACB} disabled={props.status === "loading"} aria-busy={props.status === "loading"}>
           {props.status === "loading" && <PushMark variant="loading" />}
           {props.status === "loading" ? "Signing out…" : "Sign out"}
         </button>

@@ -1,7 +1,6 @@
 // View component: Google sign-in and its feedback, shared by the account entry points.
 import { PushMark } from "./pushMark.jsx";
 import { StatusMessage } from "./statusMessage.jsx";
-import "./loginView.css";
 
 const ERROR_MESSAGES = {
   "auth/popup-closed-by-user": "The sign-in window was closed before you finished.",
@@ -14,9 +13,9 @@ const ERROR_MESSAGES = {
   "auth/unauthorized-domain": "Signing in isn't allowed from this web address yet.",
 };
 
-export function AccountSignIn({ status, error, onSignIn, secondary = false, label = "Continue with Google" }) {
+export function AccountSignIn({ status, error, onSignIn, textAction = false, label = "Continue with Google" }) {
   const pending = status === "loading";
-  const buttonClass = secondary ? "login-button login-button-secondary" : "login-button";
+  const buttonClass = textAction ? "button button-text" : "button";
 
   function signInClickACB() {
     onSignIn();

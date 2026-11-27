@@ -43,7 +43,7 @@ export function WeatherView(props) {
             <PushMark variant="failure" />
             Couldn't get the weather: {props.error.message}.
           </p>
-          <button className="weather-button weather-button-secondary" type="button" onClick={retryACB}>Try again</button>
+          <button className="button button-text" type="button" onClick={retryACB}>Try again</button>
         </div>
       );
     }
@@ -99,7 +99,7 @@ export function WeatherView(props) {
             placeholder="Stockholm"
             autoComplete="address-level2"
           />
-          <button className="weather-button" type="submit" disabled={props.city.trim() === "" || props.status === "loading"}>
+          <button className="button" type="submit" disabled={props.city.trim() === "" || props.status === "loading"} aria-busy={props.status === "loading"}>
             Check weather
           </button>
         </div>

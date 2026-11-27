@@ -34,7 +34,7 @@ export function ProfileView(props) {
             <p className="login-hint">Signed in with Google</p>
           </div>
         </div>
-        <button className="login-button login-button-secondary" type="button" onClick={signOutClickACB} disabled={pending} aria-busy={pending}>
+        <button className="button button-secondary" type="button" onClick={signOutClickACB} disabled={pending} aria-busy={pending}>
           {pending && <PushMark variant="loading" />}
           {pending ? "Signing out…" : "Sign out"}
         </button>

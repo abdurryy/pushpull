@@ -8,6 +8,7 @@ import { database } from "./persistence/firebaseConfig.js";
 import { makeRoomSync } from "./persistence/roomSync.js";
 import { makeRoomModel } from "./model/RoomModel.js";
 import "./styles/tokens.css";
+import "./styles/buttons.css";
 
 // makeAutoObservable turns the model's data into observables and its methods into MobX actions.
 // autoBind keeps `this` pointing at the model even when a method is passed around as a callback.

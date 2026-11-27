@@ -102,8 +102,7 @@
   flex-direction: column;
 }
 
-.demo-weather-form input,
-.demo-weather-form button {
+.demo-weather-form input {
   box-sizing: border-box;
   min-height: var(--hit-min);
   max-width: 100%;
@@ -116,9 +115,6 @@
 }
 
 .demo-weather-form input { width: 16ch; }
-.demo-weather-form button:not(:disabled) { cursor: pointer; }
-.demo-weather-form button:disabled { color: var(--color-muted); }
-
 
 .demo-overlay {
   position: absolute;
@@ -134,22 +130,6 @@
   inset: auto 0 0;
   background: var(--color-sunken);
   border-radius: 0 0 var(--radius) var(--radius);
-}
-
-.demo-start {
-  min-height: var(--hit-min);
-  padding-inline: var(--space-4);
-  border: 0;
-  border-radius: var(--radius);
-  background: var(--color-ink);
-  color: var(--color-surface);
-  cursor: pointer;
-  font: inherit;
-  font-weight: var(--weight-bold);
-}
-
-.demo-start:active {
-  transform: scale(var(--press-scale));
 }
 
 .demo-keys {

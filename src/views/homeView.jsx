@@ -47,13 +47,13 @@ export function HomeView(props) {
     }
     if (props.user) {
       return (
-        <a className="login-button login-button-secondary" href="#/profile">
+        <a className="button button-text" href="#/profile">
           <span className="icon" aria-hidden="true">account_circle</span>
           View profile
         </a>
       );
     }
-    return <AccountSignIn status={props.status} error={props.error} onSignIn={props.onSignIn} label="Sign in" secondary />;
+    return <AccountSignIn status={props.status} error={props.error} onSignIn={props.onSignIn} label="Sign in" textAction />;
   }
 
   return (
@@ -77,11 +77,11 @@ export function HomeView(props) {
           </p>
 
           <nav className="home-choices" aria-label="Choose this device’s role">
-            <a className="home-choice home-choice-primary" href="#/tv">
+            <a className="button home-choice" href="#/tv">
               <span className="icon" aria-hidden="true">tv</span>
               Play on TV
             </a>
-            <a className="home-choice" href="#/play/login">
+            <a className="button button-secondary home-choice" href="#/play/login">
               <span className="icon" aria-hidden="true">smartphone</span>
               Use phone
             </a>

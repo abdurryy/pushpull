@@ -29,20 +29,5 @@
 .status-message-error { color: var(--color-error); }
 
 .status-message-retry {
-  min-height: var(--hit-min);
   margin-inline-start: calc(var(--status-mark-width) + var(--space-2));
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--color-ink);
-  font: inherit;
-  font-weight: var(--weight-bold);
-  text-decoration: underline;
-  cursor: pointer;
-  transition: transform var(--duration-fast) var(--ease-out);
-}
-
-.status-message-retry:active {
-  transform: scale(var(--press-scale));
-  transition: none;
 }

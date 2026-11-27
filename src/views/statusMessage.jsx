@@ -27,7 +27,7 @@ export function StatusMessage(props) {
         <span>{props.children}</span>
       </p>
       {kind === "error" && props.onRetry && (
-        <button className="status-message-retry" type="button" onClick={retryClickACB}>
+        <button className="button button-text status-message-retry" type="button" onClick={retryClickACB}>
           {props.retryLabel || "Try again"}
         </button>
       )}

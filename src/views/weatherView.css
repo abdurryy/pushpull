@@ -73,35 +73,6 @@
   font: inherit;
 }
 
-.weather-button {
-  min-height: var(--hit-min);
-  padding: var(--space-3) var(--space-5);
-  border: 0;
-  border-radius: var(--radius);
-  background: var(--color-ink);
-  color: var(--color-surface);
-  font: inherit;
-  font-weight: var(--weight-bold);
-  cursor: pointer;
-  transition: transform var(--duration-fast) var(--ease-out);
-}
-
-.weather-button:active {
-  transform: scale(var(--press-scale));
-  transition: none;
-}
-
-.weather-button:disabled {
-  background: var(--color-sunken);
-  color: var(--color-muted);
-  cursor: not-allowed;
-}
-
-.weather-button-secondary {
-  background: var(--color-sunken);
-  color: var(--color-ink);
-}
-
 .weather-status .weather-message {
   display: flex;
   align-items: center;
