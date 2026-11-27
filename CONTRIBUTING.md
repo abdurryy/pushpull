@@ -36,6 +36,16 @@ npx playwright install chromium
 - `--name=<folder>` saves the run in its own folder. Without it, screenshots go in a folder named after the route and frames in one named after the button. Each run prints where its files are (the system temp folder, under `pushpull-screenshots`, `pushpull-frames` or `pushpull-audio`).
 - In Git Bash, a route like `"#/tv"` turns into a Windows path before the script sees it. Start the command with `MSYS_NO_PATHCONV=1`, or use PowerShell.
 
+### Four-player room smoke test
+
+After `npm install` and `npx playwright install chromium`, start the local Firebase emulators in one terminal. The Realtime Database emulator needs Java.
+
+```sh
+npx firebase-tools emulators:start --project demo-pushpull --only auth,database
+```
+
+In another terminal, run `npm run test:room`. It starts its own local Vite server, uses the Auth emulator's Google accounts, and opens one TV session and four phone-sized sessions in headless Chromium. It checks when the board unlocks, what the TV shows when phone inputs cancel, and whether a win adds one point and carries it into the next round. The output names each step and prints the final score. Rerun it against the same emulators to test a fresh room.
+
 ## Git and pull requests
 
 `main` is protected (see [Repo setup](#repo-setup-once-by-the-repo-owner)). You can't push to it directly, force-push it or delete it. Every change follows the same path: **issue → branch → pull request → review → auto-merge.**
