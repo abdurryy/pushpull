@@ -91,10 +91,16 @@
 .countdown-sparks {
   transform-box: fill-box;
   transform-origin: center;
-  animation: countdown-trails var(--intro-duration) both;
 }
 
-.countdown-sparks { animation-name: countdown-sparks; }
+.countdown-trails { animation: countdown-trails var(--intro-duration) both; }
+
+.countdown-sparks {
+  opacity: 0;
+  /* The animation starts at contact so the sound and the visible spark share one trigger. */
+  animation: countdown-sparks calc(var(--intro-duration) * .25)
+    calc(var(--intro-duration) * .38) forwards;
+}
 
 .countdown-wordmark {
   font-family: var(--font-display);
@@ -134,10 +140,9 @@
 }
 
 @keyframes countdown-sparks {
-  0%, 37% { opacity: 0; transform: scale(.35, .58); }
-  38% { opacity: 1; }
-  47% { opacity: 1; transform: scale(1.15, 1.07); }
-  63%, 100% { opacity: 0; transform: scale(1.6, 1.24); }
+  0% { opacity: 1; transform: scale(.35, .58); }
+  36% { opacity: 1; transform: scale(1.15, 1.07); }
+  100% { opacity: 0; transform: scale(1.6, 1.24); }
 }
 
 @keyframes countdown-wordmark {

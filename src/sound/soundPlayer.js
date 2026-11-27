@@ -61,6 +61,13 @@ export function setMuted(value) {
   applyMute();
 }
 
+// Call from the TV's start button so a cue can play after the press has ended.
+export function prepareSound() {
+  if (muted) return;
+  audio();
+  unlockAudioACB();
+}
+
 // Plays one effect from effects.js right away. team ("a" or "b") changes the pitch of team sounds.
 export function playSound(name, team) {
   const effect = soundEffects[name];
