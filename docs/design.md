@@ -71,7 +71,6 @@ Load the fonts and icons once, in `index.html`:
 | `--color-surface` | `#FFFFFF` | Cards, panels, the controller |
 | `--color-sunken` | `#F7E8D5` | Inputs, secondary buttons, grouped areas |
 | `--color-ink` | `#2A2134` | Text, primary buttons, icons |
-| `--color-mark` | `#000000` | Push/Pull SVG logo |
 | `--color-muted` | `#6D6377` | Secondary text |
 | `--color-line` | `#EBDCC8` | Dividers only (never the only way to see an edge) |
 | `--color-team-a` | `#FF5A1F` | Team A (orange) |
@@ -113,7 +112,7 @@ The image skeleton uses `--color-sunken` for the warm fill and `--color-bg` for 
 
 ### Animated push mark
 
-Use `PushMark` from `src/views/pushMark.jsx` alongside a visible heading or status message. The two arrows, loading ring, search beam and round-start traces use `--color-mark`. The success halo and error spark use the status palette. The SVG is decorative. With reduced motion, every variant renders as the static two-arrow mark.
+Use `PushMark` from `src/views/pushMark.jsx` alongside a visible heading or status message. The two arrows, loading ring, search beam and round-start traces use `--color-ink`. The success halo and error spark use the status palette. The SVG is decorative. With reduced motion, every variant renders as the static two-arrow mark.
 
 | Variant | Motion | Use |
 |---|---|---|
@@ -203,7 +202,7 @@ Rules:
 **Loading, empty and error.** Every View that shows data has all three, plus content:
 - **Loading:** an animated push mark plus a sentence saying what is loading ("Checking the weather in Stockholm…"). The rest of the screen stays usable (a course requirement).
 - **Empty:** what's missing and what to do ("No games yet. Join a room to play your first one.").
-- **Error:** what went wrong and a button to try again. Use `--color-error` for the message, never for the whole screen.
+- **Error:** what went wrong and a button to try again. `StatusMessage` places the text-style retry button below the message. Use `--color-error` for the message, never for the whole screen.
 
 ### Shared components
 

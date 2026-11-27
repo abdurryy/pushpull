@@ -8,7 +8,7 @@
 }
 
 .push-mark-left,
-.push-mark-right { fill: var(--color-mark); }
+.push-mark-right { fill: var(--color-ink); }
 
 .push-mark-left { transform-origin: 6px 6px; }
 .push-mark-right { transform-origin: 18px 6px; }
@@ -30,7 +30,7 @@
 .push-mark-loading .push-mark-right { --mark-travel: 2px; }
 
 .push-mark-searching .push-mark-beam {
-  fill: var(--color-mark);
+  fill: var(--color-ink);
   animation: push-mark-sweep var(--duration-loading) ease-in-out infinite;
 }
 
@@ -73,7 +73,7 @@
 
 .push-mark-ring {
   fill: none;
-  stroke: var(--color-mark);
+  stroke: var(--color-ink);
   animation: push-mark-meet var(--duration-loading) ease-out infinite;
 }
 
@@ -95,7 +95,7 @@
 
 .push-mark-trace {
   fill: none;
-  stroke: var(--color-mark);
+  stroke: var(--color-ink);
   stroke-dasharray: 1;
   opacity: 0;
   animation: push-mark-trace var(--duration) var(--ease-out);
