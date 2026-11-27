@@ -1,4 +1,4 @@
-# Publish main and create temporary previews for pull requests from this repository.
+# Publish main and manage temporary previews for pull requests from this repository.
 name: Firebase Hosting
 
 on:
@@ -6,10 +6,13 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  pull_request_target:
+    branches: [main]
+    types: [closed]
 
 concurrency:
   group: hosting-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 permissions:
   contents: read
@@ -17,7 +20,7 @@ permissions:
 jobs:
   deploy:
     name: Deploy Hosting
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     # Naming an environment makes GitHub record each run as a deployment,
     # so the repository page can link to the live site and PR previews.
@@ -74,9 +77,19 @@ jobs:
           projectId: pushpull-1df2e
           channelId: live
 
+      - name: Check whether the pull request is still open
+        id: preview-state
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          state=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq .state)
+          echo "state=$state" >> "$GITHUB_OUTPUT"
+
       - name: Publish a pull request preview
         id: preview
-        if: github.event_name == 'pull_request'
+        if: steps.preview-state.outputs.state == 'open'
         uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
@@ -85,3 +98,48 @@ jobs:
           projectId: pushpull-1df2e
           channelId: pr${{ github.event.pull_request.number }}
           expires: 7d
+
+  cleanup:
+    name: Delete Hosting preview
+    if: github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: read
+    steps:
+      # This job has Hosting credentials and runs without checking out any code.
+      - name: Delete the closed pull request's preview channel
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_HOSTING_SERVICE_ACCOUNT }}
+        shell: bash
+        run: |
+          state=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq .state)
+          if [ "$state" != closed ]; then
+            echo "PR #$PR_NUMBER is open. Keeping its preview."
+            exit 0
+          fi
+
+          export CLOUDSDK_CONFIG
+          CLOUDSDK_CONFIG=$(mktemp -d)
+          trap 'rm -rf -- "$CLOUDSDK_CONFIG"' EXIT
+          umask 077
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$CLOUDSDK_CONFIG/key.json"
+          gcloud auth activate-service-account --key-file="$CLOUDSDK_CONFIG/key.json" --quiet
+          access_token=$(gcloud auth print-access-token)
+          echo "::add-mask::$access_token"
+
+          channel="pr$PR_NUMBER"
+          status=$(curl --silent --show-error --max-time 30 --output "$CLOUDSDK_CONFIG/response.json" \
+            --write-out '%{http_code}' --request DELETE --header "Authorization: Bearer $access_token" \
+            "https://firebasehosting.googleapis.com/v1beta1/sites/pushpull-1df2e/channels/$channel")
+
+          case "$status" in
+            2??) echo "Deleted preview channel $channel." ;;
+            404) echo "Preview channel $channel is already absent." ;;
+            *)
+              echo "::error::Deleting preview channel $channel failed (HTTP $status)."
+              cat "$CLOUDSDK_CONFIG/response.json"
+              exit 1
+              ;;
+          esac
