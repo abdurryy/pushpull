@@ -12,7 +12,7 @@ Read this first. It sums up the rules below without changing them. For the detai
 - **Team colours:** orange is never a text colour (ink on orange, white on blue), and a team colour always comes with the team's name or letter. ([Colour](#colour))
 - **Icons:** Material Symbols Rounded only, with the meaning in text or `aria-label`. No photos. ([Icons and images](#icons-and-images))
 - **States:** every View that shows data has loading (`StatusMessage` with a sentence; the rest of the screen stays usable), empty and error (with a retry). ([Components](#components))
-- **Shared components first:** check `#/components` and the table in [Shared components](#shared-components) before writing your own.
+- **Shared components first:** check `/components` and the table in [Shared components](#shared-components) before writing your own.
 - **Accessibility:** a visible label on every input, `alt` on every image, the focus ring is never removed, and only the contrast pairs in the Colour table.
 - **TV:** 1920×1080, nothing inside the 5% edge (`--tv-safe`), no text smaller than `--tv-text`, nothing scrolls. ([Layout and navigation](#layout-and-navigation))
 - **Controller:** landscape only. Act on `pointerdown`, an instant pressed state, a buzz where supported, confirmation from the TV, big zones, multi-touch by `pointerId`, `touch-action: none`. ([Controller](#controller-phone-landscape), rules 1–10)
@@ -31,12 +31,12 @@ Push/Pull is a party game for four friends with one TV and their own phones. It 
 
 ## Layout and navigation
 
-**TV (`#/tv`)**, designed for 1920×1080 (16:9):
+**TV (`/tv`)**, designed for 1920×1080 (16:9):
 - Keep everything 5% in from each edge (TV safe area): `--tv-safe`.
 - The score bar sits on top: Team A's chip and score on the left, mode, round and timer in the middle, Team B's score and chip on the right. The game board fills the rest.
 - Flow: Lobby → Game board → Round results → next round.
 
-**Phone (`#/play`)**:
+**Phone (`/play`)**:
 - Log in, Join a room and Profile are **portrait**, one column, at most `--phone-max-width` wide and centred.
 - The Controller is **landscape and full-screen**. In portrait it shows only "Turn your phone sideways".
 - Flow: Log in → Join a room → Controller. Profile and stats open from the menu.
@@ -176,7 +176,7 @@ Rules:
 - **Variation:** a sound that repeats (eating, ticks) shifts its pitch slightly each time, and the same sound never starts twice within 50ms. Twenty apples shouldn't sound like a machine gun.
 - **Turning sound on and off:** browsers only allow sound after a press, so the first press on the TV ("Create room", "Start round") turns it on. The TV always shows a sound button with an icon and a label ("Sound on" / "Sound off"). Whether sound is on is application state.
 - **Never sound alone.** Every sound has a picture that says the same thing (see the Game feel table), so deaf players and muted TVs miss nothing.
-- **Where it lives:** `src/sound/` (`instruments.js`, `effects.js` with one function per event, `music.js` with the tracks as note patterns, `soundPlayer.js` with the mix and the music clock). Sound is output, like a View: Views use it through `MusicTrack`, `SoundCues` and `SoundToggle` (Shared components), and the model never imports it. Try every sound on `#/components`.
+- **Where it lives:** `src/sound/` (`instruments.js`, `effects.js` with one function per event, `music.js` with the tracks as note patterns, `soundPlayer.js` with the mix and the music clock). Sound is output, like a View: Views use it through `MusicTrack`, `SoundCues` and `SoundToggle` (Shared components), and the model never imports it. Try every sound on `/components`.
 - **Check levels before you ship a sound:** `node .agents/skills/game-audio/scripts/render-audio.mjs` renders every effect and track to WAV files and warns about clipping and effects that are much louder or quieter than the rest.
 
 ## Components
@@ -216,12 +216,12 @@ All roles have at least `--hit-min` height (48px), a keyboard focus ring and imm
 
 ### Shared components
 
-Ready-made View components in `src/views/`. **Use them before writing your own**, and see every one in every state on `#/components` (the props to copy are in `galleryView.jsx`). If one is missing something, extend it in its own small PR instead of copying it.
+Ready-made View components in `src/views/`. **Use them before writing your own**, and see every one in every state on `/components` (the props to copy are in `galleryView.jsx`). If one is missing something, extend it in its own small PR instead of copying it.
 
 | Component | Props | For |
 |---|---|---|
 | `StatusMessage` | `kind` (`loading`, `waiting`, `searching`, `empty`, `success`, `error`), the sentence as children, `onRetry`, `retryLabel` | Every loading, empty and error state |
-| `ImageSkeleton` | `src`, `alt`, `width` and `height` (or dimensions from `className`), optional `fallback`, `referrerPolicy` and `pending` | Reserves an image's space and shows a warm shimmer until the image is ready to paint. The placeholder then fades away. Try **Replay image loading** on `#/components`. Reduced motion uses a static placeholder and immediate reveal. |
+| `ImageSkeleton` | `src`, `alt`, `width` and `height` (or dimensions from `className`), optional `fallback`, `referrerPolicy` and `pending` | Reserves an image's space and shows a warm shimmer until the image is ready to paint. The placeholder then fades away. Try **Replay image loading** on `/components`. Reduced motion uses a static placeholder and immediate reveal. |
 | `TeamChip` | `team` (`"a"` or `"b"`), a name as children (default "Team A") | Anywhere a team is shown |
 | `TeamRoster` | `team`, `players` (`[{ id, name }]`), `seats` (default 2), `youId`, `name` | Lobby (#24), join (#25) |
 | `RoomCode` | `code` (empty shows four dots). Its size follows the parent's font size | Lobby (#24) |
@@ -236,7 +236,7 @@ Ready-made View components in `src/views/`. **Use them before writing your own**
 
 Every component sizes its text from the parent's font size, so the same piece works on the phone and, inside a parent with `font-size: var(--tv-text)`, on the TV.
 
-Replay the round intro on `#/components`. The Push/Pull arrows meet with a spark and a short synthesized strike, then recoil to leave room for the first number. To use it on a TV screen, call `prepareSound()` from the start button and provide a new `introKey` during the pre-countdown phase. Keep that key through `"3"`. The animation opens the gap after `--duration-loading` (900ms) and fades out as `"3"` appears. The caller supplies each countdown value on the round's schedule. Omit the key if the screen joins a countdown in progress. Reduced motion skips the decorative intro and its impact cue.
+Replay the round intro on `/components`. The Push/Pull arrows meet with a spark and a short synthesized strike, then recoil to leave room for the first number. To use it on a TV screen, call `prepareSound()` from the start button and provide a new `introKey` during the pre-countdown phase. Keep that key through `"3"`. The animation opens the gap after `--duration-loading` (900ms) and fades out as `"3"` appears. The caller supplies each countdown value on the round's schedule. Omit the key if the screen joins a countdown in progress. Reduced motion skips the decorative intro and its impact cue.
 
 ### Controller (phone, landscape)
 
@@ -278,7 +278,7 @@ All values are in [`src/styles/tokens.css`](../src/styles/tokens.css). Import it
 - [ ] Controller: actions fire on `pointerdown`, the pressed state shows instantly, and it works with the stick and a button pressed together
 - [ ] Checked on a phone-sized screen (and on a real phone for controller changes)
 - [ ] Related controls align in their shared row, and the landing page fits the tested viewport without clipping content
-- [ ] Looked at screenshots at phone and TV size, in every state (`node .agents/skills/ui-design/scripts/screenshot.mjs "#/route"` takes them)
+- [ ] Looked at screenshots at phone and TV size, in every state (`node .agents/skills/ui-design/scripts/screenshot.mjs "/route"` takes them)
 - [ ] Game events have the picture, sound and buzz from the Game feel table, and nothing flashes more than three times a second
 
 ## Sources

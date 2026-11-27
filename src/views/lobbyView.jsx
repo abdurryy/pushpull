@@ -1,6 +1,7 @@
 // View (TV): the lobby. Shows the room code and QR code, both teams filling up live, the weather search and Start round.
 // Layout from docs/visual-direction (lobby reference): rail on top, join strip, teams, and the next step at the bottom.
 import QRCode from "react-qr-code";
+import { Link } from "react-router-dom";
 import { PushMark } from "./pushMark.jsx";
 import { RoomCode } from "./roomCode.jsx";
 import { TeamRoster } from "./teamRoster.jsx";
@@ -9,7 +10,7 @@ import "./lobbyView.css";
 
 // The address a phone opens after scanning: this same site, on the join screen with the code filled in.
 function joinUrl(code) {
-  return new URL("#/play/join?code=" + code, window.location.href).href;
+  return new URL("/play/join?code=" + code, window.location.href).href;
 }
 
 function playerNameCB(player) {
@@ -162,7 +163,7 @@ export function LobbyView(props) {
   return (
     <main className="lobby">
       <header className="lobby-rail">
-        <a className="lobby-brand" href="#/"><PushMark /> PUSH/PULL</a>
+        <Link className="lobby-brand" to="/"><PushMark /> PUSH/PULL</Link>
         {renderWeather()}
       </header>
       <div className="lobby-stage">

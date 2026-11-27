@@ -1,5 +1,6 @@
 // View: shows the local Double Snake board, keyboard controls, and round results.
 import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { PushMark } from "./pushMark.jsx";
 import { GameBoard } from "./gameBoard.jsx";
 import { LuckyBoxNotice } from "./luckyBoxNotice.jsx";
@@ -101,10 +102,10 @@ export function DemoView(props) {
       <div className="demo-intro">
         <header className="demo-header">
           <nav className="demo-links" aria-label="Demo navigation">
-            {roomMode ? <a href="#/room">Back to room</a> : (
+            {roomMode ? <Link to="/room">Back to room</Link> : (
               <>
-                <a href="#/">Back to home</a>
-                <a href="#/components">Test components and sound</a>
+                <Link to="/">Back to home</Link>
+                <Link to="/components">Test components and sound</Link>
               </>
             )}
           </nav>

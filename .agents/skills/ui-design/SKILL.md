@@ -50,7 +50,7 @@ Read only what the task needs. Every extra file costs tokens for the whole team.
    - `src/views/loginView.jsx` / `.css`: buttons, pressed and disabled states, status lines with `PushMark`, error messages.
    - `src/views/lobbyView.jsx` / `.css`: a TV screen in the TV frame, with a room and a weather search in idle, loading, error, empty and content states.
    - `src/views/controllerView.jsx` / `.css`: touch zones, safe areas, the landscape-only controller.
-4. The **shared components** (design.md, Shared components). Open `#/components` to see each one in every state, and use them before writing your own: status lines, team chips and seats, room codes, the score bar, the countdown, the game board, and the sound components.
+4. The **shared components** (design.md, Shared components). Open `/components` to see each one in every state, and use them before writing your own: status lines, team chips and seats, room codes, the score bar, the countdown, the game board, and the sound components.
 5. `references/recipes.md` in this skill folder, only when you build a new button, card, field, status line or TV frame: ready-made patterns for each.
 6. The issue you are working on, especially its acceptance criteria.
 
@@ -74,7 +74,7 @@ If you can't fill in "Primary action" or "Loudest thing" in a few words, the scr
 Example for the TV lobby (issue #24):
 
 ```
-Screen:          #/tv, lobbyView
+Screen:          /tv, lobbyView
 Device:          TV, read from 2-3 m, nobody touches it
 Player's goal:   "Get my phone into the game and onto a team."
 Primary action:  join on your phone (scan the QR code or type the room code)
@@ -249,7 +249,7 @@ When a screen feels off and you don't know why, try these in order:
 ## Step 5: Look at it (mandatory)
 
 1. Start the dev server in the background: `npm run dev` (port 8080).
-2. Take screenshots of **only the sizes the screen is used at**: `npm run shots -- "#/your-route" --sizes=laptop,tv`. Every picture costs tokens to read, so don't take sizes nobody uses.
+2. Take screenshots of **only the sizes the screen is used at**: `npm run shots -- "/your-route" --sizes=laptop,tv`. Every picture costs tokens to read, so don't take sizes nobody uses.
 
    | Screen | `--sizes=` |
    |---|---|

@@ -8,7 +8,7 @@ These are the rules you must never get wrong. Details live in the files below: r
 
 - `docs/INDEX.md`: **start here**. Map of all docs, deadlines and gaps.
 - `CONTRIBUTING.md`: team workflow (git, PRs, CodeRabbit, writing issues, capture commands, agent models, adding course material).
-- `docs/design.md`: the design system. Start with "Rules at a glance". Values in `src/styles/tokens.css`. Shared components on `#/components`.
+- `docs/design.md`: the design system. Start with "Rules at a glance". Values in `src/styles/tokens.css`. Shared components on `/components`.
 - `.agents/skills/<name>/SKILL.md`: step-by-step guides with scripts (`.claude/skills/` points to the same guides).
 - `docs/course/`: Canvas material, never edited by hand. Grep its frontmatter (`grep -r "^summary:" docs/course`). A `canvas.kth.se` link is a page we haven't saved: say so, don't guess. Quote `docs/course/project/grading-criteria.md` rather than guess what a grade needs.
 
