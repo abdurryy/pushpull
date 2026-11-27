@@ -71,6 +71,7 @@ Load the fonts and icons once, in `index.html`:
 | `--color-surface` | `#FFFFFF` | Cards, panels, the controller |
 | `--color-sunken` | `#F7E8D5` | Inputs, secondary buttons, grouped areas |
 | `--color-ink` | `#2A2134` | Text, primary buttons, icons |
+| `--color-mark` | `#000000` | Push/Pull SVG logo |
 | `--color-muted` | `#6D6377` | Secondary text |
 | `--color-line` | `#EBDCC8` | Dividers only (never the only way to see an edge) |
 | `--color-team-a` | `#FF5A1F` | Team A (orange) |
