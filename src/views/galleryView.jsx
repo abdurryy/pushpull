@@ -1,7 +1,7 @@
 // View (dev page, #/components): every shared component in every state, with sample props to copy.
 // The buttons only change what this page shows, so their state stays in the View (UI-only state,
 // see docs/course/project/keeping-presenter-simple.md). Real screens get their data from the model.
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { StatusMessage } from "./statusMessage.jsx";
 import { ImageSkeleton } from "./imageSkeleton.jsx";
 import { TeamChip } from "./teamChip.jsx";
@@ -16,6 +16,7 @@ import { SoundToggle } from "./soundToggle.jsx";
 import { MusicTrack } from "./musicTrack.jsx";
 import { SoundCues } from "./soundCues.jsx";
 import { SOUND_NAMES } from "../sound/effects.js";
+import { prepareSound } from "../sound/soundPlayer.js";
 import "./galleryView.css";
 
 // Team A's teammates both steer down, so its eyes already look down. Team B's pull apart, so it goes cross-eyed.
@@ -78,6 +79,7 @@ const IMAGE_PREVIEW_DELAY_MS = 1500;
 
 export function GalleryView() {
   const soundHeading = useRef(null);
+  const lastEventId = useRef(0);
   const [retryKind, setRetryKind] = useState("error");
   const [typedCode, setTypedCode] = useState("");
   const [score, setScore] = useState({ a: 2, b: 1 });
@@ -96,6 +98,19 @@ export function GalleryView() {
   const [weatherName, setWeatherName] = useState("clear");
   const [imagePreviewPending, setImagePreviewPending] = useState(false);
 
+  const addEvent = useCallback(function addEventACB(event) {
+    lastEventId.current += 1;
+    const numbered = { ...event, id: lastEventId.current };
+    setEvents(function appendEventCB(previous) { return [...previous, numbered]; });
+    return numbered;
+  }, []);
+
+  const showCountdownStep = useCallback(function showCountdownStepACB(step) {
+    setCountdownStep(step);
+    const value = COUNTDOWN_STEPS[step];
+    if (value) addEvent({ kind: value === "Go!" ? "go" : "count" });
+  }, [addEvent]);
+
   useEffect(function waitForImagePreviewACB() {
     if (!imagePreviewPending) return;
 
@@ -110,21 +125,16 @@ export function GalleryView() {
     const introMs = parseFloat(styles.getPropertyValue("--duration-loading"));
     const timers = COUNTDOWN_STEPS.map(function scheduleStepCB(value, step) {
       return setTimeout(function showStepACB() {
-        setCountdownStep(step);
+        showCountdownStep(step);
         if (!value) setIntroRun(0);
       }, introMs + step * COUNTDOWN_SECOND_MS);
     });
     return function cancelReplayACB() { timers.forEach(timer => clearTimeout(timer)); };
-  }, [introRun]);
+  }, [introRun, showCountdownStep]);
 
   function replayImageLoadingACB() { setImagePreviewPending(true); }
 
   function retryACB() { setRetryKind("loading"); }
-  function addEvent(event) {
-    const numbered = { ...event, id: events.length + 1 };
-    setEvents([...events, numbered]);
-    return numbered;
-  }
   function teamAEatsACB() { addEvent({ kind: "eat", team: "a", x: 10, y: 5 }); }
   function teamBEatsACB() { addEvent({ kind: "eat", team: "b", x: 11, y: 9 }); }
   // The effect goes where Team B's head is now, which moves after Step snakes.
@@ -168,15 +178,16 @@ export function GalleryView() {
   }
   function lastTenACB() { setSecondsLeft(10); }
   function replayRoundIntroACB() {
+    prepareSound();
     setCountdownStep(COUNTDOWN_STEPS.length - 1);
     setIntroRun(introRun + 1);
   }
 
   function countdownACB() {
+    prepareSound();
     setIntroRun(0);
     const next = (countdownStep + 1) % COUNTDOWN_STEPS.length;
-    setCountdownStep(next);
-    if (COUNTDOWN_STEPS[next]) addEvent({ kind: COUNTDOWN_STEPS[next] === "Go!" ? "go" : "count" });
+    showCountdownStep(next);
   }
 
   function toggleSoundACB() { setSoundOff(!soundOff); }

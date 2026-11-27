@@ -30,17 +30,28 @@ export const soundEffects = {
     melody(instruments.marimba, output, time, pitchFor(team, pitch), 0.45, [["C5", 0], ["E5", 0.08], ["G5", 0.16]]);
   },
 
-  // "3", "2", "1" of the countdown.
-  count(output, time, pitch) {
-    instruments.woodblock(output, time, noteFrequency("A5") * pitch, 1.1);
+  // The arrows meet: one pitched strike with two short bursts of electrical noise.
+  roundClash(output, time, pitch) {
+    instruments.woodblock(output, time, noteFrequency("C5") * pitch, 0.59);
+    instruments.pluck(output, time, noteFrequency("G5") * pitch, 0.45);
+    instruments.clap(output, time, 0, 0.74);
+    instruments.snip(output, time + 0.035, 0, 0.7);
+    instruments.snip(output, time + 0.075, 0, 0.48);
   },
 
-  // "Go!": a bright chord with a high note on top.
+  // "3", "2", "1": a woodblock tick with a short pitched tail.
+  count(output, time, pitch) {
+    const frequency = noteFrequency("A5") * pitch;
+    instruments.woodblock(output, time, frequency, 0.9);
+    instruments.pluck(output, time + 0.014, frequency, 0.38);
+  },
+
+  // "Go!": the marimba jumps from G to C and lands on a bright major chord.
   go(output, time, pitch) {
+    melody(instruments.marimba, output, time, pitch, 0.31, [["G5", 0], ["C6", 0.075]]);
     ["C5", "E5", "G5"].forEach(function playChordNoteCB(note) {
-      instruments.pluck(output, time, noteFrequency(note) * pitch, 0.25);
+      instruments.pluck(output, time + 0.075, noteFrequency(note) * pitch, 0.16);
     });
-    instruments.marimba(output, time, noteFrequency("C6") * pitch, 0.45);
   },
 
   // Each of the last 10 seconds: a small, quiet tick.

@@ -136,7 +136,7 @@ Every game event answers on three channels at once: something moves on the TV, t
 | Lucky Box opened | A short team-coloured ring marks the crate cell. A distinct icon, team name and written outcome appear below the scores, including with reduced motion. | Growth spurt springs up, Shrink zips down, Length heist rattles and flicks, Tail snip scrapes and snaps, Length swap crosses two pitches, Triple bite crunches three times, Freeze rings like ice, and Apple delivery whooshes and lands. A muted pop marks no change. | Short buzz for both teammates when played in a phone-controlled room |
 | Snake crashes | A spark at the crashed head, the board shakes once, the snake flashes ink twice and its eyes turn to "x" | `crash`: a low thud that slides down | Long buzz for the team that crashed |
 | Score changes | The score number pops once | `point`: three rising notes | None |
-| Round starts | "3", "2", "1", "Go!" in the middle of the board, one per second | `count` on each number, `go` on "Go!" | Short buzz on "Go!" |
+| Round starts | The Push/Pull arrows spark at impact and recoil before "3", "2", "1", "Go!" in the middle of the board, one per second | `roundClash`: a strike with electrical crackle. `count`: a woodblock tick on each number. `go`: rising marimba notes into a major chord | Short buzz on "Go!" |
 | Last 10 seconds | The timer turns `--color-warning` and pops each second | `tick` each second, and the music adds its last-10-seconds layer | None |
 | Round won or tied | The winning team's chip grows into a banner with the team name | `win` (or `tie`) jingle | Long buzz for the winners |
 | Player joins or leaves the lobby | The seat fills with a pop, or empties | `join` or `leave` | Short buzz on the phone that joined |
@@ -235,7 +235,7 @@ Ready-made View components in `src/views/`. **Use them before writing your own**
 
 Every component sizes its text from the parent's font size, so the same piece works on the phone and, inside a parent with `font-size: var(--tv-text)`, on the TV.
 
-Replay the round intro on `#/components`. The Push/Pull arrows meet with a spark, then recoil to leave room for the first number. To use it on a TV screen, provide a new `introKey` during the pre-countdown phase and keep that key through `"3"`. The animation opens the gap after `--duration-loading` (900ms) and fades out as `"3"` appears. The caller supplies each countdown value on the round's schedule. Omit the key if the screen joins a countdown in progress. Reduced motion shows the same countdown with the decorative intro hidden.
+Replay the round intro on `#/components`. The Push/Pull arrows meet with a spark and a short synthesized strike, then recoil to leave room for the first number. To use it on a TV screen, call `prepareSound()` from the start button and provide a new `introKey` during the pre-countdown phase. Keep that key through `"3"`. The animation opens the gap after `--duration-loading` (900ms) and fades out as `"3"` appears. The caller supplies each countdown value on the round's schedule. Omit the key if the screen joins a countdown in progress. Reduced motion skips the decorative intro and its impact cue.
 
 ### Controller (phone, landscape)
 
