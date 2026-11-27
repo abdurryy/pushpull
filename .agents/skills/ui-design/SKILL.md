@@ -48,7 +48,7 @@ Read only what the task needs. Every extra file costs tokens for the whole team.
 3. The closest existing View and its CSS, as a sample of the house style. For a change to an existing View, that View is enough. For a new View, copy the patterns of the closest one instead of inventing new ones:
    - `src/views/homeView.jsx` / `.css`: page layout, hierarchy, link cards, the board drawing, the wide-screen breakpoint.
    - `src/views/loginView.jsx` / `.css`: buttons, pressed and disabled states, status lines with `PushMark`, error messages.
-   - `src/views/weatherView.jsx` / `.css`: a TV form with idle, loading, error, empty and content states.
+   - `src/views/lobbyView.jsx` / `.css`: a TV screen in the TV frame, with a room and a weather search in idle, loading, error, empty and content states.
    - `src/views/controllerView.jsx` / `.css`: touch zones, safe areas, the landscape-only controller.
 4. The **shared components** (design.md, Shared components). Open `#/components` to see each one in every state, and use them before writing your own: status lines, team chips and seats, room codes, the score bar, the countdown, the game board, and the sound components.
 5. `references/recipes.md` in this skill folder, only when you build a new button, card, field, status line or TV frame: ready-made patterns for each.

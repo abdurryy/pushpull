@@ -20,7 +20,7 @@ connectAuthToModel(reactiveModel);
 const { model: roomModel, dispose: disposeRoom } = makeRoomModel(makeRoomSync(database), reactiveModel);
 if (import.meta.hot) import.meta.hot.dispose(disposeRoom);
 
-createRoot(document.getElementById("root")).render(<ReactRoot model={reactiveModel} />);
+createRoot(document.getElementById("root")).render(<ReactRoot model={reactiveModel} roomModel={roomModel} />);
 
 // Handy for debugging in the browser console: type `myModel` to see the application state.
 window.myModel = reactiveModel;

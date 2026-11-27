@@ -1,7 +1,7 @@
 // Root component: navigation. Maps each route to its presenter. Hash routes (#/tv) work on any static host, like Firebase Hosting.
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import { HomePresenter } from "./presenters/homePresenter.jsx";
-import { WeatherPresenter } from "./presenters/weatherPresenter.jsx";
+import { LobbyPresenter } from "./presenters/lobbyPresenter.jsx";
 import { LoginPresenter } from "./presenters/loginPresenter.jsx";
 import { JoinPresenter } from "./presenters/joinPresenter.jsx";
 import { DemoPresenter } from "./presenters/demoPresenter.jsx";
@@ -9,13 +9,13 @@ import { ControllerPresenter } from "./presenters/controllerPresenter.jsx";
 import { GalleryPresenter } from "./presenters/galleryPresenter.jsx";
 import { ProfilePresenter } from "./presenters/profilePresenter.jsx";
 
-function makeRouter(model) {
+function makeRouter(model, roomModel) {
   return createHashRouter([
     { path: "/", element: <HomePresenter model={model} /> },
     { path: "/profile", element: <ProfilePresenter model={model} /> },
     { path: "/demo", element: <DemoPresenter model={model} /> },
-    // The shared screen. Shows the weather check for now; the lobby and game board come later.
-    { path: "/tv", element: <WeatherPresenter model={model} /> },
+    // The shared screen: the lobby, where phones join a room and the host checks the weather. The game board comes later.
+    { path: "/tv", element: <LobbyPresenter model={model} roomModel={roomModel} /> },
     // The phone flow starts with logging in: Log in -> Join a room -> Controller.
     { path: "/play/login", element: <LoginPresenter model={model} /> },
     // The destination exists now; room codes and team selection are a separate feature.
@@ -29,5 +29,5 @@ function makeRouter(model) {
 }
 
 export function ReactRoot(props) {
-  return <RouterProvider router={makeRouter(props.model)} />;
+  return <RouterProvider router={makeRouter(props.model, props.roomModel)} />;
 }

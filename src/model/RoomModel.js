@@ -5,6 +5,17 @@ import { normalizeRoomCode, validRoomCode } from "../persistence/roomSync.js";
 const SIDES = ["a", "b", "center"];
 const STICKS = ["idle", "up", "down", "left", "right"];
 const BUTTONS = ["dash", "ping", "shed", "hold"];
+// Double Snake is two against two: a round can start only with exactly this many players on each team.
+const TEAM_SIZE = 2;
+
+function seatOrderCB(first, second) {
+  return first.seat.localeCompare(second.seat);
+}
+
+// "1 more player" or "2 more players", for the lobby's waiting message.
+function morePlayers(count) {
+  return count + (count === 1 ? " more player" : " more players");
+}
 
 export function makeRoomModel(sync, appModel) {
   const model = makeAutoObservable({
@@ -18,8 +29,46 @@ export function makeRoomModel(sync, appModel) {
     error: null,
     stick: "idle",
     requestId: 0,
+    // Set when the host starts a round. The game board (#28) takes over from here.
+    roundStarting: false,
 
     get user() { return appModel.user; },
+
+    // The room's players grouped by the side they picked, in seat order: { a, b, center }.
+    get teams() {
+      const teams = { a: [], b: [], center: [] };
+      const players = this.room?.players || {};
+      function toPlayerCB(uid) {
+        return { id: uid, name: players[uid].name, side: players[uid].side, seat: players[uid].seat };
+      }
+      function addToTeamCB(player) {
+        teams[player.side]?.push(player);
+      }
+      Object.keys(players).map(toPlayerCB).sort(seatOrderCB).forEach(addToTeamCB);
+      return teams;
+    },
+
+    // Why the host can't start a round yet, in words for the TV, or null when everything is ready.
+    // The Start button and startRound() both use this, so they can never disagree.
+    get startBlockedReason() {
+      if (!this.room) return "Create a room first.";
+      if (!this.connected) return "Reconnecting… Players can join again once the TV is back online.";
+      const { a, b } = this.teams;
+      if (a.length > TEAM_SIZE) return "Team A has " + a.length + " players. One of them needs to switch to Team B.";
+      if (b.length > TEAM_SIZE) return "Team B has " + b.length + " players. One of them needs to switch to Team A.";
+      const missingA = TEAM_SIZE - a.length;
+      const missingB = TEAM_SIZE - b.length;
+      if (missingA > 0 && missingB > 0) return "Waiting for " + morePlayers(missingA) + " on Team A and " + missingB + " on Team B…";
+      if (missingA > 0) return "Waiting for " + morePlayers(missingA) + " on Team A…";
+      if (missingB > 0) return "Waiting for " + morePlayers(missingB) + " on Team B…";
+      return null;
+    },
+
+    // The host starts the round once both teams are full.
+    startRound() {
+      if (this.role !== "host" || this.startBlockedReason) return;
+      this.roundStarting = true;
+    },
 
     async createRoom() {
       await openRoom("host");
@@ -52,6 +101,7 @@ export function makeRoomModel(sync, appModel) {
       this.loading = true;
       this.inputReady = false;
       this.stick = "idle";
+      this.roundStarting = false;
     },
 
     receiveRoom(room) {
@@ -102,6 +152,7 @@ export function makeRoomModel(sync, appModel) {
       this.inputReady = false;
       this.stick = "idle";
       this.error = null;
+      this.roundStarting = false;
     },
   }, {}, { autoBind: true });
 

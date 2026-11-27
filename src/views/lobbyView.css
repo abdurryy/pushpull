@@ -1,0 +1,185 @@
+/* View styles: the TV lobby (design.md, Layout and navigation; docs/visual-direction, lobby reference). TV sizes only. */
+
+/* The TV frame: rail, stage and the next step, inside the safe area. Nothing scrolls. */
+.lobby {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-5);
+  box-sizing: border-box;
+  height: 100svh;
+  /* 5% of the height top and bottom, 5% of the width at the sides, as in demoView.css. */
+  padding: min(var(--tv-safe), 5svh) var(--tv-safe);
+  overflow: hidden;
+  font-size: var(--tv-text);
+}
+
+/* Rail: the logo on the left, the weather search on the right (docs/visual-direction puts weather in the rail). */
+.lobby-rail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+}
+
+.lobby-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--hit-min);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.lobby-brand .push-mark {
+  width: 2em;
+  height: 1em;
+}
+
+.lobby-context {
+  font-weight: var(--weight-bold);
+}
+
+.lobby-muted {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.lobby-stage {
+  display: grid;
+  align-content: center;
+  gap: var(--space-5);
+  min-height: 0;
+}
+
+/* Join strip: the loudest thing. Heading and sentence, then the code, then the QR code. */
+.lobby-join {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-7);
+  padding: var(--space-4) var(--space-7);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.lobby-join-text {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.lobby-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--tv-title);
+  font-weight: var(--weight-display);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.lobby-code {
+  font-size: calc(var(--tv-score) * 1.5);
+}
+
+/* Big enough to scan from the sofa (about 240px at 1080p), and smaller on a short laptop screen so nothing scrolls. */
+.lobby-qr {
+  display: grid;
+  place-items: center;
+  width: min(10em, 22svh);
+  aspect-ratio: 1;
+}
+
+.lobby-qr svg {
+  width: 100%;
+  height: 100%;
+}
+
+.lobby-qr-empty {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius);
+  background: var(--color-sunken);
+  color: var(--color-muted);
+  font-size: 6em;
+}
+
+/* Team A left, Team B right. Players look for their own name from the sofa, so the rosters use --tv-title. */
+.lobby-teams {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+}
+
+.lobby-teams .team-roster {
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--tv-title);
+}
+
+.lobby-teams .team-roster-seats {
+  gap: var(--space-2);
+}
+
+.lobby-teams .team-roster-seat {
+  padding-block: var(--space-1);
+}
+
+/* Weather: label, field and button on one row, the result next to it. */
+.lobby-weather {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: end;
+  gap: var(--space-3) var(--space-5);
+}
+
+.lobby-weather-form {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.lobby-weather-label {
+  font-weight: var(--weight-bold);
+}
+
+.lobby-weather-input {
+  box-sizing: border-box;
+  width: 12em;
+  min-height: var(--hit-min);
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+}
+
+.lobby-weather-status {
+  min-width: 0;
+}
+
+.lobby-weather-result {
+  margin: 0;
+  font-weight: var(--weight-bold);
+}
+
+/* The next step: status in words on the left, the one primary button on the right. */
+.lobby-next {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  min-height: calc(var(--hit-min) * 1.5);
+  font-size: var(--tv-title);
+}
+
+.lobby-next .button {
+  flex: none;
+  min-height: calc(var(--hit-min) * 1.5);
+  padding-inline: var(--space-6);
+}
