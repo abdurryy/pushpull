@@ -1,7 +1,7 @@
 // Root component: navigation. Maps each route to its presenter. Hash routes (#/tv) work on any static host, like Firebase Hosting.
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import { HomePresenter } from "./presenters/homePresenter.jsx";
-import { WeatherPresenter } from "./presenters/weatherPresenter.jsx";
+import { LobbyPresenter } from "./presenters/lobbyPresenter.jsx";
 import { LoginPresenter } from "./presenters/loginPresenter.jsx";
 import { JoinPresenter } from "./presenters/joinPresenter.jsx";
 import { RoomPresenter } from "./presenters/roomPresenter.jsx";
@@ -26,8 +26,8 @@ function makeRouter({ model, roomModel, roomController }) {
     { path: "/room", element: <RoomPresenter key="host" app={model} room={roomModel} /> },
     { path: "/room/login", element: <LoginPresenter model={model} host /> },
     { path: "/room/game", element: <RoomPresenter key="board" app={model} room={roomModel} board /> },
-    // The shared screen. Shows the weather check for now; the lobby and game board come later.
-    { path: "/tv", element: <WeatherPresenter model={model} /> },
+    // The shared screen: the lobby, where phones join a room and the host checks the weather. The game board comes later.
+    { path: "/tv", element: <LobbyPresenter model={model} roomModel={roomModel} /> },
     // The phone flow starts with logging in: Log in -> Join a room -> Controller.
     { path: "/play/login", element: <LoginPresenter model={model} /> },
     { path: "/play/join", loader: loadJoinCodeACB, element: join, hydrateFallbackElement: join },

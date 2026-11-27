@@ -25,7 +25,7 @@ Read with it: `docs/course/project/keeping-presenter-simple.md` (the rules and w
 1. The issue: its Approach and Acceptance criteria are the spec.
 2. keeping-presenter-simple.md, all of it.
 3. The nearest existing feature, as a pattern to copy:
-   - Fetching data: `PushPullModel.findWeather` + `resolvePromise.js` + `weatherPresenter.jsx` + `weatherView.jsx`.
+   - Fetching data: `PushPullModel.findWeather` + `resolvePromise.js` + the weather search in `lobbyPresenter.jsx` + `lobbyView.jsx`.
    - Auth: `persistence/firebaseAuth.js` (`connectAuthToModel`) + `loginPresenter.jsx`.
    - Live sync with Firebase: `model/RoomModel.js` + `persistence/roomSync.js`.
    - A clock as a side effect: the `reaction` at the bottom of `model/DemoModel.js`.

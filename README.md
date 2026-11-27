@@ -36,7 +36,7 @@ Needs Node.js 22.12 or newer (Vite 8 requires it).
 
 Copy `.env.example` to `.env.local` and fill in the Firebase web config (Firebase console > Project settings > Your apps, or ask the team). `.env.local` is git-ignored; never commit the real values.
 
-Without Firebase config, the home and weather screens still work and sign-in shows a setup message. Sign in from the home page and choose **View profile** to see your account at `#/profile`.
+Without Firebase config, the home screen and the TV weather search still work and sign-in shows a setup message. Rooms also need `VITE_FIREBASE_DATABASE_URL`. Sign in from the home page and choose **View profile** to see your account at `#/profile`.
 
 ```sh
 npm install
@@ -44,7 +44,7 @@ npm run dev      # http://localhost:8080
 npm run build    # production build in dist/ (not minified, a course rule)
 ```
 
-Open http://localhost:8080 and pick **Use this screen as the TV**, or go straight to http://localhost:8080/#/tv. Type a city and press **Check weather** to see live data from Open-Meteo.
+Open http://localhost:8080 and pick **Use this screen as the TV**, or go straight to http://localhost:8080/#/tv. Sign in, press **Create room**, and join on phones with the room code or QR code. Type a city and press **Check weather** to see live data from Open-Meteo.
 
 Tip: in the browser console, `myModel` shows the current application state.
 
@@ -83,12 +83,12 @@ Run `node --test test/doubleSnakeRules.test.mjs` from the project root. The test
 │   ├── presenters/               # one per screen: model ↔ view, one model method per event
 │   │   ├── homePresenter.jsx     # start screen
 │   │   ├── loginPresenter.jsx    # phone login; only talks to the auth service
-│   │   ├── weatherPresenter.jsx  # weather check on the TV
+│   │   ├── lobbyPresenter.jsx    # TV lobby: room, teams, weather and Start round
 │   │   └── galleryPresenter.jsx  # dev page with every shared component
 │   ├── views/                    # UI only: render props, fire onXxx events, all JSX and CSS
 │   │   ├── homeView.jsx/.css     # pick this device's role
 │   │   ├── loginView.jsx/.css    # Continue with Google, with checking, signing-in and error states
-│   │   ├── weatherView.jsx/.css  # city search with loading, empty and error states
+│   │   ├── lobbyView.jsx/.css    # TV lobby: room code, QR code, teams, weather search
 │   │   ├── galleryView.jsx/.css  # #/components: every shared component in every state
 │   │   └── statusMessage, teamChip, teamRoster, roomCode, roomCodeInput, scoreBar,
 │   │       countdown, gameBoard, soundCues, musicTrack, soundToggle  # shared components, listed in docs/design.md
@@ -123,7 +123,7 @@ _Required in the mid-project review._
 - First API data on screen: the TV shows the live weather for a city, with loading, empty and error states
 - Homepage: explains Double Snake, links to the shared screen and phone setup, and offers Google sign-in
 - Account profile (`#/profile`): shows the current Google account and lets the player sign out
-- Local Double Snake demo: shared keyboard, two teams, apples, eight Lucky Box outcomes, crashes, timer and replay. Open it from the TV weather screen or the homepage.
+- Local Double Snake demo: shared keyboard, two teams, apples, eight Lucky Box outcomes, crashes, timer and replay. Open it from the homepage.
 - Firebase project and Google sign-in on the phone (`#/play/login`)
 - Phone room join by typing or pasting a code or opening an invite link, with live team selection and open seats
 - Room-code playtest with four signed-in phone controllers and the shared Double Snake board
@@ -133,19 +133,20 @@ _Required in the mid-project review._
 - Agent skills in `.agents/skills/` so everyone's coding agent follows design.md, the MVP rules and the user-testing rules
 - A living game board drawn on a canvas: snakes glide and look where their team steers, both teammates' directions show at the head, rain, wind and night are visible, and the keyboard demo has effects, sound and music
 - Visual direction for the full-screen revamp: four annotated reference screens (TV lobby, mode intro, scoreboard, phone join) in [docs/visual-direction](docs/visual-direction/README.md)
+- TV lobby (`#/tv`): the host creates a room and sees its code and QR code, players fill Team A and Team B live, the weather search keeps working while they join, and Start round stays disabled (and says why) until each team has two players
 
 **Planned**
 - MobX model with the game rules, plus per-user persistence in Firebase
 - Screens on the phone: full room join flow, controller actions, profile settings and stats
-- Screens on the TV: lobby, game board, round results
+- Screens on the TV: game board, round results
 - First user test with paper controllers
 
 ## Third-party components
 
 _Required in the final submission: user-visible components written by others for the framework we use. Grades B and A need at least one (router and suspense don't count)._
 
-Planned:
-- [react-qr-code](https://www.npmjs.com/package/react-qr-code): the QR code players scan to join a room
+Used:
+- [react-qr-code](https://www.npmjs.com/package/react-qr-code) (MIT): the QR code on the TV lobby that players scan to join a room (`src/views/lobbyView.jsx`)
 
 Fonts and icons (Google Fonts):
 - [Unbounded](https://fonts.google.com/specimen/Unbounded) and [Atkinson Hyperlegible Next](https://fonts.google.com/specimen/Atkinson+Hyperlegible+Next)

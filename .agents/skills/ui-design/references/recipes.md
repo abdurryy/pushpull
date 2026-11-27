@@ -4,7 +4,7 @@ Small patterns taken from the Views we already have. Copy them instead of invent
 
 ## A View with all its states
 
-The same shape as `weatherView.jsx`: one function picks what to show, so every state is easy to find and explain.
+The same shape as the weather status in `lobbyView.jsx`: one function picks what to show, so every state is easy to find and explain.
 
 ```jsx
 function renderContent() {
