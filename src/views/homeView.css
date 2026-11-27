@@ -75,6 +75,10 @@
   font: var(--weight-display) var(--text-hero) / 1.12 var(--font-display);
 }
 
+.home-title-snake {
+  letter-spacing: var(--space-1);
+}
+
 .home-lead {
   max-width: 42ch;
   margin: 0;
