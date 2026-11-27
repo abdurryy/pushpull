@@ -12,25 +12,30 @@ export function noteFrequency(note) {
   return 440 * Math.pow(2, semitonesFromA4 / 12);
 }
 
+// Team B plays a fourth higher so both teams' cues fit the music.
+export function pitchFor(team, pitch) {
+  return team === "b" ? pitch * Math.pow(2, 5 / 12) : pitch;
+}
+
 // Rise to the volume in 5ms, then fade out exponentially, the way struck wood dies away.
 // Starting and ending near zero (never at zero, which an exponential fade can't reach) avoids clicks.
-function strike(param, time, volume, decay) {
+function strike(param, time, volume, decay, attack = 0.005) {
   param.setValueAtTime(0.0001, time);
-  param.exponentialRampToValueAtTime(volume, time + 0.005);
+  param.exponentialRampToValueAtTime(volume, time + attack);
   param.exponentialRampToValueAtTime(0.0001, time + decay);
 }
 
 // One oscillator through a fading volume. slideTo bends the pitch during the first slideTime seconds.
-function tone(output, time, options) {
+export function tone(output, time, options) {
   const context = output.context;
   const oscillator = context.createOscillator();
   const gain = context.createGain();
-  oscillator.type = options.type;
+  oscillator.type = options.type ?? "sine";
   oscillator.frequency.setValueAtTime(options.frequency, time);
   if (options.slideTo) {
     oscillator.frequency.exponentialRampToValueAtTime(options.slideTo, time + options.slideTime);
   }
-  strike(gain.gain, time, options.volume, options.decay);
+  strike(gain.gain, time, options.volume, options.decay, options.attack);
   oscillator.connect(gain).connect(output);
   oscillator.start(time);
   oscillator.stop(time + options.decay + 0.05);
@@ -52,7 +57,7 @@ function noiseBuffer(context) {
 }
 
 // Noise through a filter. The filter decides the colour: lowpass is a thud, bandpass a clap, highpass a shaker.
-function noise(output, time, options) {
+export function noise(output, time, options) {
   const context = output.context;
   const source = context.createBufferSource();
   const filter = context.createBiquadFilter();
@@ -63,7 +68,7 @@ function noise(output, time, options) {
   if (options.sweepTo) {
     filter.frequency.exponentialRampToValueAtTime(options.sweepTo, time + options.decay);
   }
-  strike(gain.gain, time, options.volume, options.decay);
+  strike(gain.gain, time, options.volume, options.decay, options.attack);
   source.connect(filter).connect(gain).connect(output);
   source.start(time);
   source.stop(time + options.decay + 0.05);
