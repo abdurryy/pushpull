@@ -1,7 +1,8 @@
-/* View styles: a portrait join flow with equally sized side choices. */
+/* View styles: a portrait join flow with a full-width next action. */
 .join {
   box-sizing: border-box;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-6);
   max-width: var(--phone-max-width);
   margin-inline: auto;
@@ -31,9 +32,16 @@
   white-space: nowrap;
 }
 
-.join-content {
+.join-content,
+.join-heading,
+.join-form {
   display: grid;
-  gap: var(--space-3);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.join-heading {
+  gap: var(--space-2);
 }
 
 .join h1,
@@ -43,20 +51,17 @@
 }
 
 .join h1 {
-  font: var(--weight-display) var(--text-title) / 1.15 var(--font-display);
+  font: var(--weight-display) var(--text-hero) / 1.15 var(--font-display);
   text-wrap: balance;
 }
 
 .join-context,
-.join-instructions,
-.join-side-detail {
+.join-instructions {
   color: var(--color-muted);
 }
 
-.join-form {
-  display: grid;
-  gap: var(--space-4);
-  margin-block-start: var(--space-3);
+.join-context {
+  font-weight: var(--weight-bold);
 }
 
 .join-form .room-code-input-boxes {
@@ -65,35 +70,24 @@
 
 .join-sides {
   display: grid;
-  grid-template-columns: repeat(3, minmax(var(--hit-min), 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2);
-  margin-block-start: var(--space-3);
   touch-action: pan-y;
   user-select: none;
 }
 
-.join-side {
-  display: grid;
-  align-content: start;
-  gap: var(--space-2);
-  text-align: center;
-}
-
-.join-side .join-side-button {
+.join-sides .join-side-button {
+  flex-direction: column;
   min-height: var(--controller-button);
-  min-width: 0;
-  padding-inline: var(--space-1);
+  padding: var(--space-3);
 }
 
-.join-side-button.button[aria-pressed="true"],
-.join-side-button.button:hover:not(:disabled) {
+.join-center-button {
+  grid-column: 1 / -1;
+}
+
+.join-sides .button[aria-pressed="true"] {
   text-decoration: none;
-}
-
-.join-side-button .team-chip {
-  max-width: 100%;
-  padding-inline: var(--space-2);
-  white-space: normal;
 }
 
 .join-side-button[data-full="true"] .team-chip {
@@ -104,7 +98,6 @@
 .join-actions {
   display: grid;
   gap: var(--space-2);
-  margin-block-start: var(--space-3);
 }
 
 .join-actions .button-text {

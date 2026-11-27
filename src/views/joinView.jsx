@@ -1,4 +1,4 @@
-// View: code entry and a three-column side picker for phones.
+// View: room code entry, team selection and the handoff to the controller.
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { PushMark } from "./pushMark.jsx";
@@ -9,8 +9,8 @@ import "./joinView.css";
 
 const SIDES = [
   { value: "a", label: "Team A" },
-  { value: "center", label: "Center" },
   { value: "b", label: "Team B" },
+  { value: "center", label: "Wait without a team" },
 ];
 
 export function JoinView(props) {
@@ -54,35 +54,41 @@ export function JoinView(props) {
     const center = value === "center";
     const seats = props.openSeats[value];
     const full = seats === 0;
-    let detail = seats === 1 ? "1 open seat" : seats + " open seats";
-    if (full) detail = "Team full";
-    if (center) detail = "No team";
+    const detail = full ? "Team full" : seats + (seats === 1 ? " open seat" : " open seats");
 
     return (
-      <div className="join-side" key={value}>
-        <button
-          className="button button-secondary join-side-button"
-          type="button"
-          value={value}
-          aria-pressed={selected}
-          data-full={full && !selected}
-          aria-describedby={"join-side-" + value}
-          disabled={!props.connected || props.loading || Boolean(props.changingSide) || (full && !selected)}
-          onClick={pickACB}
-        >
-          {center ? label : <TeamChip team={value}>{label}</TeamChip>}
-        </button>
-        <span id={"join-side-" + value} className="join-side-detail">{detail}</span>
-      </div>
+      <button
+        className={"button button-secondary " + (center ? "join-center-button" : "join-side-button")}
+        type="button"
+        key={value}
+        value={value}
+        aria-label={label}
+        aria-pressed={selected}
+        data-full={full && !selected}
+        aria-describedby={center ? undefined : "join-side-" + value}
+        disabled={!props.connected || props.loading || Boolean(props.changingSide) || (full && !selected)}
+        onClick={pickACB}
+      >
+        {center ? label : (
+          <>
+            <TeamChip team={value}>{label}</TeamChip>
+            <span id={"join-side-" + value}>{detail}</span>
+          </>
+        )}
+      </button>
     );
   }
 
   function renderSides() {
+    const teamsFull = props.openSeats.a === 0 && props.openSeats.b === 0;
+    const busy = props.loading || Boolean(props.changingSide);
+
     return (
       <>
-        <p className="join-context">Room <strong className="numbers">{props.code}</strong></p>
-        <h1 id="join-title">Pick a side</h1>
-        <p className="join-instructions">Tap or slide across the choices.</p>
+        <div className="join-heading">
+          <p className="join-context">Step 2 of 2 · Room <strong className="numbers">{props.code}</strong></p>
+          <h1 id="join-title">Pick a side</h1>
+        </div>
         <div
           className="join-sides"
           role="group"
@@ -92,21 +98,38 @@ export function JoinView(props) {
           onPointerUp={finishSlideACB}
           onPointerCancel={cancelSlideACB}
         >
-          {SIDES.map(renderSideCB)}
+          {SIDES.filter(function availableChoiceCB({ value }) {
+            return value !== "center" || props.side !== "center";
+          }).map(renderSideCB)}
         </div>
         {props.loading && <StatusMessage>Leaving room…</StatusMessage>}
         {props.changingSide && !props.loading && props.connected && <StatusMessage>Picking side…</StatusMessage>}
-        {props.connected && !props.loading && !props.hostOnline && <StatusMessage kind="waiting">Waiting for the host to reconnect…</StatusMessage>}
-        {props.connected && !props.loading && props.hostOnline && (
-          <StatusMessage kind="empty">
-            {props.side === "center" ? "You're in the center." : "You're on Team " + props.side.toUpperCase() + "."}
-          </StatusMessage>
+        {!props.connected && <StatusMessage kind="waiting">Connection lost. Reconnecting…</StatusMessage>}
+        {props.connected && !props.loading && !props.changingSide && (
+          <>
+            {!props.hostOnline && <StatusMessage kind="waiting">Waiting for the host to reconnect…</StatusMessage>}
+            {props.side === "center" ? (
+              <p className="join-instructions">
+                {teamsFull ? "Both teams are full. Wait for a seat to open." : "Choose an open seat to play."}
+              </p>
+            ) : (
+              <>
+                <StatusMessage kind="success">{"You're on Team " + props.side.toUpperCase() + "."}</StatusMessage>
+                {props.hostOnline && <p className="join-instructions">The host starts the round.</p>}
+              </>
+            )}
+          </>
         )}
+        {props.error && <StatusMessage kind="error">{props.error}</StatusMessage>}
         <div className="join-actions">
-          {props.side !== "center" && <Link className="button" to="/play/room-controller">Open controller</Link>}
-          <button className="button button-text" type="button" disabled={!props.connected || props.loading || Boolean(props.changingSide)} onClick={props.onLeave}>
+          <button className="button button-text" type="button" disabled={!props.connected || busy} onClick={props.onLeave}>
             Leave room
           </button>
+          {props.side !== "center" && (
+            props.connected && !busy
+              ? <Link className="button" to="/play/room-controller">Open controller</Link>
+              : <button className="button" type="button" disabled>Open controller</button>
+          )}
         </div>
       </>
     );
@@ -115,10 +138,18 @@ export function JoinView(props) {
   function renderCode() {
     return (
       <>
-        <h1>Join a room</h1>
-        <p className="join-instructions">Enter the four characters shown on the TV.</p>
+        <div className="join-heading">
+          <p className="join-context">Step 1 of 2</p>
+          <h1>Join a room</h1>
+          <p className="join-instructions">Enter the four characters shown on the TV.</p>
+        </div>
         <form className="join-form" onSubmit={joinACB}>
-          <RoomCodeInput value={props.codeInput} onCodeChange={props.onCodeChange} />
+          <RoomCodeInput value={props.codeInput} invalid={Boolean(props.error)} onCodeChange={props.onCodeChange} />
+          {!props.connected && <StatusMessage kind="waiting">Connection lost. Reconnecting…</StatusMessage>}
+          {props.loading && props.connected && <StatusMessage>Joining room…</StatusMessage>}
+          {props.error && (
+            <StatusMessage kind="error">{props.error} Check the code on the TV or ask the host for help.</StatusMessage>
+          )}
           <button
             className="button"
             type="submit"
@@ -128,7 +159,6 @@ export function JoinView(props) {
             {props.error ? "Try again" : "Join room"}
           </button>
         </form>
-        {props.loading && props.connected && <StatusMessage>Joining room…</StatusMessage>}
       </>
     );
   }
@@ -153,13 +183,7 @@ export function JoinView(props) {
       );
     }
 
-    return (
-      <>
-        {props.code ? renderSides() : renderCode()}
-        {!props.connected && <StatusMessage kind="waiting">Connection lost. Reconnecting…</StatusMessage>}
-        {props.error && <StatusMessage kind="error">{props.error}</StatusMessage>}
-      </>
-    );
+    return props.code ? renderSides() : renderCode();
   }
 
   return (
