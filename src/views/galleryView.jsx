@@ -68,6 +68,7 @@ function describeSnakeCB(snake) {
   return "Team " + snake.team.toUpperCase() + "'s snake is " + snake.body.length + " long" + (snake.crashed ? " and crashed" : "");
 }
 const COUNTDOWN_STEPS = ["3", "2", "1", "Go!", null];
+const COUNTDOWN_SECOND_MS = 1000;
 const TRACKS = ["lobby", "round", "trivia", "results"];
 
 const AYA = { id: "u1", name: "Aya" };
@@ -82,6 +83,7 @@ export function GalleryView() {
   const [score, setScore] = useState({ a: 2, b: 1 });
   const [secondsLeft, setSecondsLeft] = useState(42);
   const [countdownStep, setCountdownStep] = useState(4);
+  const [introRun, setIntroRun] = useState(0);
   // One list of events feeds both GameBoard (pictures) and SoundCues (sounds), like the model's event list will.
   const [events, setEvents] = useState([]);
   const [luckyPreview, setLuckyPreview] = useState(null);
@@ -101,6 +103,19 @@ export function GalleryView() {
     const timeout = setTimeout(revealImageACB, IMAGE_PREVIEW_DELAY_MS);
     return () => clearTimeout(timeout);
   }, [imagePreviewPending]);
+
+  useEffect(function playRoundIntroACB() {
+    if (!introRun) return;
+    const styles = getComputedStyle(document.documentElement);
+    const introMs = parseFloat(styles.getPropertyValue("--duration-loading"));
+    const timers = COUNTDOWN_STEPS.map(function scheduleStepCB(value, step) {
+      return setTimeout(function showStepACB() {
+        setCountdownStep(step);
+        if (!value) setIntroRun(0);
+      }, introMs + step * COUNTDOWN_SECOND_MS);
+    });
+    return function cancelReplayACB() { timers.forEach(timer => clearTimeout(timer)); };
+  }, [introRun]);
 
   function replayImageLoadingACB() { setImagePreviewPending(true); }
 
@@ -152,7 +167,13 @@ export function GalleryView() {
     if (next <= 10) addEvent({ kind: "tick" });
   }
   function lastTenACB() { setSecondsLeft(10); }
+  function replayRoundIntroACB() {
+    setCountdownStep(COUNTDOWN_STEPS.length - 1);
+    setIntroRun(introRun + 1);
+  }
+
   function countdownACB() {
+    setIntroRun(0);
     const next = (countdownStep + 1) % COUNTDOWN_STEPS.length;
     setCountdownStep(next);
     if (COUNTDOWN_STEPS[next]) addEvent({ kind: COUNTDOWN_STEPS[next] === "Go!" ? "go" : "count" });
@@ -268,7 +289,7 @@ export function GalleryView() {
               effects={events.filter(function hasPositionCB(event) { return event.x !== undefined; })}
               inputs={SAMPLE_INPUTS} weather={SAMPLE_WEATHER[weatherName]} tickMs={240}
               label={snakes.map(describeSnakeCB).join(", ")} />
-            <Countdown value={COUNTDOWN_STEPS[countdownStep]} />
+            <Countdown value={COUNTDOWN_STEPS[countdownStep]} introKey={introRun || null} />
           </div>
         </div>
         <div className="gallery-row" role="group" aria-label="Preview Lucky Box outcomes">
@@ -284,6 +305,7 @@ export function GalleryView() {
           <button className="button button-secondary" type="button" onClick={scoreBACB}>Team B scores</button>
           <button className="button button-secondary" type="button" onClick={nextSecondACB}>Next second</button>
           <button className="button button-secondary" type="button" onClick={lastTenACB}>Last 10 seconds</button>
+          <button className="button button-secondary" type="button" onClick={replayRoundIntroACB}>Replay round intro</button>
           <button className="button button-secondary" type="button" onClick={countdownACB}>Next countdown step</button>
         </div>
         <div className="gallery-row">

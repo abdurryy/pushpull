@@ -226,7 +226,7 @@ Ready-made View components in `src/views/`. **Use them before writing your own**
 | `RoomCode` | `code` (empty shows four dots). Its size follows the parent's font size | Lobby (#24) |
 | `RoomCodeInput` | `value`, `onCodeChange(code)`, `disabled`, `invalid`, `label`. Put it inside a `<form>` so Enter submits | Join (#25) |
 | `ScoreBar` | `scoreA`, `scoreB`, `teamAName`, `teamBName`, `title`, `secondsLeft` | Game board (#28) |
-| `Countdown` | `value` (`"3"`, `"2"`, `"1"`, `"Go!"` or nothing). The parent needs `position: relative` | Game board (#28) |
+| `Countdown` | `value` (`"3"`, `"2"`, `"1"`, `"Go!"` or nothing) and optional `introKey` for a fresh round. The parent needs `position: relative` | Game board (#28) |
 | `GameBoard` | `columns`, `rows`, `snakes` (`[{ team, heading, body, crashed, looking, torn }]`, where `looking` is the direction the team steers and `torn` means teammates pull apart), `apples`, `box` (`{ x, y }` or `null`), `effects` (`[{ id, kind, team, x, y, outcome? }]`; the board draws apple, crash and Lucky Box effects), `inputs` (`{ a: [dir, dir], b: [dir, dir] }`), `weather` (`{ wet, wind, night }`), `tickMs`, `label`. Drawn on a canvas, see Game board above | Game board (#28) |
 | `LuckyBoxNotice` | `event` (the latest box outcome, with `id`, `outcome`, `team` and `amount` where applicable), `box` (the visible crate), `playing` | Double Snake score area and shared board preview |
 | `SoundCues` | `cues`: the same event list as `GameBoard`. Plays each new `id` once. Lucky Box cues use `outcome` and `amount`. Other cues use `kind` as the sound name. | Every TV screen with events |
@@ -234,6 +234,8 @@ Ready-made View components in `src/views/`. **Use them before writing your own**
 | `SoundToggle` | `muted`, `onToggle` | Every TV screen |
 
 Every component sizes its text from the parent's font size, so the same piece works on the phone and, inside a parent with `font-size: var(--tv-text)`, on the TV.
+
+Replay the round intro on `#/components`. The Push/Pull arrows meet with a spark, then recoil to leave room for the first number. To use it on a TV screen, provide a new `introKey` during the pre-countdown phase and keep that key through `"3"`. The animation opens the gap after `--duration-loading` (900ms) and fades out as `"3"` appears. The caller supplies each countdown value on the round's schedule. Omit the key if the screen joins a countdown in progress. Reduced motion shows the same countdown with the decorative intro hidden.
 
 ### Controller (phone, landscape)
 
