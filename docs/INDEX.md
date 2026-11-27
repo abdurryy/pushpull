@@ -29,6 +29,7 @@ Each file's frontmatter has `source`, `saved`, `tags` and `summary`. Assignments
 | File | What it covers | Read it when |
 |---|---|---|
 | [grading-criteria.md](course/project/grading-criteria.md) | **The grading matrix (Fx–A)** for architecture, UX, APIs/persistence and cooperation, plus a summary of what an A takes | Choosing the idea, planning features, before every deliverable |
+| [self-assessment-template.md](course/project/self-assessment-template.md) | Evidence worksheet for the coach meeting and final submission | Before meeting the coach and while developing |
 | [project-intro-and-grading.md](course/project/project-intro-and-grading.md) | Goals, group rules, GenAI policy, deadline links | You need the rules or the big picture |
 | [project-advice.md](course/project/project-advice.md) | Recommended 17-step build order, from repo setup to user testing | Planning work or splitting tasks |
 | [keeping-presenter-simple.md](course/project/keeping-presenter-simple.md) | Presenter anti-patterns, their fixes and which ones cost grade | Writing or reviewing presenter code |
