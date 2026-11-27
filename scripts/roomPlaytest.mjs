@@ -219,27 +219,54 @@ async function releaseStick(phone) {
   await phone.getByRole("group", { name: "Joystick: idle" }).waitFor();
 }
 
+function holdSticks(players, directions) {
+  return runForPhones(players, function directionCB(index) { return `Hold ${directions[index]}`; },
+    function holdACB(phone, index) { return holdStick(phone, directions[index]); });
+}
+
+function releaseSticks(players) {
+  return runForPhones(players, function releaseCB() { return "Release to idle"; }, releaseStick);
+}
+
 async function playOnPhones(players, signal) {
-  const phone = players[0].phone;
-  for (const directions of [["left", "right", "up", "down"], ["right", "right", "up", "up"]]) {
-    signal.throwIfAborted();
-    await runForPhones(players, function directionCB(index) { return `Hold ${directions[index]}`; },
-      function holdACB(page, index) { return holdStick(page, directions[index]); });
-    await waitForRoomSticks(phone, directions);
-    await delay(1_500, undefined, { signal });
-    if (directions[0] === directions[1]) {
-      const labels = Object.keys(ACTIONS);
-      await runForPhones(players, function actionCB(index) { return `Tap ${labels[index]}`; }, async function tapACB(page, index) {
-        await page.getByRole("button", { name: labels[index], exact: true }).tap();
-        await page.waitForFunction(function buttonArrivedACB(button) {
-          const model = window.roomModel;
-          return model.room?.inputs?.[model.user.uid]?.button === button;
-        }, ACTIONS[labels[index]]);
-      });
-    }
-    await runForPhones(players, function releaseCB() { return "Release to idle"; }, releaseStick);
-    await waitForRoomSticks(phone, [null, null, null, null]);
-  }
+  const [ada, max, bo, kim] = players;
+  const first = [ada, bo];
+  const second = [max, kim];
+  const upOnly = ["up", null, "up", null];
+  const idle = [null, null, null, null];
+
+  // Both snakes start sideways. Apply up first and release down first so the only
+  // possible solo input is up, even if Firebase delivers the two inputs on different ticks.
+  signal.throwIfAborted();
+  await holdSticks(first, ["up", "up"]);
+  await waitForRoomSticks(max.phone, upOnly);
+  signal.throwIfAborted();
+  await holdSticks(second, ["down", "down"]);
+  await waitForRoomSticks(ada.phone, ["up", "down", "up", "down"]);
+  await delay(1_500, undefined, { signal });
+  await releaseSticks(second);
+  await waitForRoomSticks(ada.phone, upOnly);
+  await releaseSticks(first);
+  await waitForRoomSticks(max.phone, idle);
+
+  signal.throwIfAborted();
+  const matching = ["right", "right", "left", "left"];
+  await holdSticks(players, matching);
+  await waitForRoomSticks(ada.phone, matching);
+  // Pulse the matching directions so the snakes stop before reaching one another.
+  await delay(500, undefined, { signal });
+  await releaseSticks(players);
+  await waitForRoomSticks(ada.phone, idle);
+
+  signal.throwIfAborted();
+  const labels = Object.keys(ACTIONS);
+  await runForPhones(players, function actionCB(index) { return `Tap ${labels[index]}`; }, async function tapACB(phone, index) {
+    await phone.getByRole("button", { name: labels[index], exact: true }).tap();
+    await phone.waitForFunction(function buttonArrivedACB(button) {
+      const model = window.roomModel;
+      return model.room?.inputs?.[model.user.uid]?.button === button;
+    }, ACTIONS[labels[index]]);
+  });
 }
 
 async function leavePlayer(phone) {

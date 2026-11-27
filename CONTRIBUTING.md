@@ -62,7 +62,7 @@ npm run test:room -- --room YOUR_CODE --preview-url https://YOUR_PREVIEW.web.app
 
 The hosted run opens visible Chrome windows so you can sign in manually. In each fresh window, choose **Continue with Google**, sign in with the designated test account, then return to the terminal and press Enter. Have any second-factor prompts ready. The runner keeps each phone in its own disposable browser context.
 
-When all four phones are ready, choose **Open game board** and **Start round** on your TV, then press Enter in the terminal. Watch both teams cancel opposite inputs, return to idle, and then move with matching inputs. Ada taps Dash, Max taps Ping, Bo taps Shed, and Kim taps Hold up. The terminal logs each player's team, action and elapsed time.
+When all four phones are ready, choose **Open game board** and **Start round** on your TV, then press Enter in the terminal. Watch both teams cancel opposite inputs, return to idle, and then move briefly with matching inputs. Once the sticks are idle again, Ada taps Dash, Max taps Ping, Bo taps Shed, and Kim taps Hold up. The terminal logs each player's team, action and elapsed time.
 
 Press Ctrl+C to stop a run early. The runner releases the sticks and uses **Leave room** on the test phones so you can reuse the seats. If a phone cannot confirm that it left, the runner reports the cleanup failure. On failures after playtest recording begins, the terminal prints a temporary folder containing per-phone PNGs and Playwright trace ZIPs. Open a trace locally with `npx playwright show-trace <path-to-zip>`. Recording starts after sign-in. Keep the files private because they can contain room and session data.
 
