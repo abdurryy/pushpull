@@ -48,13 +48,13 @@ In another terminal, run `npm run test:room`. It starts its own local Vite serve
 
 #### Drive the phones for a TV room you host
 
-For an emulator playtest, start the emulators as above. Set `VITE_USE_FIREBASE_EMULATORS=true` in the shell that runs `npm run dev`, then open `#/room` in your own browser. Sign in with a mock account, create an empty room, and copy its code into the command below. The runner serves its own copy of the app against the same emulators. Add `--headed` to show the four phone windows.
+For an emulator playtest, start the emulators as above. Set `VITE_USE_FIREBASE_EMULATORS=true` in the shell that runs `npm run dev`, then open `/room` in your own browser. Sign in with a mock account, create an empty room, and copy its code into the command below. The runner serves its own copy of the app against the same emulators. Add `--headed` to show the four phone windows.
 
 ```sh
 npm run test:room -- --room YOUR_CODE
 ```
 
-For a hosted playtest, use an HTTPS pull-request preview whose hostname is in Firebase Authentication's authorized domains. Open `#/room` on that preview and create an empty room. Set aside four distinct Google test accounts for Ada, Max, Bo and Kim, and use a separate account for the TV. Install Google Chrome for this mode.
+For a hosted playtest, use an HTTPS pull-request preview whose hostname is in Firebase Authentication's authorized domains. Open `/room` on that preview and create an empty room. Set aside four distinct Google test accounts for Ada, Max, Bo and Kim, and use a separate account for the TV. Install Google Chrome for this mode.
 
 ```sh
 npm run test:room -- --room YOUR_CODE --preview-url https://YOUR_PREVIEW.web.app

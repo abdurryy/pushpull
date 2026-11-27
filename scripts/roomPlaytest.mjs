@@ -38,7 +38,7 @@ async function step(description, runACB) {
 }
 
 async function signInEmulator(page, baseUrl, route, name) {
-  await page.goto(baseUrl + route);
+  await page.goto(new URL(route, baseUrl).href);
   const [popup] = await Promise.all([
     page.waitForEvent("popup"),
     page.getByRole("button", { name: "Continue with Google" }).click(),
@@ -64,7 +64,7 @@ async function expectRoomResult(phone, success) {
 }
 
 async function joinTeam(phone, baseUrl, invite, player) {
-  await phone.goto(baseUrl + invite);
+  await phone.goto(new URL(invite, baseUrl).href);
   await phone.getByRole("button", { name: "Join room" }).tap();
   await expectRoomResult(phone, phone.getByRole("heading", { name: "Pick a side" }));
   const team = phone.getByRole("button", { name: `Team ${player.team}`, exact: true });
@@ -128,14 +128,14 @@ async function playRoom(browser, baseUrl) {
   const boardLink = host.getByRole("link", { name: "Open game board" });
 
   const invite = await step("Create a fresh room with both teams empty", async function createRoomACB() {
-    await signInEmulator(host, baseUrl, "#/room/login", "Host");
+    await signInEmulator(host, baseUrl, "/room/login", "Host");
     await host.getByRole("link", { name: "Continue to host a room" }).click();
     await host.getByRole("button", { name: "Create room" }).click();
     await rosterA.getByText("0 of 2").waitFor();
     await rosterB.getByText("0 of 2").waitFor();
     assert.equal(await boardLink.count(), 0, "The board opened before any players joined");
     const href = await host.getByRole("link", { name: "Open phone invite" }).getAttribute("href");
-    assert.match(href, /^#\/play\/join\?code=[A-Z2-9]{4}$/);
+    assert.match(href, /^\/play\/join\?code=[A-Z2-9]{4}$/);
     return href;
   });
   const code = invite.slice(-4);
@@ -144,7 +144,7 @@ async function playRoom(browser, baseUrl) {
   for (const player of PLAYERS) {
     await step(`Join ${player.name} on Team ${player.team}`, async function joinACB() {
       const phone = await openPhone(browser);
-      await signInEmulator(phone, baseUrl, "#/play/login", player.name);
+      await signInEmulator(phone, baseUrl, "/play/login", player.name);
       await joinTeam(phone, baseUrl, invite, player);
       phones.push(phone);
       const roster = player.team === "A" ? rosterA : rosterB;
@@ -242,10 +242,12 @@ async function playOnPhones(players, signal) {
   }
 }
 
-async function leavePlayer(phone, baseUrl, invite) {
+async function leavePlayer(phone) {
   await phone.mouse.up();
-  // The invite is a hash route. A same-page navigation keeps the joined room in memory.
-  if (phone.url() !== baseUrl + invite) await phone.goto(baseUrl + invite);
+  const { pathname } = new URL(phone.url());
+  // The controller link added a history entry. Going back keeps the joined room in memory.
+  if (pathname === "/play/room-controller") await phone.goBack();
+  else if (pathname !== "/play/join") return;
   const leave = phone.getByRole("button", { name: "Leave room" });
   const joinForm = phone.getByRole("button", { name: /^(Join room|Try again)$/ }).and(phone.locator(":enabled"));
   await leave.or(joinForm).first().waitFor();
@@ -279,12 +281,12 @@ async function signInPhones(browser, baseUrl, hosted, startedAt, ask) {
     const player = { ...seat, phone, startedAt, tracing: false };
     await playerStep(player, "Sign in", async function signInACB() {
       if (hosted) {
-        await phone.goto(baseUrl + "#/play/login");
+        await phone.goto(new URL("/play/login", baseUrl).href);
         await phone.bringToFront();
         await ask(`In the browser, sign in with the designated ${player.name} test account using Continue with Google, then press Enter. `);
         await expectRoomResult(phone, phone.getByRole("link", { name: "Continue to join a room" }));
       } else {
-        await signInEmulator(phone, baseUrl, "#/play/login", player.name);
+        await signInEmulator(phone, baseUrl, "/play/login", player.name);
       }
       const uid = await phone.evaluate(function accountACB() { return window.roomModel.user?.uid; });
       assert.ok(uid && !usedAccounts.has(uid), "Each seat needs its own signed-in test account.");
@@ -297,7 +299,7 @@ async function signInPhones(browser, baseUrl, hosted, startedAt, ask) {
 
 async function playOperatorRoom(browser, baseUrl, { code, hosted, headed }, signal, ask) {
   const startedAt = performance.now();
-  const invite = `#/play/join?code=${code}`;
+  const invite = `/play/join?code=${code}`;
   const players = await signInPhones(browser, baseUrl, hosted, startedAt, ask);
   const attemptingJoin = [];
   let failure;
@@ -331,8 +333,7 @@ async function playOperatorRoom(browser, baseUrl, { code, hosted, headed }, sign
   }
 
   try {
-    await runForPhones(attemptingJoin, function leaveCB() { return "Release input and leave room"; },
-      function leaveACB(phone) { return leavePlayer(phone, baseUrl, invite); });
+    await runForPhones(attemptingJoin, function leaveCB() { return "Release input and leave room"; }, leavePlayer);
   } catch (error) {
     if (!failure) await saveFailure(players).catch(function reportACB(diagnosticError) { console.error(diagnosticError.message); });
     throw new AggregateError([failure, error].filter(Boolean), `Could not confirm that every test player left room ${code}.`);
