@@ -119,10 +119,11 @@ export function LobbyView(props) {
       return <StatusMessage kind="loading">Checking if you're signed in…</StatusMessage>;
     }
     if (!props.signedIn) {
+      // The sign-in control comes from the login presenter and signs in here, so the host never leaves the TV.
       return (
         <>
           <StatusMessage kind="empty">Sign in to host a room on this screen.</StatusMessage>
-          <a className="button" href="#/play/login">Sign in</a>
+          <div className="lobby-signin">{props.signIn}</div>
         </>
       );
     }

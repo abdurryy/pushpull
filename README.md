@@ -44,7 +44,7 @@ npm run dev      # http://localhost:8080
 npm run build    # production build in dist/ (not minified, a course rule)
 ```
 
-Open http://localhost:8080 and pick **Use this screen as the TV**, or go straight to http://localhost:8080/#/tv. Sign in, press **Create room**, and join on phones with the room code or QR code. Type a city and press **Check weather** to see live data from Open-Meteo.
+Open http://localhost:8080 and pick **Play on TV**, or go straight to http://localhost:8080/#/tv. Sign in on that screen with **Continue with Google**, press **Create room**, and join on phones with the room code or QR code. Type a city and press **Check weather** to see live data from Open-Meteo.
 
 Tip: in the browser console, `myModel` shows the current application state.
 
@@ -133,7 +133,7 @@ _Required in the mid-project review._
 - Agent skills in `.agents/skills/` so everyone's coding agent follows design.md, the MVP rules and the user-testing rules
 - A living game board drawn on a canvas: snakes glide and look where their team steers, both teammates' directions show at the head, rain, wind and night are visible, and the keyboard demo has effects, sound and music
 - Visual direction for the full-screen revamp: four annotated reference screens (TV lobby, mode intro, scoreboard, phone join) in [docs/visual-direction](docs/visual-direction/README.md)
-- TV lobby (`#/tv`): the host creates a room and sees its code and QR code, players fill Team A and Team B live, the weather search keeps working while they join, and Start round stays disabled (and says why) until each team has two players
+- TV lobby (`#/tv`): the host signs in on the TV itself, creates a room and sees its code and QR code, players fill Team A and Team B live, the weather search keeps working while they join, and Start round stays disabled (and says why) until each team has two players
 
 **Planned**
 - MobX model with the game rules, plus per-user persistence in Firebase
