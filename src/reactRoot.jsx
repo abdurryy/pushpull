@@ -9,6 +9,7 @@ import { DemoPresenter } from "./presenters/demoPresenter.jsx";
 import { ControllerPresenter } from "./presenters/controllerPresenter.jsx";
 import { GalleryPresenter } from "./presenters/galleryPresenter.jsx";
 import { ProfilePresenter } from "./presenters/profilePresenter.jsx";
+import { NotFoundView } from "./views/notFoundView.jsx";
 
 // "#/play/join?code=K7M4" becomes "https://pushpull.live/play/join?code=K7M4". An old invite carried its room
 // code inside the fragment, so the query comes along to the new address.
@@ -66,8 +67,7 @@ function makeRouter({ model, roomModel, roomController }) {
     { path: "/play/room-controller", element: <ControllerPresenter key="live" room={roomModel} controller={roomController} /> },
     // Dev page: every shared component in every state.
     { path: "/components", element: <GalleryPresenter /> },
-    // Unknown routes go back to the start screen.
-    { path: "*", element: <HomePresenter model={model} /> },
+    { path: "*", element: <NotFoundView /> },
   ]);
 }
 
