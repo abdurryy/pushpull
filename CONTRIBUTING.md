@@ -85,6 +85,8 @@ CodeRabbit reads the linked issue and checks the PR against it, so **the issue i
 - **How to test:** numbered steps someone can follow, covering the loading, empty and error cases.
 - **Out of scope:** what this issue won't do, so the PR stays small.
 
+When opening a new issue on someone's behalf, ask whether they want it assigned to them unless they already gave an assignment preference. Leave the issue unassigned if they decline or have yet to reply.
+
 With the CLI: `gh issue create --title "<what>" --body-file <brief.md>`. If an existing issue is thin, fill in the missing sections before you start. If a task is too big for one small PR, split it into several issues and link them.
 
 **The pull request:** fill in `.github/pull_request_template.md`: `Closes #<issue>`, what changed per layer, each acceptance criterion with how it's met, the test steps you actually ran with what you saw, and the Visual work block. Don't tick a criterion you didn't verify. Say what's left instead.
