@@ -70,7 +70,7 @@ export function HomeView(props) {
         <section className="home-intro" aria-labelledby="home-title">
           <h1 id="home-title" className="home-title">
             <span>Two friends.</span>
-            <span>One snake.</span>
+            <span>One <span className="home-title-snake">snake</span>.</span>
           </h1>
           <p className="home-lead">
             Four friends, one TV. Each pair steers a snake with their phones.
