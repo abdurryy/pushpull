@@ -6,6 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
+    "test:room": "node scripts/roomPlaytest.mjs",
     "shots": "node .agents/skills/ui-design/scripts/screenshot.mjs",
     "shots:controller": "node .agents/skills/ui-design/scripts/screenshot.mjs \"#/play/controller\" --click=\"Enter controller\" --name=controller --sizes=phone-sideways",
     "frames": "node .agents/skills/game-feel/scripts/capture-frames.mjs",
