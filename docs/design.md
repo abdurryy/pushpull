@@ -133,6 +133,7 @@ Every game event answers on three channels at once: something moves on the TV, t
 | Event | On the TV | TV sound | Phone |
 |---|---|---|---|
 | Apple eaten | The apple bursts into six dots in the team colour, a ring grows from its cell, and a bulge travels down the snake's body | `eat`: two quick rising wooden notes, a little higher for Team B | Short buzz for both teammates |
+| Lucky Box opened | A short team-coloured ring marks the crate cell. A distinct icon, team name and written outcome appear below the scores, including with reduced motion. | `luckyGain`: rising wooden notes, `luckyLoss`: falling wooden notes, `luckyTrade`: two even wooden taps | Short buzz for both teammates when played in a phone-controlled room |
 | Snake crashes | A spark at the crashed head, the board shakes once, the snake flashes ink twice and its eyes turn to "x" | `crash`: a low thud that slides down | Long buzz for the team that crashed |
 | Score changes | The score number pops once | `point`: three rising notes | None |
 | Round starts | "3", "2", "1", "Go!" in the middle of the board, one per second | `count` on each number, `go` on "Go!" | Short buzz on "Go!" |
