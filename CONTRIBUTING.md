@@ -36,6 +36,12 @@ npx playwright install chromium
 - `--name=<folder>` saves the run in its own folder. Without it, screenshots go in a folder named after the route and frames in one named after the button. Each run prints where its files are (the system temp folder, under `pushpull-screenshots`, `pushpull-frames` or `pushpull-audio`).
 - In Git Bash, a route like `"/tv"` turns into a Windows path before the script sees it. Start the command with `MSYS_NO_PATHCONV=1`, or use PowerShell.
 
+### Public route smoke test
+
+After installing Playwright's Chromium, run `npm run test:routes` before sharing a preview. It starts its own local Vite server and a fresh browser, opens the homepage, follows its links to the keyboard demo, component gallery and phone sign-in, and starts a demo round. The command prints each route as it checks it and exits with an error if a check fails.
+
+The test runs without Firebase credentials or emulators. It leaves the demo's optional weather field blank and keeps browser requests on the local server.
+
 ### Four-player room smoke test
 
 After `npm install` and `npx playwright install chromium`, start the local Firebase emulators in one terminal. The Realtime Database emulator needs Java.
