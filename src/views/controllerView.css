@@ -140,7 +140,8 @@
 
 .controller-actions {
   display: grid;
-  grid-template: repeat(2, minmax(0, 1fr)) / repeat(2, minmax(0, 1fr));
+  --action-zone-min: calc(var(--controller-button) + var(--controller-gap));
+  grid-template: repeat(2, minmax(var(--action-zone-min), 1fr)) / repeat(2, minmax(0, 1fr));
   padding-block: max(var(--space-3), var(--controller-safe-top)) max(var(--space-3), var(--controller-safe-bottom));
   padding-inline: 0 max(var(--space-3), var(--controller-safe-right));
 }
@@ -175,6 +176,13 @@
 }
 
 .controller-action .icon { font-size: var(--text-title); }
+
+.controller-action:focus-visible {
+  outline-offset: calc(-1 * var(--space-2));
+}
+
+.controller-action:disabled { cursor: default; }
+.controller-action:disabled .controller-action-face { color: var(--color-muted); }
 
 .controller-action[data-held="true"] .controller-action-face {
   transform: scale(var(--press-scale));
