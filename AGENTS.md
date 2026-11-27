@@ -57,6 +57,16 @@ Full detail: `docs/course/project/keeping-presenter-simple.md`.
 - Callbacks: `...ACB` for event handlers, promise and side-effect callbacks, and `...CB` for array callbacks.
 - 2-space indent, LF line endings. Code copied from the lab gets a comment saying so.
 
+## Choosing the next issue
+
+Treat “what next?” and similar questions as a request to recommend the smartest next issue for the developer. Start with their open assigned issues. Use their known GitHub login, or the signed-in login if it matches the developer. Check the project board for status, priority and target dates. Use the developer's current branch and open pull requests to understand their active work, and the Team table in README.md to identify likely owners of unassigned work.
+
+1. Check **Blocked by** and any explicit prerequisites in each candidate's description. Skip candidates with open prerequisites and issues whose implementation is already in review. Check **Blocking** (`gh api --paginate 'repos/{owner}/{repo}/issues/<number>/dependencies/blocking'`) and the related issue descriptions to see what the candidate would unlock. Verify the downstream issue is open, who owns it, and whether other blockers would still keep it from starting.
+2. Prefer a ready assigned issue that lets a teammate start work soon. If none does, pick the ready assigned issue that follows most naturally from the developer's current work or helps the next milestone. Use priority and target date to break ties. If none is ready, suggest a ready unassigned issue that fits their area or explain the concrete prerequisite that needs to land.
+3. Keep issues that require test participants or an on-site session out of the recommendation. When an open test the developer owns or has to help with is due within three calendar days or overdue (Stockholm time), add a separate line starting with ⚠️ and include the issue number, date and what needs arranging. Use the board's Target date, then the issue's Target date, then the milestone due date.
+
+Lead with one issue and one concrete reason. Name the teammate and link both issues when the recommendation unblocks them. For example, “You should take #42. It unblocks Casper's trivia work in #57.” For inferred sequencing, use wording such as “You should take #42. Casper will probably need it when he starts trivia in #57.” Treat the question as a request for advice. Start work only when the developer asks.
+
 ## Git, PRs and CodeRabbit
 
 Every task: **issue → branch → PR → auto-merge.** Details and how to write issues and PRs: `CONTRIBUTING.md`.
