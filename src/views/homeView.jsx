@@ -86,6 +86,10 @@ export function HomeView(props) {
               Use phone
             </a>
           </nav>
+          <nav className="home-extras" aria-label="Demo and testing">
+            <a href="#/demo">Keyboard demo</a>
+            <a href="#/components">Component gallery</a>
+          </nav>
         </section>
 
         <figure className="home-preview">
@@ -107,11 +111,6 @@ export function HomeView(props) {
           <p className="home-preview-copy">Steer together. Pull apart to stop.</p>
         </figure>
       </div>
-
-      <nav className="home-extras" aria-label="Demo and testing">
-        <a href="#/demo">Keyboard demo</a>
-        <a href="#/components">Component gallery</a>
-      </nav>
     </main>
   );
 }
