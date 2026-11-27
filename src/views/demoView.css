@@ -212,8 +212,9 @@
 
 @media (min-width: 80rem) and (orientation: landscape) {
   .demo {
+    --demo-inset-block: min(var(--tv-safe), 5svh);
     max-width: calc(var(--phone-max-width) * 4);
-    padding-block: calc(var(--tv-safe) * 9 / 16);
+    padding-block: var(--demo-inset-block);
   }
 
   .demo,
@@ -227,5 +228,10 @@
 
 /* Leave vertical room for the score, pickup result and weather on short displays. */
 @media (min-width: 80rem) and (max-height: 48rem) and (orientation: landscape) {
-  .demo-playfield { max-width: calc((100svh - var(--space-8) * 3) * 5 / 3); }
+  .demo-intro,
+  .demo-guide { gap: var(--space-2); }
+
+  .demo-playfield {
+    max-width: calc((100svh - var(--demo-inset-block) * 2 - var(--space-8) * 2 - var(--tv-text) * 4) * 5 / 3);
+  }
 }

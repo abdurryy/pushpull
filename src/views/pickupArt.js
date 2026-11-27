@@ -6,14 +6,14 @@ export const pickupColors = {
   wood: "--color-sunken",
   rim: "--color-board-dot",
   amber: "--color-warning",
-  red: "--color-error",
+  apple: "--color-apple",
   leaf: "--color-success",
 };
 
 export const APPLE_ART = [
   { d: "M16 12c-1-4-2-6-4-8", stroke: "ink", width: 2.1 },
   { d: "M16 10c.6-4.5 4.1-7 8.5-7-1 4.9-4.2 7.4-8.5 7Z", fill: "leaf", stroke: "ink", width: 1.2 },
-  { d: "M16 12c2-1.1 3.4-2 5.7-2 4.1 0 6.8 3.1 6.8 7.5 0 5.7-4 11.5-8.4 11.5-2 0-2.6-.9-4.1-.9s-2.1.9-4.1.9c-4.4 0-8.4-5.8-8.4-11.5C3.5 13.1 6.2 10 10.3 10c2.3 0 3.7.9 5.7 2Z", fill: "red", stroke: "ink", width: 1.6 },
+  { d: "M16 12c2-1.1 3.4-2 5.7-2 4.1 0 6.8 3.1 6.8 7.5 0 5.7-4 11.5-8.4 11.5-2 0-2.6-.9-4.1-.9s-2.1.9-4.1.9c-4.4 0-8.4-5.8-8.4-11.5C3.5 13.1 6.2 10 10.3 10c2.3 0 3.7.9 5.7 2Z", fill: "apple", stroke: "ink", width: 1.6 },
   { d: "M8.1 18.1c0-1.9 1.1-3.2 2.8-3.6", stroke: "white", width: 1.85 },
 ];
 

@@ -18,7 +18,7 @@
 
   --color-board: #FFFCF6;
   --color-board-dot: #E3CFB3;
-  --color-apple: #2A2134;
+  --color-apple: var(--color-error);
 
   --color-success: #17703D;
   --color-warning: #8F5400;
