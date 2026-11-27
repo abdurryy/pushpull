@@ -180,7 +180,16 @@ Rules:
 
 ## Components
 
-**Buttons.** One primary button per screen: ink fill, white text. Secondary: `--color-sunken` fill, ink text. Minimum height `--hit-min` (48px) on phones. A button says what it does ("Join room", "Start round").
+**Buttons.** Use the shared classes in `src/styles/buttons.css` on native buttons and on links styled as actions. Keep one primary action per screen and use a verb to name what each control does.
+
+| Role | Classes and attributes | When to use it |
+|---|---|---|
+| Primary | `button` | The main next step, such as “Start round”. Ink fill with white text. |
+| Secondary | `button button-secondary` | A supporting action, such as “Use phone” next to “Play on TV”. Sunken fill with ink text. |
+| Text | `button button-text` | A quiet action, such as “Try again” below an error. Underlined ink text. |
+| Toggle | `button button-secondary` with `aria-pressed={selected}` | A choice that stays set, such as a weather preview. The selected choice has an ink fill and underlined white text. |
+
+All roles have at least `--hit-min` height (48px), a keyboard focus ring and immediate press feedback. Use native `disabled` when an action is unavailable. For a pending request, set `aria-busy` on its disabled button and show what is happening in words.
 
 **Inputs.** A visible label above every input. Height 48px, `--color-sunken` fill, `--radius`. The room code is 4 separate boxes in `--font-numbers` that jump to the next box as you type and accept a pasted code.
 

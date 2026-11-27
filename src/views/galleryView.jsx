@@ -132,7 +132,7 @@ export function GalleryView() {
 
   function renderLuckyButtonCB([outcome, result]) {
     return (
-      <button className="gallery-lucky-button" key={outcome} type="button" data-outcome={outcome} onClick={previewLuckyACB}>
+      <button className="button button-secondary" key={outcome} type="button" data-outcome={outcome} onClick={previewLuckyACB}>
         <LuckyBoxIcon outcome={outcome} /> {result.label}
       </button>
     );
@@ -163,7 +163,7 @@ export function GalleryView() {
   function weatherClickACB(event) { setWeatherName(event.currentTarget.dataset.weather); }
 
   function renderWeatherButtonCB(name) {
-    return <button key={name} type="button" data-weather={name} aria-pressed={weatherName === name} onClick={weatherClickACB}>{name}</button>;
+    return <button className="button button-secondary" key={name} type="button" data-weather={name} aria-pressed={weatherName === name} onClick={weatherClickACB}>{name}</button>;
   }
   function trackClickACB(event) { setTrack(event.currentTarget.dataset.track); }
   function stopMusicACB() { setTrack(null); }
@@ -177,10 +177,10 @@ export function GalleryView() {
   }
 
   function renderTrackButtonCB(name) {
-    return <button key={name} type="button" data-track={name} aria-pressed={track === name} onClick={trackClickACB}>{name}</button>;
+    return <button className="button button-secondary" key={name} type="button" data-track={name} aria-pressed={track === name} onClick={trackClickACB}>{name}</button>;
   }
   function renderSoundButtonCB(name) {
-    return <button key={name} type="button" data-sound={name} onClick={soundClickACB} disabled={soundOff}>{name}</button>;
+    return <button className="button button-secondary" key={name} type="button" data-sound={name} onClick={soundClickACB} disabled={soundOff}>{name}</button>;
   }
 
   return (
@@ -188,15 +188,13 @@ export function GalleryView() {
       <MusicTrack name={track} intensity={lastTenLayer ? 1 : 0} muted={soundOff} />
       <SoundCues cues={events} />
       <header className="gallery-header">
-        <nav className="gallery-nav" aria-label="Testing navigation">
-          <a href="#/">Back to home</a>
-          <a href="#/demo">Play the keyboard demo</a>
-        </nav>
         <h1>Test components and sound</h1>
         <p>Try room codes, team seats, the game board, music, and sound effects.</p>
-        <div className="gallery-row">
-          <button type="button" onClick={jumpToSoundACB}>Jump to sound tests</button>
-        </div>
+        <nav className="gallery-row" aria-label="Gallery shortcuts">
+          <button className="button" type="button" onClick={jumpToSoundACB}>Jump to sound tests</button>
+          <a className="button button-secondary" href="#/demo">Play keyboard demo</a>
+          <a className="button button-text" href="#/">Back to home</a>
+        </nav>
       </header>
 
       <section className="gallery-section" aria-labelledby="gallery-status">
@@ -220,7 +218,7 @@ export function GalleryView() {
           pending={imagePreviewPending}
         />
         <div className="gallery-row">
-          <button type="button" onClick={replayImageLoadingACB} disabled={imagePreviewPending}>
+          <button className="button button-secondary" type="button" onClick={replayImageLoadingACB} disabled={imagePreviewPending} aria-busy={imagePreviewPending}>
             {imagePreviewPending ? "Loading image…" : "Replay image loading"}
           </button>
         </div>
@@ -277,16 +275,16 @@ export function GalleryView() {
           {Object.entries(luckyResults).map(renderLuckyButtonCB)}
         </div>
         <div className="gallery-row">
-          <button type="button" onClick={teamAEatsACB}>Team A eats</button>
-          <button type="button" onClick={teamBEatsACB}>Team B eats</button>
-          <button type="button" onClick={crashACB}>Crash</button>
-          <button type="button" onClick={stepSnakesACB}>Step snakes</button>
-          <button type="button" onClick={resetBoardACB}>Reset board</button>
-          <button type="button" onClick={scoreAACB}>Team A scores</button>
-          <button type="button" onClick={scoreBACB}>Team B scores</button>
-          <button type="button" onClick={nextSecondACB}>Next second</button>
-          <button type="button" onClick={lastTenACB}>Last 10 seconds</button>
-          <button type="button" onClick={countdownACB}>Next countdown step</button>
+          <button className="button button-secondary" type="button" onClick={teamAEatsACB}>Team A eats</button>
+          <button className="button button-secondary" type="button" onClick={teamBEatsACB}>Team B eats</button>
+          <button className="button button-secondary" type="button" onClick={crashACB}>Crash</button>
+          <button className="button button-secondary" type="button" onClick={stepSnakesACB}>Step snakes</button>
+          <button className="button button-secondary" type="button" onClick={resetBoardACB}>Reset board</button>
+          <button className="button button-secondary" type="button" onClick={scoreAACB}>Team A scores</button>
+          <button className="button button-secondary" type="button" onClick={scoreBACB}>Team B scores</button>
+          <button className="button button-secondary" type="button" onClick={nextSecondACB}>Next second</button>
+          <button className="button button-secondary" type="button" onClick={lastTenACB}>Last 10 seconds</button>
+          <button className="button button-secondary" type="button" onClick={countdownACB}>Next countdown step</button>
         </div>
         <div className="gallery-row">
           {Object.keys(SAMPLE_WEATHER).map(renderWeatherButtonCB)}
@@ -302,8 +300,8 @@ export function GalleryView() {
         <h3>Music</h3>
         <div className="gallery-row">
           {TRACKS.map(renderTrackButtonCB)}
-          <button type="button" onClick={stopMusicACB}>Stop music</button>
-          <button type="button" aria-pressed={lastTenLayer} onClick={lastTenLayerACB}>Round music: last 10 seconds</button>
+          <button className="button button-secondary" type="button" onClick={stopMusicACB}>Stop music</button>
+          <button className="button button-secondary" type="button" aria-pressed={lastTenLayer} onClick={lastTenLayerACB}>Round music: last 10 seconds</button>
         </div>
         <h3>Effects</h3>
         <label className="gallery-sound-team">

@@ -58,47 +58,12 @@ function renderContent() {
 
 ## Buttons
 
-One primary button per screen. The pressed state shows at once (no transition), and only the release animates.
-
-```css
-.xxx-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  min-height: var(--hit-min);
-  padding: var(--space-3) var(--space-5);
-  border: 0;
-  border-radius: var(--radius);
-  background: var(--color-ink);
-  color: var(--color-surface);
-  font: inherit;
-  font-weight: var(--weight-bold);
-  cursor: pointer;
-  transition: transform var(--duration-fast) var(--ease-out);
-}
-
-.xxx-button:active {
-  transform: scale(var(--press-scale));
-  transition: none;
-}
-
-.xxx-button-secondary {
-  background: var(--color-sunken);
-  color: var(--color-ink);
-}
-
-.xxx-button:disabled {
-  background: var(--color-sunken);
-  color: var(--color-muted);
-  cursor: progress;
-}
-```
+Use the shared button classes from `src/styles/buttons.css`. Pick one primary action per screen, add `button-secondary` for supporting actions and use `button-text` for quiet actions such as retries. For a choice that stays set, add `aria-pressed={selected}` to a secondary button. Use a native link for navigation.
 
 ```jsx
-<button className="xxx-button" type="button" onClick={startClickACB} disabled={props.status === "loading"}>
+<button className="button" type="button" onClick={startClickACB} disabled={pending} aria-busy={pending}>
   <span className="icon" aria-hidden="true">play_arrow</span>
-  Start round
+  {pending ? "Starting round…" : "Start round"}
 </button>
 ```
 

@@ -36,13 +36,16 @@
   justify-self: end;
 }
 
-.home-account > .login-button {
+.home-account > .button {
   padding-inline: var(--space-3);
   background: transparent;
 }
 
-.home-account > .login-button:hover:not(:disabled) {
-  background: var(--color-sunken);
+@media (hover: hover) {
+  .home-account > .button:hover:not(:disabled) {
+    background: var(--color-sunken);
+    text-decoration: none;
+  }
 }
 
 .home-account > .status-message-error {
@@ -85,31 +88,11 @@
   max-width: var(--phone-max-width);
 }
 
-.home-choice {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  box-sizing: border-box;
-  min-height: var(--hit-min);
+.home-choices .button {
   padding: var(--space-2);
-  border-radius: var(--radius);
-  background: var(--color-sunken);
-  color: var(--color-ink);
-  font-weight: var(--weight-bold);
-  text-align: center;
-  text-decoration: none;
 }
 
-.home-choice-primary {
-  background: var(--color-ink);
-  color: var(--color-surface);
-}
-
-.home-choice:hover,
-.home-choice:active,
 .home-extras a:active {
-  text-decoration: underline;
   text-decoration-thickness: var(--focus-offset);
 }
 
@@ -294,7 +277,7 @@
     font-size: var(--tv-score);
   }
 
-  .home-choice {
+  .home-choices .button {
     padding: var(--space-3) var(--space-4);
   }
 }

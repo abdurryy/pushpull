@@ -110,7 +110,7 @@ export function DemoView(props) {
               <PushMark variant="game-start" /> Round {roundNumber}
             </p>
           ) : (
-            <button ref={start} className="demo-start" type="button" onClick={props.onStart}>
+            <button ref={start} className="button" type="button" onClick={props.onStart}>
               {round ? "Play another round" : "Start round"}
             </button>
           )}
@@ -158,7 +158,8 @@ export function DemoView(props) {
             <label htmlFor="demo-city">Weather city (optional)</label>
             <div className="demo-weather-form">
               <input id="demo-city" value={props.cityQuery} onChange={cityChangeACB} />
-              <button type="submit" disabled={!props.cityQuery.trim() || props.weatherStatus === "loading"}>Check weather</button>
+              <button className="button button-secondary" type="submit"
+                disabled={!props.cityQuery.trim() || props.weatherStatus === "loading"} aria-busy={props.weatherStatus === "loading"}>Check weather</button>
             </div>
             <p role="status">{renderWeatherStatus(props.weatherStatus, props.weatherCity)}</p>
           </form>

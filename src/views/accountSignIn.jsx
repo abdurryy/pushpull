@@ -1,7 +1,6 @@
 // View component: Google sign-in and its feedback, shared by the account entry points.
 import { PushMark } from "./pushMark.jsx";
 import { StatusMessage } from "./statusMessage.jsx";
-import "./loginView.css";
 
 const ERROR_MESSAGES = {
   "auth/popup-closed-by-user": "The sign-in window was closed before you finished.",
@@ -16,7 +15,7 @@ const ERROR_MESSAGES = {
 
 export function AccountSignIn({ status, error, onSignIn, secondary = false, label = "Continue with Google" }) {
   const pending = status === "loading";
-  const buttonClass = secondary ? "login-button login-button-secondary" : "login-button";
+  const buttonClass = secondary ? "button button-secondary" : "button";
 
   function signInClickACB() {
     onSignIn();

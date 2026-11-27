@@ -56,42 +56,6 @@
   color: var(--color-muted);
 }
 
-.login-button {
-  display: inline-flex;
-  box-sizing: border-box;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  min-height: var(--hit-min);
-  padding: var(--space-3) var(--space-5);
-  border: 0;
-  border-radius: var(--radius);
-  background: var(--color-ink);
-  color: var(--color-surface);
-  font: inherit;
-  font-weight: var(--weight-bold);
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-  transition: transform var(--duration-fast) var(--ease-out);
-}
-
-.login-button:active {
-  transform: scale(var(--press-scale));
-  transition: none;
-}
-
-.login-button:disabled {
-  background: var(--color-sunken);
-  color: var(--color-muted);
-  cursor: progress;
-}
-
-.login-button-secondary {
-  background: var(--color-sunken);
-  color: var(--color-ink);
-}
-
 .login-user {
   display: flex;
   align-items: center;
