@@ -116,10 +116,10 @@ async function listJobs(page, wanted) {
     return { effects: SOUND_NAMES, tracks: Object.keys(tracks) };
   });
   const jobs = [];
-  const teamEffects = ["eat", "point", "join", "leave", "luckyGain", "luckyLoss", "luckyTrade"];
+  const teamEffects = ["eat", "point", "join", "leave"];
   names.effects.forEach(function addEffectCB(name) {
     jobs.push({ kind: "effect", name, team: "a", file: name });
-    if (teamEffects.includes(name)) {
+    if (teamEffects.includes(name) || name.startsWith("lucky")) {
       jobs.push({ kind: "effect", name, team: "b", file: name + "-team-b" });
     }
   });

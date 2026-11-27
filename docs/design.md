@@ -133,7 +133,7 @@ Every game event answers on three channels at once: something moves on the TV, t
 | Event | On the TV | TV sound | Phone |
 |---|---|---|---|
 | Apple eaten | The apple bursts into six dots in the team colour, a ring grows from its cell, and a bulge travels down the snake's body | `eat`: two quick rising wooden notes, a little higher for Team B | Short buzz for both teammates |
-| Lucky Box opened | A short team-coloured ring marks the crate cell. A distinct icon, team name and written outcome appear below the scores, including with reduced motion. | `luckyGain`: rising wooden notes, `luckyLoss`: falling wooden notes, `luckyTrade`: two even wooden taps | Short buzz for both teammates when played in a phone-controlled room |
+| Lucky Box opened | A short team-coloured ring marks the crate cell. A distinct icon, team name and written outcome appear below the scores, including with reduced motion. | Each outcome has its own cue. Growth spurt rises, Shrink drops, Length heist knocks then plucks, Tail snip clicks twice, Length swap returns to its first note, Triple bite knocks three times, Freeze strikes a chord, and Apple delivery taps into a ringing note. A single tap marks no change. | Short buzz for both teammates when played in a phone-controlled room |
 | Snake crashes | A spark at the crashed head, the board shakes once, the snake flashes ink twice and its eyes turn to "x" | `crash`: a low thud that slides down | Long buzz for the team that crashed |
 | Score changes | The score number pops once | `point`: three rising notes | None |
 | Round starts | "3", "2", "1", "Go!" in the middle of the board, one per second | `count` on each number, `go` on "Go!" | Short buzz on "Go!" |
@@ -220,7 +220,7 @@ Ready-made View components in `src/views/`. **Use them before writing your own**
 | `Countdown` | `value` (`"3"`, `"2"`, `"1"`, `"Go!"` or nothing). The parent needs `position: relative` | Game board (#28) |
 | `GameBoard` | `columns`, `rows`, `snakes` (`[{ team, heading, body, crashed, looking, torn }]`, where `looking` is the direction the team steers and `torn` means teammates pull apart), `apples`, `box` (`{ x, y }` or `null`), `effects` (`[{ id, kind, team, x, y, outcome? }]`; the board draws apple, crash and Lucky Box effects), `inputs` (`{ a: [dir, dir], b: [dir, dir] }`), `weather` (`{ wet, wind, night }`), `tickMs`, `label`. Drawn on a canvas, see Game board above | Game board (#28) |
 | `LuckyBoxNotice` | `event` (the latest box outcome, with `id`, `outcome`, `team` and `amount` where applicable), `box` (the visible crate), `playing` | Double Snake score area and shared board preview |
-| `SoundCues` | `cues`: the same event list as `GameBoard`. Plays each new `id` once; `kind` is a sound name from `src/sound/effects.js` | Every TV screen with events |
+| `SoundCues` | `cues`: the same event list as `GameBoard`. Plays each new `id` once. Lucky Box cues use `outcome` and `amount`. Other cues use `kind` as the sound name. | Every TV screen with events |
 | `MusicTrack` | `name` (`lobby`, `round`, `trivia`, `results` or nothing), `intensity` (1 in the last 10 seconds), `muted`. One per screen | Every TV screen |
 | `SoundToggle` | `muted`, `onToggle` | Every TV screen |
 
