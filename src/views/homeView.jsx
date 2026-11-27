@@ -73,17 +73,23 @@ export function HomeView(props) {
             <span>One <span className="home-title-snake">snake</span>.</span>
           </h1>
           <p className="home-lead">
-            Four friends, one TV. Each pair steers a snake with their phones.
+            Four friends, one TV. Two of you steer each snake, so you have to agree which way to go.
           </p>
 
           <nav className="home-choices" aria-label="Choose this device’s role">
             <a className="button home-choice" href="#/tv">
               <span className="icon" aria-hidden="true">tv</span>
-              Play on TV
+              <span className="home-choice-label">
+                Play on TV
+                <span className="home-choice-role">Shared board</span>
+              </span>
             </a>
             <a className="button button-secondary home-choice" href="#/play/login">
               <span className="icon" aria-hidden="true">smartphone</span>
-              Use phone
+              <span className="home-choice-label">
+                Use phone
+                <span className="home-choice-role">Your controller</span>
+              </span>
             </a>
           </nav>
           <nav className="home-extras" aria-label="Demo and testing">
@@ -109,7 +115,7 @@ export function HomeView(props) {
             inputs={PREVIEW_INPUTS}
             label="Team A steers its snake toward an apple. Team B’s two players steer in opposite directions, stopping their snake."
           />
-          <p className="home-preview-copy">Steer together. Pull apart to stop.</p>
+          <p className="home-preview-copy">Team A agrees. Team B pulls apart.</p>
         </figure>
       </div>
     </main>
