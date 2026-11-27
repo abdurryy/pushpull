@@ -60,6 +60,8 @@ When a phone drops offline, its last direction becomes idle once Firebase detect
 
 For the hosted playtest, publish the matching Realtime Database rules from `main` with `npx firebase-tools deploy --only database --project pushpull-1df2e`. The Hosting workflow publishes the web build.
 
+A deploy reaches everyone on their next page load. The `headers` in `firebase.json` set this: the page and the manifest are `no-cache`, so the browser asks every time and gets a small `304` when nothing changed, while the files in `/assets/` are cached for a year because Vite puts the content's hash in their names. Without that, Hosting's default of one hour meant a fix could take an hour to reach a phone or a teammate who had opened the site already.
+
 ### Double Snake rules tests
 
 Run `node --test test/doubleSnakeRules.test.mjs` from the project root. The tests use fixed boards and inputs to check steering, crashes, apple growth and timeouts with Node alone.
