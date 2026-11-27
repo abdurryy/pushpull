@@ -10,23 +10,26 @@ import { ControllerPresenter } from "./presenters/controllerPresenter.jsx";
 import { GalleryPresenter } from "./presenters/galleryPresenter.jsx";
 import { ProfilePresenter } from "./presenters/profilePresenter.jsx";
 
-// "#/play/join?code=K7M4" becomes "/play/join?code=K7M4". An old invite carried its room code inside the
-// fragment, so the query comes along to the new path.
-function hashAsPath() {
+// "#/play/join?code=K7M4" becomes "https://pushpull.live/play/join?code=K7M4". An old invite carried its room
+// code inside the fragment, so the query comes along to the new address.
+// Our own origin always goes in front: a fragment like "#/.//example.com" reads as a path here but as another
+// site's address on its own, and that would send the visitor away from Push/Pull.
+function hashAsUrl() {
   const target = new URL(window.location.hash.slice(1), window.location.origin);
-  return target.pathname + target.search;
+  if (target.origin !== window.location.origin) return window.location.origin + "/";
+  return window.location.origin + target.pathname + target.search;
 }
 
 // Links we shared before put the route in the fragment (/#/tv). Old bookmarks and invites keep working because
 // we turn them into a path (/tv). index.jsx calls this before the router reads the address.
 export function keepOldHashLinksWorking() {
   if (window.location.hash.startsWith("#/")) {
-    window.history.replaceState(null, "", hashAsPath());
+    window.history.replaceState(null, "", hashAsUrl());
   }
   // An old link can also be opened while the app is already running. That only changes the fragment,
-  // which this router ignores, so load the path instead.
+  // which this router ignores, so load the address instead.
   window.addEventListener("hashchange", function hashChangedACB() {
-    if (window.location.hash.startsWith("#/")) window.location.replace(hashAsPath());
+    if (window.location.hash.startsWith("#/")) window.location.replace(hashAsUrl());
   });
 }
 
