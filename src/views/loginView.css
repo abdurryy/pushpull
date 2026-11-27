@@ -49,11 +49,35 @@
   color: var(--color-muted);
 }
 
-.login-checking {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  color: var(--color-muted);
+.login-entry {
+  gap: var(--space-6);
+  padding-block-start: max(var(--space-4), env(safe-area-inset-top));
+  padding-block-end: max(var(--space-5), env(safe-area-inset-bottom));
+}
+
+.login-entry .login-brand {
+  font-family: var(--font-display);
+  text-decoration: none;
+}
+
+.login-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.login-content h1 {
+  margin: 0;
+  font: var(--weight-display) var(--text-hero) / 1.15 var(--font-display);
+  text-wrap: balance;
+}
+
+.login-content .login-text {
+  font-size: var(--text-body);
+}
+
+.login-sign-out {
+  justify-self: start;
 }
 
 .login-user {
