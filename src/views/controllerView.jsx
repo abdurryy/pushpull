@@ -70,7 +70,7 @@ function useControllerWakeLock(enabled) {
 }
 
 export function ControllerView({
-  onClear, onStick, onAction, direction, roomCode, team, unavailable, reconnecting, hostAway, error, ...heldActions
+  onClear, onStick, onAction, direction, roomCode, closedRoomCode, team, unavailable, reconnecting, hostAway, error, ...heldActions
 }) {
   const screen = useRef(null);
   const stickPointer = useRef(null);
@@ -243,8 +243,14 @@ export function ControllerView({
   if (unavailable) {
     return (
       <main ref={screen} className="controller controller-unavailable">
-        <p role="status">Your room is unavailable. Join a room and choose a team to use this controller.</p>
-        <Link className="button" to="/play/join">Go to room setup</Link>
+        <p role="status">
+          {closedRoomCode
+            ? "The host closed room " + closedRoomCode + "."
+            : "Your room is unavailable. Join a room and choose a team to use this controller."}
+        </p>
+        <Link className="button" to="/play/join">
+          {closedRoomCode ? "Join another room" : "Go to room setup"}
+        </Link>
       </main>
     );
   }

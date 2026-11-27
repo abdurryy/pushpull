@@ -56,7 +56,7 @@ On the host screen, choose **Host a room playtest**, sign in with Google, and cr
 
 For a local run, start the Firebase Auth and Realtime Database emulators with `npx firebase-tools emulators:start --project demo-pushpull --only auth,database`. Set `VITE_USE_FIREBASE_EMULATORS=true` in your shell before starting Vite. Open the app in separate browser profiles or contexts and use the emulator's mock Google accounts. The emulator flag applies only to the dev server and uses the local demo project.
 
-When a phone drops offline, its last direction becomes idle once Firebase detects the disconnect. A player can leave the room to free their seat. Closing the room from the host lobby gives players a link back to room setup.
+When a phone drops offline, its last direction becomes idle once Firebase detects the disconnect. A player can leave the room to free their seat. To end the session, choose **Close room** in the host lobby and confirm. Phones return to room-code entry or show a **Join another room** link from the controller.
 
 For the hosted playtest, publish the matching Realtime Database rules from `main` with `npx firebase-tools deploy --only database --project pushpull-1df2e`. The Hosting workflow publishes the web build.
 
@@ -129,6 +129,7 @@ _Required in the mid-project review._
 - Firebase project and Google sign-in on the phone (`/play/login`)
 - Phone room join by typing or pasting a code or opening an invite link, with live team selection and open seats
 - Room-code playtest with four signed-in phone controllers and the shared Double Snake board
+- Host room-closure confirmation with a clear rejoin path for connected players
 - Game feel and sound designed in design.md: the picture, sound and phone buzz for every game event
 - Shared View components for the next screens (status lines, team seats, room code boxes, score bar, countdown, game board), shown in every state on `/components`
 - Sound effects for every game event and music for the lobby, round, trivia and results, made in code with the Web Audio API

@@ -21,7 +21,7 @@ export const RoomPresenter = observer(function RoomPresenter({ app, room, board 
       loading={room.loading}
       error={room.error}
       onCreate={room.createRoom}
-      onLeave={room.departRoom}
+      onCloseRoom={room.departRoom}
     />
   );
 });

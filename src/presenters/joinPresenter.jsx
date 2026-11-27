@@ -12,6 +12,7 @@ export const JoinPresenter = observer(function JoinPresenter({ app, room }) {
       hostOnline={room.room?.hostOnline === true}
       code={room.joined ? room.code : null}
       codeInput={room.codeInput}
+      closedRoomCode={room.closedRoomCode}
       side={room.side}
       openSeats={room.openTeamSeats}
       changingSide={room.pendingSide}

@@ -2,6 +2,7 @@
 // Layout from docs/visual-direction (lobby reference): rail on top, join strip, teams, and the next step at the bottom.
 import QRCode from "react-qr-code";
 import { Link } from "react-router-dom";
+import { CloseRoomButton } from "./closeRoomButton.jsx";
 import { PushMark } from "./pushMark.jsx";
 import { RoomCode } from "./roomCode.jsx";
 import { TeamRoster } from "./teamRoster.jsx";
@@ -147,11 +148,14 @@ export function LobbyView(props) {
   // With a room: why Start round is still disabled, or that everyone's in.
   function renderStartStep() {
     let status = <StatusMessage kind="success">Everyone's in. Start when you're ready.</StatusMessage>;
-    if (props.roundStarting) status = <StatusMessage kind="loading">Starting the round…</StatusMessage>;
+    if (props.closing) status = <StatusMessage kind="loading">Closing room…</StatusMessage>;
+    else if (props.roomError) status = <StatusMessage kind="error">{props.roomError}</StatusMessage>;
+    else if (props.roundStarting) status = <StatusMessage kind="loading">Starting the round…</StatusMessage>;
     else if (props.startBlockedReason) status = <StatusMessage kind="waiting">{props.startBlockedReason}</StatusMessage>;
     return (
       <>
         {status}
+        <CloseRoomButton disabled={props.closing || !props.connected} onCloseRoom={props.onCloseRoom} />
         <button className="button" type="button" onClick={startRoundACB}
           disabled={Boolean(props.startBlockedReason) || props.roundStarting} aria-busy={props.roundStarting}>
           Start round

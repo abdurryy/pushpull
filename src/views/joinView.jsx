@@ -141,7 +141,11 @@ export function JoinView(props) {
         <div className="join-heading">
           <p className="join-context">Step 1 of 2</p>
           <h1>Join a room</h1>
-          <p className="join-instructions">Enter the four characters shown on the TV.</p>
+          {props.closedRoomCode ? (
+            <StatusMessage kind="empty">
+              The host closed room {props.closedRoomCode}. Enter a new code to join another room.
+            </StatusMessage>
+          ) : <p className="join-instructions">Enter the four characters shown on the TV.</p>}
         </div>
         <form className="join-form" onSubmit={joinACB}>
           <RoomCodeInput value={props.codeInput} invalid={Boolean(props.error)} onCodeChange={props.onCodeChange} />

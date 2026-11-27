@@ -1,0 +1,38 @@
+/* View styles: keep the close confirmation readable at the lobby's text size. */
+.close-room-dialog {
+  box-sizing: border-box;
+  max-inline-size: min(var(--phone-max-width), calc(100% - var(--space-6)));
+  padding: var(--space-5);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+.close-room-dialog::backdrop {
+  background: var(--color-ink);
+  opacity: 0.55;
+}
+
+.close-room-content {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.close-room-content h2,
+.close-room-content p {
+  margin: 0;
+}
+
+.close-room-content h2 {
+  font-family: var(--font-display);
+  font-size: inherit;
+  text-wrap: balance;
+}
+
+.close-room-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}

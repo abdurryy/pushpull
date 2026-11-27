@@ -29,6 +29,7 @@ export function makeRoomModel(sync, appModel) {
     loading: false,
     pendingSide: null,
     error: null,
+    closedRoomCode: null,
     stick: "idle",
     requestId: 0,
     // Set when the host starts a round. The game board (#28) takes over from here.
@@ -80,6 +81,7 @@ export function makeRoomModel(sync, appModel) {
     // canStart, the Start button and startRound() all read this, so they can never disagree.
     get startBlockedReason() {
       if (!this.room) return "Create a room first.";
+      if (this.loading) return "Closing room…";
       if (!this.connected) return "Reconnecting… Players can join again once the TV is back online.";
       // hostOnline is the room's own record of the host screen being present. Without it the
       // roster on screen may already be stale, so a round must not start from it.
@@ -124,6 +126,7 @@ export function makeRoomModel(sync, appModel) {
       this.loading = true;
       this.pendingSide = null;
       this.error = null;
+      this.closedRoomCode = null;
       this.requestId += 1;
       return this.requestId;
     },
@@ -143,12 +146,21 @@ export function makeRoomModel(sync, appModel) {
     },
 
     receiveRoom(room) {
-      this.room = room;
-      this.loading = false;
       if (!room) {
-        this.inputReady = false;
-        this.error = "This room is no longer available.";
+        // Firebase echoes the host's removal locally before the server accepts it.
+        if (this.role === "host" && this.loading && this.room) return;
+        const closedCode = this.role === "player" ? this.code : null;
+        this.leaveRoom();
+        this.closedRoomCode = closedCode;
+        if (closedCode) {
+          if (this.codeInput === closedCode) this.codeInput = "";
+        } else {
+          this.error = "This room is no longer available.";
+        }
+        return;
       }
+      if (!this.room) this.loading = false;
+      this.room = room;
     },
 
     setError(error) {
@@ -206,6 +218,7 @@ export function makeRoomModel(sync, appModel) {
       this.inputReady = false;
       this.stick = "idle";
       this.error = null;
+      this.closedRoomCode = null;
       this.roundStarting = false;
     },
 
@@ -269,7 +282,7 @@ export function makeRoomModel(sync, appModel) {
     function roomCodeACB() { return model.code; },
     function subscribeACB(code) {
       stopRoom?.();
-      if (code) stopRoom = sync.watchRoom(code, model.receiveRoom, reportRoomError());
+      stopRoom = code ? sync.watchRoom(code, model.receiveRoom, reportRoomError()) : null;
     },
   );
   const stopInput = reaction(
@@ -279,7 +292,9 @@ export function makeRoomModel(sync, appModel) {
       // Keep the last connected input location in case a queued write replays after reconnecting.
       if (!connected) return;
       const next = code && role === "player" && uid ? { code, uid } : null;
-      if (previousInput && connected && (previousInput.code !== next?.code || previousInput.uid !== next?.uid)
+      // The host's delete already removed the old input record.
+      if (previousInput && previousInput.code !== model.closedRoomCode
+        && (previousInput.code !== next?.code || previousInput.uid !== next?.uid)
         && previousInput.uid === uid) {
         sync.clearInput(previousInput.code, uid).catch(reportRoomError());
       }
