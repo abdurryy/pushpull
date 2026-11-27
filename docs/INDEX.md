@@ -12,6 +12,7 @@ Read this first, then open only the file you need.
 | [user-testing/](user-testing/README.md) | One file per user test session plus a template (required for submission) |
 | [../README.md](../README.md) | Team, setup, project structure, status, third-party components |
 | [../CONTRIBUTING.md](../CONTRIBUTING.md) | Git and PR workflow, CodeRabbit, ownership, code rules, one-time repo setup |
+| [deployment-recovery.md](deployment-recovery.md) | Identify deployed builds, diagnose failed previews, and recover the live site before a playtest |
 
 ## Deadlines
 
