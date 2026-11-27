@@ -1,9 +1,12 @@
-/* View styles: one readable column for the missing page and recovery link. */
+/* View styles: a board scene with the missing-page copy and recovery link. */
 .not-found {
   box-sizing: border-box;
   display: grid;
-  justify-items: start;
-  gap: var(--space-4);
+  grid-template-areas: "copy" "board" "home";
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  gap: var(--space-5);
+  min-height: 100svh;
   max-width: var(--phone-max-width);
   margin-inline: auto;
   padding: max(var(--space-7), env(safe-area-inset-top))
@@ -12,8 +15,57 @@
     max(var(--space-4), env(safe-area-inset-left));
 }
 
+.not-found-copy {
+  grid-area: copy;
+  display: grid;
+  align-self: end;
+  gap: var(--space-3);
+}
+
 .not-found h1 {
   margin: 0;
   font: var(--weight-display) var(--text-hero) / 1.15 var(--font-display);
   text-wrap: balance;
+}
+
+.not-found-board {
+  grid-area: board;
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: var(--space-2);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.not-found-sign {
+  position: absolute;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-ink);
+  color: var(--color-surface);
+  font: var(--weight-display) var(--tv-score) / 1 var(--font-display);
+}
+
+.not-found-home {
+  grid-area: home;
+  align-self: start;
+}
+
+@media (min-width: 48rem) {
+  .not-found {
+    grid-template-areas: "copy board" "home board";
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    gap: var(--space-5) var(--space-7);
+    max-width: calc(var(--phone-max-width) * 2.5);
+    padding-inline: var(--space-6);
+  }
+
+  .not-found h1 {
+    font-size: var(--tv-title);
+  }
+
+  .not-found-home {
+    justify-self: start;
+  }
 }
