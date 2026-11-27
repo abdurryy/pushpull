@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Push/Pull paper test kit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&family=Unbounded:wght@500;800&display=swap">
+    <style>
+      /* Print material for user test 1 (issue #31). Everything is laid out for A4 landscape. */
+      @page { size: A4 landscape; margin: 10mm; }
+
+      :root {
+        --ink: #2A2134;
+        --bg: #FFF6EA;
+        --team-a: #FF5A1F;
+        --team-b: #2D5BFF;
+        --cell: 12.5mm;
+        --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+        --text: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        padding: 10mm;
+        background: #E9E4DC;
+        color: var(--ink);
+        font-family: var(--text);
+        font-size: 10.5pt;
+        line-height: 1.45;
+      }
+
+      h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; }
+      h1 { font-size: 20pt; margin: 0 0 2mm; }
+      h2 { font-size: 14pt; margin: 0 0 3mm; }
+      h3 { font-size: 11pt; margin: 4mm 0 1.5mm; }
+      p, ul, ol { margin: 0 0 2.5mm; }
+      li { margin-bottom: 1mm; }
+      strong { font-weight: 700; }
+
+      .sheet {
+        width: 277mm;
+        min-height: 190mm;
+        margin: 0 auto 8mm;
+        padding: 0;
+        background: var(--bg);
+        box-shadow: 0 2mm 6mm rgba(0, 0, 0, .25);
+      }
+
+      .sheet-inner { padding: 6mm 8mm; }
+
+      /* The on-screen note is for whoever opens the file; it never prints. */
+      .screen-note {
+        width: 277mm;
+        margin: 0 auto 8mm;
+        padding: 5mm 8mm;
+        background: #FFFFFF;
+        border: 2px solid var(--ink);
+      }
+
+      .cut { border: 1px dashed var(--ink); }
+      .muted { color: #5B5168; }
+      .small { font-size: 9pt; }
+
+      /* ---------- Board ---------- */
+      .board-wrap { display: grid; grid-template-columns: 6mm auto; gap: 1mm; }
+      .board-cols { display: grid; grid-template-columns: repeat(20, var(--cell)); grid-column: 2; }
+      .board-cols span, .board-rows span {
+        font-size: 7pt; text-align: center; line-height: 5mm; color: #5B5168;
+      }
+      .board-rows { display: grid; grid-template-rows: repeat(12, var(--cell)); }
+      .board-rows span { line-height: var(--cell); }
+
+      .board {
+        position: relative;
+        width: calc(20 * var(--cell));
+        height: calc(12 * var(--cell));
+        background-color: #FFFFFF;
+        background-image:
+          repeating-linear-gradient(to right, var(--ink) 0 .3mm, transparent .3mm var(--cell)),
+          repeating-linear-gradient(to bottom, var(--ink) 0 .3mm, transparent .3mm var(--cell));
+        border: .6mm solid var(--ink);
+      }
+
+      .start {
+        position: absolute;
+        width: var(--cell);
+        height: var(--cell);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 7pt;
+        font-weight: 700;
+      }
+      .start-a { background: var(--team-a); }
+      .start-b { background: var(--team-b); color: #FFFFFF; }
+      .start-head { outline: .8mm solid var(--ink); outline-offset: -.8mm; }
+
+      /* ---------- Controller ---------- */
+      .controllers { display: flex; flex-direction: column; gap: 6mm; align-items: center; }
+      .controller {
+        width: 150mm;
+        height: 70mm;
+        padding: 4mm 5mm 5mm;
+        background: #FFFFFF;
+        border: .8mm solid var(--ink);
+        border-radius: 6mm;
+        display: grid;
+        grid-template-columns: 70mm 1fr;
+        grid-template-rows: 5mm 1fr;
+        gap: 2mm 4mm;
+      }
+      .controller-player {
+        grid-column: 1 / -1;
+        font-size: 8pt; letter-spacing: .4mm; text-transform: uppercase; color: #5B5168;
+      }
+      .stick-zone {
+        border: .5mm dashed var(--ink);
+        border-radius: 4mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .stick-zone p { margin: 0; font-size: 9pt; }
+      .buttons { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 3mm; }
+      .button {
+        border: .5mm solid var(--ink);
+        border-radius: 4mm;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 10pt;
+      }
+      .button span { font-weight: 400; font-size: 7.5pt; color: #5B5168; }
+
+      /* ---------- Cards and tokens ---------- */
+      .card-grid { display: flex; flex-wrap: wrap; gap: 4mm; }
+      .arrow-card {
+        width: 40mm; height: 40mm;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        font-size: 24pt; line-height: 1;
+        background: #FFFFFF;
+      }
+      .arrow-card b { font-size: 8pt; font-weight: 400; color: #5B5168; margin-top: 2mm; }
+
+      .token-row { display: flex; flex-wrap: wrap; gap: 3mm; margin-bottom: 4mm; align-items: flex-start; }
+      .token {
+        width: 11.5mm; height: 11.5mm;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 8pt; font-weight: 700;
+        border-radius: 50%;
+        background: #FFFFFF;
+      }
+      .token-a { background: var(--team-a); }
+      .token-b { background: var(--team-b); color: #FFFFFF; }
+
+      .lucky-card {
+        width: 62mm; height: 26mm;
+        padding: 2mm 3mm;
+        background: #FFFFFF;
+        font-size: 8.5pt;
+      }
+      .lucky-card b { display: block; font-size: 10pt; font-family: var(--display); }
+
+      /* ---------- Tables ---------- */
+      table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+      th, td { border: .3mm solid var(--ink); padding: 1.5mm 2mm; text-align: left; vertical-align: top; }
+      th { background: #F1E7D8; font-weight: 700; }
+      .notes-table td { height: 9mm; }
+
+      .two-col { column-count: 2; column-gap: 8mm; }
+      .two-col > * { break-inside: avoid; }
+
+      .say {
+        border-left: 1mm solid var(--ink);
+        padding-left: 3mm;
+        margin: 0 0 3mm;
+      }
+
+      @media print {
+        body { background: #FFFFFF; padding: 0; }
+        .screen-note { display: none; }
+        .sheet { width: auto; min-height: 0; margin: 0; box-shadow: none; background: #FFFFFF; page-break-after: always; }
+        .sheet:last-child { page-break-after: auto; }
+        .sheet-inner { padding: 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="screen-note">
+      <h1>Push/Pull paper test kit</h1>
+      <p>
+        Everything needed to run user test 1 on paper: the facilitator's script, a note sheet, the board,
+        four controllers, direction cards and tokens. The plan for the session is in issue #31.
+      </p>
+      <p>
+        <strong>Printing:</strong> print all 7 pages on A4, landscape, at 100% scale (not "fit to page", or the
+        board squares will not match the tokens). Black and white is fine. You need one copy of each page,
+        except the controller pages, which give you the four controllers, and the note sheet, which is worth
+        printing twice.
+      </p>
+      <p class="small muted">This box does not print.</p>
+    </div>
+
+    <!-- ============ 1. Facilitator script ============ -->
+    <section class="sheet"><div class="sheet-inner">
+      <h1>Facilitator script</h1>
+      <p class="small muted">User test 1, paper prototype. Keep this page in front of you. 30 minutes.</p>
+
+      <div class="two-col">
+        <h3>Before they arrive</h3>
+        <ul>
+          <li>Board on the table, both snakes on their start squares.</li>
+          <li>One controller and four direction cards per player.</li>
+          <li>Note sheet and a pen for the note-taker. Pencil and eraser for the board.</li>
+          <li>Roles: one person talks, one writes, one moves the snakes. Two people can do it if the
+            facilitator also moves the snakes.</li>
+        </ul>
+
+        <h3>0 to 3 min: welcome</h3>
+        <p class="say">
+          "Thanks for helping. We are testing a party game we are building, not you. Nothing here can go
+          wrong. Please say out loud what you are thinking while you play, even when it is confusing.
+          Is it OK if we write notes? We will not use your name. May we take photos of the table, with no
+          faces in them?"
+        </p>
+
+        <h3>3 to 6 min: set up</h3>
+        <p>Two teams of two. Teammates sit next to each other. Hand out the controllers.</p>
+        <p class="say">
+          "You are two teams. Each team has one snake. Both of you steer the same snake, at the same time.
+          Eat apples to grow. Do not hit a wall or a snake. Every few seconds I will say 'three, two, one,
+          show', and you both put a direction card on your controller at the same time. Then I move the
+          snakes."
+        </p>
+        <p><strong>Do not explain what happens when teammates pick different directions.</strong> Whether they
+          work that out is the main thing we want to learn.</p>
+
+        <h3>6 to 21 min: three rounds</h3>
+        <p>A round is 20 moves, or until a snake crashes. Call "three, two, one, show" about every 5 seconds.</p>
+        <ol>
+          <li><strong>Round 1.</strong> "Get your snake to the apple before the other team."</li>
+          <li><strong>Between rounds.</strong> "Make your snake stop where it is."</li>
+          <li><strong>Round 2.</strong> "Turn your snake around and bring it back to where you started."</li>
+          <li><strong>Round 3.</strong> "Grow as long as you can and still be alive on the last move."</li>
+        </ol>
+        <p>Do not help unless they are completely stuck. If you do help, the note-taker writes it down.
+          The next page tells whoever moves the snakes what to do on each move.</p>
+
+        <h3>21 to 28 min: questions</h3>
+        <ol>
+          <li>What happened when you and your teammate pointed different ways?</li>
+          <li>Could you tell whether your card counted? How?</li>
+          <li>How did you and your teammate decide where to go?</li>
+          <li>Was there a moment you did not know what to do? What did you do then?</li>
+          <li>What was the most fun moment? The most annoying one?</li>
+          <li>These four buttons are on the controller but we have not built them yet. What would you expect
+            each one to do?</li>
+          <li>From 1 to 5, how much would you want to play another round?</li>
+        </ol>
+
+        <h3>28 to 30 min: close</h3>
+        <p class="say">"Thank you. Is there anything else you want to tell us?"</p>
+        <p>Write down the real start and end time. The session has to be at least 30 minutes.</p>
+      </div>
+    </div></section>
+
+    <!-- ============ 2. Moving the snakes ============ -->
+    <section class="sheet"><div class="sheet-inner">
+      <h1>Moving the snakes</h1>
+      <p class="small muted">
+        For whoever plays the computer. These are the rules the built game follows, so the paper game
+        behaves the same way.
+      </p>
+
+      <div class="two-col">
+        <h3>Every move</h3>
+        <ol>
+          <li>Say "three, two, one, show". Both teammates put a card down at the same time.</li>
+          <li>Work out each team's direction with the table below.</li>
+          <li>Move each head one square and shade it with the pencil.</li>
+          <li>Erase the last square of the tail, unless the snake just ate the apple. An apple makes it
+            one square longer, so leave the tail alone that move.</li>
+          <li>If a head lands on the apple, put the apple token on another free square.</li>
+          <li>If a head lands on the Lucky Box, draw a card, read it out and do what it says.</li>
+        </ol>
+
+        <h3>What the team's two cards mean</h3>
+        <table>
+          <thead><tr><th>The two cards</th><th>The snake</th></tr></thead>
+          <tbody>
+            <tr><td>The same direction</td><td>Goes that way</td></tr>
+            <tr><td>Opposite directions</td><td>Does not move this turn</td></tr>
+            <tr><td>Different, not opposite, and one is the way it is already going</td><td>Keeps going that way</td></tr>
+            <tr><td>Different, not opposite, and neither is the way it is already going</td><td>Follows player 1's card</td></tr>
+            <tr><td>Only one card down</td><td>Follows that card</td></tr>
+          </tbody>
+        </table>
+
+        <h3>When a round ends</h3>
+        <ul>
+          <li>After 20 moves, or</li>
+          <li>when a head hits a wall, its own body or the other snake.</li>
+        </ul>
+        <p>The longer snake wins the round. Set the board back up and start the next one.</p>
+
+        <h3>Start of a round</h3>
+        <p>
+          Team A on C7, D7 and E7, head on E7 facing right. Team B on P7, Q7 and R7, head on P7 facing left.
+          Put the apple on a free square, and the Lucky Box on another one.
+        </p>
+
+        <h3>If you are asked</h3>
+        <p>
+          Say what happened, not why: "the snake did not move". Do not explain the rule about opposite
+          directions. We want to see whether they work it out.
+        </p>
+      </div>
+    </div></section>
+
+    <!-- ============ 3. Note sheet ============ -->
+    <section class="sheet"><div class="sheet-inner">
+      <h1>Note sheet</h1>
+      <p class="small muted">
+        One line per thing you saw. Write what people did and said, not what you think they meant.
+        Severity: 1 = cosmetic, 2 = slows them down, 3 = blocks them. No full names.
+      </p>
+      <p class="small">
+        Date: ____________ &nbsp;&nbsp; Start: ________ &nbsp;&nbsp; End: ________ &nbsp;&nbsp;
+        Testers (who they are, not their names): ______________________________________________
+      </p>
+      <table class="notes-table">
+        <thead>
+          <tr><th style="width: 14mm">Time</th><th style="width: 30mm">Task</th><th>What happened</th><th style="width: 70mm">Quote</th><th style="width: 16mm">Sev.</th></tr>
+        </thead>
+        <tbody>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div></section>
+
+    <!-- ============ 3. Board ============ -->
+    <section class="sheet"><div class="sheet-inner">
+      <h2>Board, 20 by 12</h2>
+      <p class="small muted">
+        Shade a square with a pencil for each part of a snake. Team A starts on C7, D7 and E7, head on E7.
+        Team B starts on P7, Q7 and R7, head on P7. Put the apple and the Lucky Box on free squares.
+      </p>
+      <div class="board-wrap">
+        <div class="board-cols">
+          <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span>
+          <span>H</span><span>I</span><span>J</span><span>K</span><span>L</span><span>M</span><span>N</span>
+          <span>O</span><span>P</span><span>Q</span><span>R</span><span>S</span><span>T</span>
+        </div>
+        <div class="board-rows">
+          <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
+          <span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span>
+        </div>
+        <div class="board">
+          <div class="start start-a" style="left: calc(2 * var(--cell)); top: calc(6 * var(--cell));"></div>
+          <div class="start start-a" style="left: calc(3 * var(--cell)); top: calc(6 * var(--cell));"></div>
+          <div class="start start-a start-head" style="left: calc(4 * var(--cell)); top: calc(6 * var(--cell));">A →</div>
+          <div class="start start-b start-head" style="left: calc(15 * var(--cell)); top: calc(6 * var(--cell));">← B</div>
+          <div class="start start-b" style="left: calc(16 * var(--cell)); top: calc(6 * var(--cell));"></div>
+          <div class="start start-b" style="left: calc(17 * var(--cell)); top: calc(6 * var(--cell));"></div>
+        </div>
+      </div>
+    </div></section>
+
+    <!-- ============ 4 and 5. Controllers ============ -->
+    <section class="sheet"><div class="sheet-inner">
+      <h2>Controllers, players 1 and 2</h2>
+      <p class="small muted">Cut along the outline. Hold it sideways, like a phone.</p>
+      <div class="controllers">
+        <div class="controller cut">
+          <span class="controller-player">Player 1</span>
+          <div class="stick-zone"><p>Put your direction card here<br><span class="small muted">anywhere in this area</span></p></div>
+          <div class="buttons">
+            <div class="button">Dash<span>not built yet</span></div>
+            <div class="button">Ping<span>not built yet</span></div>
+            <div class="button">Shed<span>not built yet</span></div>
+            <div class="button">Hold up<span>not built yet</span></div>
+          </div>
+        </div>
+        <div class="controller cut">
+          <span class="controller-player">Player 2</span>
+          <div class="stick-zone"><p>Put your direction card here<br><span class="small muted">anywhere in this area</span></p></div>
+          <div class="buttons">
+            <div class="button">Dash<span>not built yet</span></div>
+            <div class="button">Ping<span>not built yet</span></div>
+            <div class="button">Shed<span>not built yet</span></div>
+            <div class="button">Hold up<span>not built yet</span></div>
+          </div>
+        </div>
+      </div>
+    </div></section>
+
+    <section class="sheet"><div class="sheet-inner">
+      <h2>Controllers, players 3 and 4</h2>
+      <p class="small muted">Cut along the outline. Hold it sideways, like a phone.</p>
+      <div class="controllers">
+        <div class="controller cut">
+          <span class="controller-player">Player 3</span>
+          <div class="stick-zone"><p>Put your direction card here<br><span class="small muted">anywhere in this area</span></p></div>
+          <div class="buttons">
+            <div class="button">Dash<span>not built yet</span></div>
+            <div class="button">Ping<span>not built yet</span></div>
+            <div class="button">Shed<span>not built yet</span></div>
+            <div class="button">Hold up<span>not built yet</span></div>
+          </div>
+        </div>
+        <div class="controller cut">
+          <span class="controller-player">Player 4</span>
+          <div class="stick-zone"><p>Put your direction card here<br><span class="small muted">anywhere in this area</span></p></div>
+          <div class="buttons">
+            <div class="button">Dash<span>not built yet</span></div>
+            <div class="button">Ping<span>not built yet</span></div>
+            <div class="button">Shed<span>not built yet</span></div>
+            <div class="button">Hold up<span>not built yet</span></div>
+          </div>
+        </div>
+      </div>
+    </div></section>
+
+    <!-- ============ 6. Direction cards ============ -->
+    <section class="sheet"><div class="sheet-inner">
+      <h2>Direction cards</h2>
+      <p class="small muted">
+        Cut these out: four cards for each of the four players. Everyone shows a card at the same time,
+        on "three, two, one, show".
+      </p>
+      <div class="card-grid">
+        <div class="arrow-card cut">↑<b>up</b></div>
+        <div class="arrow-card cut">↓<b>down</b></div>
+        <div class="arrow-card cut">←<b>left</b></div>
+        <div class="arrow-card cut">→<b>right</b></div>
+        <div class="arrow-card cut">↑<b>up</b></div>
+        <div class="arrow-card cut">↓<b>down</b></div>
+        <div class="arrow-card cut">←<b>left</b></div>
+        <div class="arrow-card cut">→<b>right</b></div>
+        <div class="arrow-card cut">↑<b>up</b></div>
+        <div class="arrow-card cut">↓<b>down</b></div>
+        <div class="arrow-card cut">←<b>left</b></div>
+        <div class="arrow-card cut">→<b>right</b></div>
+        <div class="arrow-card cut">↑<b>up</b></div>
+        <div class="arrow-card cut">↓<b>down</b></div>
+        <div class="arrow-card cut">←<b>left</b></div>
+        <div class="arrow-card cut">→<b>right</b></div>
+      </div>
+    </div></section>
+
+    <!-- ============ 7. Tokens and Lucky Box ============ -->
+    <section class="sheet"><div class="sheet-inner">
+      <h2>Tokens and Lucky Box cards</h2>
+      <p class="small muted">Cut out. Heads and apples go on the board. Keep the Lucky Box cards face down in a pile.</p>
+
+      <h3>Heads and apples</h3>
+      <div class="token-row">
+        <div class="token token-a cut">A</div>
+        <div class="token token-b cut">B</div>
+        <div class="token cut">apple</div>
+        <div class="token cut">apple</div>
+        <div class="token cut">apple</div>
+        <div class="token cut">apple</div>
+        <div class="token cut">box</div>
+        <div class="token cut">box</div>
+      </div>
+
+      <h3>Lucky Box: draw a card when a snake reaches the box</h3>
+      <div class="card-grid">
+        <div class="lucky-card cut"><b>Growth spurt</b>Your snake grows by 3 squares.</div>
+        <div class="lucky-card cut"><b>Shrink</b>Your snake loses 2 squares from its tail.</div>
+        <div class="lucky-card cut"><b>Length heist</b>Take 2 squares from the other team and add them to your snake.</div>
+        <div class="lucky-card cut"><b>Tail snip</b>The other team loses 2 squares from its tail.</div>
+        <div class="lucky-card cut"><b>Length swap</b>The two snakes swap lengths.</div>
+        <div class="lucky-card cut"><b>Triple bite</b>The next apple you eat grows you by 3 instead of 1.</div>
+        <div class="lucky-card cut"><b>Freeze</b>The other team misses its next move.</div>
+        <div class="lucky-card cut"><b>Apple delivery</b>Move the apple to a free square next to your head.</div>
+      </div>
+      <p class="small muted">
+        These eight outcomes are the ones in the built game. On paper, one square stands for one length.
+      </p>
+    </div></section>
+  </body>
+</html>

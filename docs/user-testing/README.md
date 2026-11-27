@@ -14,6 +14,13 @@ How much testing each grade needs ([grading criteria](../course/project/grading-
 
 Testers should come from our **target group**. Write down how long each session took.
 
+## Paper kit for test 1
+
+[paper-kit.html](paper-kit.html) is everything needed to run the paper test in issue #31: the facilitator's
+script, a page for whoever moves the snakes, a note sheet, the 20 by 12 board, four controllers, direction
+cards and tokens. Open it in a browser and print all 8 pages on A4, landscape, at 100% scale. The session
+plan is in the issue.
+
 ## Template
 
 ```markdown
