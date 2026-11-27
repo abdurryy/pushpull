@@ -62,8 +62,7 @@ export function makeRoomModel(sync, appModel) {
     },
 
     get canStart() {
-      return this.role === "host" && this.connected && this.room?.hostOnline === true
-        && this.teams.a.length === TEAM_SIZE && this.teams.b.length === TEAM_SIZE;
+      return this.role === "host" && !this.startBlockedReason;
     },
 
     get steering() {
@@ -78,10 +77,13 @@ export function makeRoomModel(sync, appModel) {
     },
 
     // Why the host can't start a round yet, in words for the TV, or null when everything is ready.
-    // The Start button and startRound() both use this, so they can never disagree.
+    // canStart, the Start button and startRound() all read this, so they can never disagree.
     get startBlockedReason() {
       if (!this.room) return "Create a room first.";
       if (!this.connected) return "Reconnecting… Players can join again once the TV is back online.";
+      // hostOnline is the room's own record of the host screen being present. Without it the
+      // roster on screen may already be stale, so a round must not start from it.
+      if (this.room.hostOnline !== true) return "Reconnecting this screen to the room… Start works again once it is back.";
       const { a, b } = this.teams;
       if (a.length > TEAM_SIZE) return "Team A has " + a.length + " players. One of them needs to switch to Team B.";
       if (b.length > TEAM_SIZE) return "Team B has " + b.length + " players. One of them needs to switch to Team A.";

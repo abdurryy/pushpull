@@ -16,13 +16,19 @@ function fakeSync() {
   };
 }
 
-async function hostWithPlayers(players) {
+// hostOnline is what the room records about the host screen being present, so a normal room has it set.
+async function hostWithPlayers(players, hostOnline = true) {
   const session = makeAutoObservable({ user: { uid: "host", name: "Host" } });
   const { model } = makeRoomModel(fakeSync(), session);
   await model.createRoom();
-  model.receiveRoom({ code: "K7M4", meta: { hostUid: "host" }, players });
+  model.receiveRoom({ code: "K7M4", meta: { hostUid: "host" }, hostOnline, players });
   return model;
 }
+
+const FULL_TEAMS = {
+  ada: player("Ada", "a", "s1"), max: player("Max", "a", "s2"),
+  bo: player("Bo", "b", "s3"), kim: player("Kim", "b", "s4"),
+};
 
 function player(name, side, seat) {
   return { name, side, seat };
@@ -60,12 +66,28 @@ test("Start round works only with two full teams", async function () {
   notReady.startRound();
   assert.equal(notReady.roundStarting, false);
 
-  const ready = await hostWithPlayers({
-    ada: player("Ada", "a", "s1"), max: player("Max", "a", "s2"), bo: player("Bo", "b", "s3"), kim: player("Kim", "b", "s4"),
-  });
+  const ready = await hostWithPlayers(FULL_TEAMS);
   assert.equal(ready.startBlockedReason, null);
   ready.startRound();
   assert.equal(ready.roundStarting, true);
+});
+
+test("Start round waits for the host screen to be back in the room", async function () {
+  const offline = await hostWithPlayers(FULL_TEAMS, false);
+  assert.equal(offline.startBlockedReason, "Reconnecting this screen to the room… Start works again once it is back.");
+  offline.startRound();
+  assert.equal(offline.roundStarting, false);
+});
+
+test("canStart agrees with startBlockedReason", async function () {
+  const ready = await hostWithPlayers(FULL_TEAMS);
+  assert.equal(ready.canStart, true);
+
+  const offline = await hostWithPlayers(FULL_TEAMS, false);
+  assert.equal(offline.canStart, false);
+
+  const notReady = await hostWithPlayers({ ada: player("Ada", "a", "s1") });
+  assert.equal(notReady.canStart, false);
 });
 
 test("a room that is gone blocks Start round", async function () {
