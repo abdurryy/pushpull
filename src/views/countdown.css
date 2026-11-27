@@ -7,7 +7,10 @@
   pointer-events: none;
 }
 
+.countdown-with-intro { container-type: inline-size; }
+
 .countdown-value {
+  grid-area: 1 / 1;
   display: grid;
   place-items: center;
   min-width: 1.4em;
@@ -27,4 +30,134 @@
     opacity: 0;
     transform: scale(calc(var(--pop-scale) * 1.5));
   }
+}
+
+.countdown-intro {
+  /* Start the 3 after --duration-loading, while the arrows finish their recoil. */
+  --intro-duration: calc(var(--duration-loading) + var(--duration-effect));
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  font-size: min(calc(var(--tv-score) * 2.35), 20cqi);
+}
+
+.countdown-intro::before,
+.countdown-intro .push-mark,
+.countdown-electricity,
+.countdown-wordmark {
+  grid-area: 1 / 1;
+}
+
+.countdown-intro .push-mark,
+.countdown-electricity,
+.countdown-wordmark {
+  z-index: 1;
+}
+
+.countdown-intro::before {
+  content: "";
+  place-self: stretch;
+  background: var(--color-board);
+  animation: countdown-backdrop var(--intro-duration) both;
+}
+
+.countdown-electricity {
+  width: 2em;
+  height: 1em;
+  overflow: visible;
+}
+
+.countdown-intro .push-mark-left,
+.countdown-intro .push-mark-right {
+  transform-origin: center;
+  animation: countdown-arrows var(--intro-duration) both;
+}
+
+.countdown-intro .push-mark-left {
+  --side: -1;
+  fill: var(--color-team-a);
+}
+
+.countdown-intro .push-mark-right {
+  --side: 1;
+  fill: var(--color-team-b);
+}
+
+.countdown-trails,
+.countdown-sparks {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: countdown-trails var(--intro-duration) both;
+}
+
+.countdown-sparks { animation-name: countdown-sparks; }
+
+.countdown-wordmark {
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  font-size: .48em;
+  line-height: 1;
+  animation: countdown-wordmark var(--intro-duration) both;
+}
+
+.countdown-with-intro .countdown-value {
+  animation-name: countdown-first-in;
+}
+
+@keyframes countdown-arrows {
+  0% { opacity: 0; transform: translateX(calc(var(--side) * 145%)) scaleX(1.23); }
+  9% { opacity: 1; }
+  23% {
+    transform: translateX(calc(var(--side) * 77%)) scaleX(1.15);
+    animation-timing-function: ease-in;
+  }
+  38% {
+    transform: scale(1.06, .96);
+    animation-timing-function: var(--ease-out);
+  }
+  43% { transform: translateX(calc(var(--side) * 5%)) scale(.94, 1.07); }
+  51%, 59% { transform: none; }
+  68% { transform: translateX(calc(var(--side) * 59%)); }
+  76% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(calc(var(--side) * 150%)); }
+}
+
+@keyframes countdown-trails {
+  0%, 9% { opacity: 0; transform: scale(1.18); }
+  21% { opacity: .65; }
+  34% { opacity: .72; transform: scale(.68); }
+  40%, 100% { opacity: 0; transform: scale(.6); }
+}
+
+@keyframes countdown-sparks {
+  0%, 37% { opacity: 0; transform: scale(.35, .58); }
+  38% { opacity: 1; }
+  47% { opacity: 1; transform: scale(1.15, 1.07); }
+  63%, 100% { opacity: 0; transform: scale(1.6, 1.24); }
+}
+
+@keyframes countdown-wordmark {
+  0%, 42% { opacity: 0; transform: translateY(195%); }
+  55%, 63% { opacity: 1; transform: translateY(180%); }
+  82%, 100% { opacity: 0; transform: translateY(205%); }
+}
+
+@keyframes countdown-backdrop {
+  0%, 73% { opacity: .92; }
+  100% { opacity: 0; }
+}
+
+@keyframes countdown-first-in {
+  from {
+    opacity: 0;
+    transform: scale(var(--press-scale));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countdown-intro { display: none; }
 }
