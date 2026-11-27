@@ -168,6 +168,8 @@ The Firebase Hosting workflow builds and publishes the app on every push to `mai
 
 Deploy early and often (the course suggests Firebase Hosting). Don't deploy minified code: keep `minify: false` in `vite.config.js`.
 
+For a failed preview or a live release that needs recovery, follow the [deployment recovery runbook](docs/deployment-recovery.md).
+
 ## User testing
 
 Every time you test with users (paper mock-up or deployed app), add a file in [docs/user-testing/](docs/user-testing/README.md). The final submission requires it.
