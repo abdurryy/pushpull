@@ -170,7 +170,12 @@ export function JoinView(props) {
         <>
           <h1>Join a room</h1>
           <p className="join-instructions">Sign in so your team can see your name.</p>
-          <Link className="button" to="/play/login">Sign in with Google</Link>
+          <Link
+            className="button"
+            to={{ pathname: "/play/login", search: props.codeInput ? "?" + new URLSearchParams({ code: props.codeInput }) : "" }}
+          >
+            Sign in with Google
+          </Link>
         </>
       );
     }
