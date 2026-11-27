@@ -1,16 +1,21 @@
 /* View styles: status lines. Sizes follow the parent's font size, so the same line works on a phone and a TV. */
 .status-message {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-3) var(--space-4);
+  --status-mark-width: 1.5em;
+  display: grid;
+  justify-items: start;
 }
 
 .status-message-text {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  align-items: flex-start;
+  gap: var(--space-2);
   margin: 0;
+}
+
+.status-message-text .push-mark {
+  width: var(--status-mark-width);
+  height: calc(var(--status-mark-width) / 2);
+  margin-block-start: calc((1lh - var(--status-mark-width) / 2) / 2);
 }
 
 .status-message-loading,
@@ -25,13 +30,14 @@
 
 .status-message-retry {
   min-height: var(--hit-min);
-  padding: var(--space-2) var(--space-4);
+  margin-inline-start: calc(var(--status-mark-width) + var(--space-2));
+  padding: 0;
   border: 0;
-  border-radius: var(--radius);
-  background: var(--color-sunken);
+  background: transparent;
   color: var(--color-ink);
   font: inherit;
   font-weight: var(--weight-bold);
+  text-decoration: underline;
   cursor: pointer;
   transition: transform var(--duration-fast) var(--ease-out);
 }
