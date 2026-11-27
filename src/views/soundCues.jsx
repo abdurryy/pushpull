@@ -1,7 +1,24 @@
 // View component: plays each new event's sound once. It renders nothing.
-// Give it the same event list as GameBoard ([{ id, kind, team }]); kind is a sound name from src/sound/effects.js.
+// Give it the same event list as GameBoard, including the outcome for Lucky Box events.
 import { useEffect, useRef } from "react";
 import { playSound } from "../sound/soundPlayer.js";
+
+const luckyBoxSounds = {
+  growth: "luckyGrowth",
+  shrink: "luckyShrink",
+  steal: "luckySteal",
+  snip: "luckySnip",
+  swap: "luckySwap",
+  bonusApple: "luckyBonusApple",
+  freeze: "luckyFreeze",
+  appleDelivery: "luckyAppleDelivery",
+};
+
+function soundName(cue) {
+  const luckySound = luckyBoxSounds[cue.outcome];
+  if (!luckySound) return cue.kind;
+  return cue.amount === 0 ? "luckyNoChange" : luckySound;
+}
 
 function cueIdCB(cue) {
   return cue.id;
@@ -20,7 +37,7 @@ export function SoundCues(props) {
     cues.forEach(function playCueCB(cue) {
       if (played.current.has(cue.id)) return;
       played.current.add(cue.id);
-      playSound(cue.kind, cue.team);
+      playSound(soundName(cue), cue.team);
     });
   }, [cues]);
 
