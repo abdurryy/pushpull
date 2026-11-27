@@ -2,7 +2,7 @@
 
 .home {
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto 1fr;
   gap: var(--space-4);
   box-sizing: border-box;
   min-height: 100svh;
@@ -119,9 +119,9 @@
 }
 
 .home-extras {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 var(--space-5);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, max-content));
+  column-gap: var(--space-4);
 }
 
 .home-extras a {
@@ -129,6 +129,7 @@
   align-items: center;
   min-height: var(--hit-min);
   color: var(--color-ink);
+  overflow-wrap: anywhere;
 }
 
 .home-preview {
@@ -170,7 +171,7 @@
   text-wrap: pretty;
 }
 
-@media (40rem <= width < 60rem) and (orientation: landscape) {
+@media (34rem <= width < 60rem) and (orientation: landscape) {
   .home {
     max-width: calc(var(--phone-max-width) * 2);
     padding-inline: max(var(--space-5), env(safe-area-inset-left)) max(var(--space-5), env(safe-area-inset-right));
@@ -202,6 +203,8 @@
   }
 
   .home-preview {
+    justify-self: end;
+    width: min(100%, calc(100svh * 1.05));
     padding: var(--space-5);
   }
 }
@@ -248,7 +251,23 @@
   }
 }
 
-@media (max-height: 29rem) and (orientation: landscape) and (min-width: 40rem) {
+@media (max-height: 33rem) and (orientation: portrait), (34rem <= width < 40rem) and (orientation: landscape) {
+  .home-title {
+    font-size: var(--text-title);
+  }
+}
+
+@media (max-height: 33rem) and (orientation: portrait) {
+  .home-hero {
+    gap: var(--space-2);
+  }
+
+  .home-intro {
+    gap: var(--space-1);
+  }
+}
+
+@media (max-height: 29rem) and (orientation: landscape) and (min-width: 34rem) {
   .home-preview {
     justify-self: end;
     width: min(100%, calc(100svh * 0.82));

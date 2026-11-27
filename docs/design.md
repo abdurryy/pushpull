@@ -99,7 +99,7 @@ Rules:
 
 - **Spacing:** 4px steps. `--space-1` to `--space-8` = 4, 8, 12, 16, 24, 32, 48, 64. Use `gap` on flex and grid layouts, not margins between siblings.
 - **Alignment:** Put the wordmark and account action in the same grid row and align their vertical centers. Give adjacent actions the same row and hit height. Let alerts wrap onto their own row so the controls stay aligned.
-- **Landing page fit:** Keep the heading, device actions, board preview and extra links visible at the standard phone, sideways phone, laptop and TV sizes. Reduce preview size and spacing first. Allow the page to scroll if enlarged text or an unusually short viewport needs more space.
+- **Landing page fit:** Keep the demo and gallery links with the device choices so the board cannot push them below the first screen. Check short windows at both phone and desktop widths. Reduce preview size and spacing first. Allow the page to scroll if enlarged text or an unusually short viewport needs more space.
 - **Corners:** `--radius` = 10px for cards, buttons, inputs and chips. `--radius-small` = 6px inside small parts like the room code boxes. `--radius-round` only for circular things (controller buttons, avatars).
 - **Depth: flat.** No shadows and no borders around cards. A card is `--color-surface` on `--color-bg`. Inside a card, use `--color-sunken`.
 - **Focus:** every focusable element shows `--focus-ring` (3px ink outline, 2px offset). Never remove it.

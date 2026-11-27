@@ -259,7 +259,7 @@ When a screen feels off and you don't know why, try these in order:
    | Pages used on every device (home, gallery) | `phone,laptop` while working, all five once before the PR |
 
    - The sizes are small phone 360×640, phone 390×844, phone sideways 844×390, laptop 1280×720 and TV 1920×1080. Without `--sizes`, it takes all five. Reduced motion is on, so animations don't blur the picture.
-   - It warns when a page scrolls sideways, when a TV-sized page scrolls at all, and when the page throws an error. On the landing route, also compare the page height with the viewport at phone sizes. Reduce the preview and spacing before touch targets, and keep content reachable when text is enlarged.
+   - It warns when a page scrolls sideways, when a TV-sized page scrolls at all, and when the page throws an error. On the landing route, check the final link bounds on short phones and wide, short windows such as 1920×720. Keep the demo and gallery links with the device actions and reduce preview size before touch targets. Keep all content reachable when text is enlarged.
    - To see another state, run a model action first: `--js="myModel.setCityQuery('Stockholm'); myModel.findWeather()"`. `myModel` and `roomModel` are on `window` in dev. For a state that's hard to reach, change the starting value in the model locally, take the screenshot and **undo it before you commit**.
    - For a state behind a button, press it first by its text: `--click="Enter controller"` (repeat for more, in order). `npm run shots:controller` does this for the controller. A size where the button isn't shown is skipped with a note.
    - Each run saves into its own folder, named after the first route or `--name=<folder>`. The script prints the paths.
