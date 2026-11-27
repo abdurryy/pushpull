@@ -107,7 +107,9 @@ export function JoinView(props) {
         {!props.connected && <StatusMessage kind="waiting">Connection lost. Reconnecting…</StatusMessage>}
         {props.connected && !props.loading && !props.changingSide && (
           <>
-            {!props.hostOnline && <StatusMessage kind="waiting">Waiting for the host to reconnect…</StatusMessage>}
+            {!props.hostOnline && (
+              <StatusMessage kind="waiting">The TV lost its connection. Waiting for the host to reconnect…</StatusMessage>
+            )}
             {props.side === "center" ? (
               <p className="join-instructions">
                 {teamsFull ? "Both teams are full. Wait for a seat to open." : "Choose an open seat to play."}
@@ -126,7 +128,7 @@ export function JoinView(props) {
             Leave room
           </button>
           {props.side !== "center" && (
-            props.connected && !busy
+            props.connected && props.hostOnline && !busy
               ? <Link className="button" to="/play/room-controller">Open controller</Link>
               : <button className="button" type="button" disabled>Open controller</button>
           )}

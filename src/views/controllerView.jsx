@@ -240,23 +240,22 @@ export function ControllerView({
     if (event.type === "click" && event.detail !== 0) return;
     setMode("active");
   }
-  if (unavailable) {
+  if (unavailable || hostAway) {
     return (
       <main ref={screen} className="controller controller-unavailable">
         <p role="status">
-          {closedRoomCode
+          {hostAway ? "The TV lost its connection. Waiting for the host to reconnect…" : closedRoomCode
             ? "The host closed room " + closedRoomCode + "."
             : "Your room is unavailable. Join a room and choose a team to use this controller."}
         </p>
         <Link className="button" to="/play/join">
-          {closedRoomCode ? "Join another room" : "Go to room setup"}
+          {hostAway ? "Back to room" : closedRoomCode ? "Join another room" : "Go to room setup"}
         </Link>
       </main>
     );
   }
 
   let roomStatus = team ? "Team " + team.toUpperCase() + " · " + roomCode : null;
-  if (hostAway) roomStatus = "Waiting for the host to reconnect…";
   if (reconnecting) roomStatus = "Reconnecting…";
   if (error) roomStatus = error;
 

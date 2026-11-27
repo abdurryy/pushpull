@@ -129,10 +129,15 @@ async function check() {
 
   goOffline(host.db);
   await eventually(() => phone.model.room?.hostOnline === false);
+  await eventually(() => players.every(player => !player.model.inputReady && player.model.stick === "idle"));
   assert.equal(host.model.canStart, false);
   assert.deepEqual(host.model.steering, [null, null, null, null]);
+  phone.model.setStick("right");
+  phone.model.pressButton("dash");
+  await eventually(() => players.every(player => !player.model.room?.inputs));
   goOnline(host.db);
-  await eventually(() => host.model.canStart);
+  await eventually(() => host.model.canStart && players.every(player => player.model.inputReady));
+  assert.deepEqual(host.model.steering, [null, null, null, null]);
 
   phone.model.setCodeInput(code);
   await Promise.all([host.model.departRoom(), host.model.departRoom()]);

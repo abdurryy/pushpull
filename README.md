@@ -58,6 +58,8 @@ For a local run, start the Firebase Auth and Realtime Database emulators with `n
 
 When a phone drops offline, its last direction becomes idle once Firebase detects the disconnect. A player can leave the room to free their seat. To end the session, choose **Close room** in the host lobby and confirm. Phones return to room-code entry or show a **Join another room** link from the controller.
 
+If the TV loses its connection during a round, phones clear their controls and show a recovery message. When that TV reconnects, it returns to the lobby with the score from completed rounds. Players can also go back to room setup and leave if the TV stays offline.
+
 For the hosted playtest, publish the matching Realtime Database rules from `main` with `npx firebase-tools deploy --only database --project pushpull-1df2e`. The Hosting workflow publishes the web build.
 
 A deploy reaches everyone on their next page load. The `headers` in `firebase.json` set this: the page and the manifest are `no-cache`, so the browser asks for them every time and Hosting sends them, about 400 bytes compressed for the page. The files in `/assets/` are cached for a year instead, because Vite puts the content's hash in their names, and they answer `304 Not Modified` when a browser checks. Without these headers, Hosting's default of one hour meant a fix could take an hour to reach a phone or a teammate who had opened the site already.
@@ -130,6 +132,7 @@ _Required in the mid-project review._
 - Phone room join by typing or pasting a code or opening an invite link, with live team selection and open seats
 - Room-code playtest with four signed-in phone controllers and the shared Double Snake board
 - Host room-closure confirmation with a clear rejoin path for connected players
+- Host disconnect recovery that clears steering and keeps the score from completed rounds
 - Game feel and sound designed in design.md: the picture, sound and phone buzz for every game event
 - Shared View components for the next screens (status lines, team seats, room code boxes, score bar, countdown, game board), shown in every state on `/components`
 - Sound effects for every game event and music for the lobby, round, trivia and results, made in code with the Web Audio API

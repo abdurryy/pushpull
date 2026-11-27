@@ -2,6 +2,7 @@
 import { observer } from "mobx-react-lite";
 import { RoomView } from "../views/roomView.jsx";
 import { DemoPresenter } from "./demoPresenter.jsx";
+import { demoModel } from "../model/DemoModel.js";
 
 export const RoomPresenter = observer(function RoomPresenter({ app, room, board }) {
   const active = room.role === "host" && Boolean(room.room);
@@ -18,6 +19,8 @@ export const RoomPresenter = observer(function RoomPresenter({ app, room, board 
       code={active ? room.code : null}
       teams={room.teams}
       ready={active && room.canStart}
+      clearingSteering={room.hostRecovery === "clearing"}
+      interrupted={active && demoModel.interruptedRoomRound?.code === room.code}
       loading={room.loading}
       error={room.error}
       onCreate={room.createRoom}

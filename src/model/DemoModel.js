@@ -29,6 +29,7 @@ export const demoModel = makeAutoObservable({
   deadline: 0,
   roundNumber: 0,
   remoteRoom: null,
+  interruptedRoomRound: null,
   ticks: 0,
   weather: null,
   events: [],
@@ -93,14 +94,17 @@ export const demoModel = makeAutoObservable({
   startRound(weatherResult, remoteRoom = null) {
     if (this.playing) return;
     if (remoteRoom && !remoteRoom.canStart) return;
+    const savedRound = remoteRoom && this.interruptedRoomRound?.code === remoteRoom.code
+      ? this.interruptedRoomRound : null;
+    if (remoteRoom) this.interruptedRoomRound = null;
     this.remoteRoom = remoteRoom;
     this.pressed = [];
     this.seconds = ROUND_SECONDS;
     this.deadline = performance.now() + ROUND_SECONDS * 1000;
     this.ticks = 0;
     this.weather = roundWeather(weatherResult);
-    this.round = createRound(this.round?.score);
-    this.roundNumber += 1;
+    this.round = createRound(savedRound?.score ?? this.round?.score);
+    this.roundNumber = (savedRound?.roundNumber ?? this.roundNumber) + 1;
     this.crashed = [];
     this.luckyResult = null;
     this.addEvents([{ kind: "go" }]);
@@ -133,6 +137,20 @@ export const demoModel = makeAutoObservable({
     this.pressed = [];
   },
 
+  interruptRound() {
+    if (!this.playing || !this.remoteRoom?.code) return;
+    // Preserve the completed rounds when the board returns to the lobby.
+    this.interruptedRoomRound = {
+      code: this.remoteRoom.code,
+      score: this.round.score,
+      roundNumber: this.roundNumber - 1,
+    };
+    this.round = null;
+    this.events = [];
+    this.luckyResult = null;
+    this.crashed = [];
+  },
+
   leaveDemo() {
     this.clearKeys();
     this.remoteRoom = null;
@@ -162,6 +180,14 @@ export const demoModel = makeAutoObservable({
 }, {}, { autoBind: true });
 
 let clock;
+const stopHostRecovery = reaction(
+  function readHostRecoveryACB() {
+    return demoModel.playing && Boolean(demoModel.remoteRoom?.code) && demoModel.remoteRoom.reconnectingHost;
+  },
+  function interruptOnHostLossACB(reconnecting) {
+    if (reconnecting) demoModel.interruptRound();
+  },
+);
 reaction(
   function readPlayingACB() { return demoModel.playing; },
   function syncClockACB(playing) {
@@ -171,5 +197,8 @@ reaction(
 );
 
 if (import.meta.hot) {
-  import.meta.hot.dispose(function stopClockACB() { clearInterval(clock); });
+  import.meta.hot.dispose(function stopClockACB() {
+    clearInterval(clock);
+    stopHostRecovery();
+  });
 }

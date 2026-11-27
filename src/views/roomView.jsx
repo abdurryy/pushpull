@@ -22,7 +22,9 @@ export function RoomView(props) {
         <div className="room-actions">
           {!props.loading && (props.ready
             ? <Link className="button" to="/room/game">Open game board</Link>
-            : <StatusMessage kind="empty">Two players on each team can start the round.</StatusMessage>)}
+            : <StatusMessage kind="empty">
+              {props.clearingSteering ? "Waiting for the phones to clear their steering…" : "Two players on each team can start the round."}
+            </StatusMessage>)}
           <CloseRoomButton disabled={props.loading || !props.connected} onCloseRoom={props.onCloseRoom} />
         </div>
       </>
@@ -50,6 +52,7 @@ export function RoomView(props) {
       {props.loading && <StatusMessage>{props.code ? "Closing room…" : "Opening room…"}</StatusMessage>}
       {props.code && props.connected && !props.hostOnline && <StatusMessage kind="waiting">Waiting for the host to connect…</StatusMessage>}
       {props.error && <StatusMessage kind="error">{props.error}</StatusMessage>}
+      {props.interrupted && <StatusMessage kind="empty">The interrupted round ended without a point. Play again from the lobby.</StatusMessage>}
       {renderContent()}
     </main>
   );
