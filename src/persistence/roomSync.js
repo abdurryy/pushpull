@@ -100,8 +100,31 @@ export function makeRoomSync(database) {
       });
     },
 
-    setSide(code, uid, side) {
-      return set(roomRef(code, "/players/" + uid + "/side"), side);
+    async trackHostConnection(code) {
+      const presence = roomRef(code, "/hostOnline");
+      await onDisconnect(presence).set(false);
+      await set(presence, true);
+    },
+
+    closeRoom(code) {
+      return remove(roomRef(code));
+    },
+
+    async setSide(code, uid, side) {
+      try {
+        // Wait for the server's capacity check before showing the new side locally.
+        await runTransaction(roomRef(code, "/players/" + uid + "/side"), function selectSideACB() {
+          return side;
+        }, { applyLocally: false });
+      } catch (error) {
+        if (error.message !== "permission_denied") throw error;
+        const players = side === "center" ? null : (await get(roomRef(code, "/players"))).val();
+        const teammates = Object.entries(players || {}).filter(function sameSideCB([id, player]) {
+          return id !== uid && player.side === side;
+        });
+        if (teammates.length >= 2) throw new Error("Team " + side.toUpperCase() + " is full. Pick another side.");
+        throw new Error("Could not pick that side. Try again.");
+      }
     },
 
     setStick(code, uid, stick) {

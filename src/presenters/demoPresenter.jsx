@@ -1,15 +1,15 @@
-// Presenter: connects the keyboard demo view to its reactive round model.
+// Presenter: connects the keyboard and room board to the reactive round model.
 import { observer } from "mobx-react-lite";
 import { demoModel, keyGroups } from "../model/DemoModel.js";
 import { COLUMNS, ROWS, TICK_MS } from "../model/doubleSnakeRules.js";
 import { promiseStatus } from "../model/resolvePromise.js";
 import { DemoView } from "../views/demoView.jsx";
 
-export const DemoPresenter = observer(function DemoPresenter({ model }) {
+export const DemoPresenter = observer(function DemoPresenter({ model, room = null }) {
   const weather = model.weatherPromiseState;
   const selectedWeather = model.cityQuery.trim() ? weather.data : null;
 
-  function startRoundACB() { demoModel.startRound(selectedWeather); }
+  function startRoundACB() { demoModel.startRound(selectedWeather, room); }
 
   return (
     <DemoView
@@ -26,6 +26,10 @@ export const DemoPresenter = observer(function DemoPresenter({ model }) {
       seconds={demoModel.seconds}
       playing={demoModel.playing}
       keyGroups={keyGroups}
+      roomCode={room?.code}
+      teams={room?.teams}
+      reconnecting={Boolean(room && (!room.connected || room.room?.hostOnline !== true))}
+      canStart={room ? room.canStart : true}
       columns={COLUMNS}
       rows={ROWS}
       teamACancelled={demoModel.teamACancelled}

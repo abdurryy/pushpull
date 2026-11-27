@@ -1,0 +1,49 @@
+/* View styles: one column for phones and a shared roster on the host screen. */
+.room {
+  box-sizing: border-box;
+  display: grid;
+  justify-items: start;
+  gap: var(--space-4);
+  max-width: var(--phone-max-width);
+  margin-inline: auto;
+  padding: var(--space-5) var(--space-4);
+}
+
+.room h1,
+.room p {
+  margin: 0;
+}
+
+.room h1 {
+  font: var(--weight-display) var(--text-title) / 1.15 var(--font-display);
+  text-wrap: balance;
+}
+
+.room-share,
+.room-teams {
+  display: grid;
+  gap: var(--space-3);
+  justify-self: stretch;
+}
+
+.room-share .room-code { font-size: var(--text-title); }
+.room-share .button { justify-self: start; }
+
+.room-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+@media (min-width: 60rem) and (orientation: landscape) {
+  .room-host {
+    max-width: none;
+    padding: min(var(--tv-safe), 5svh) var(--tv-safe);
+    font-size: var(--tv-text);
+  }
+
+  .room-host h1 { font-size: var(--tv-title); }
+  .room-host .room-code { font-size: var(--tv-score); }
+  .room-host .room-teams { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

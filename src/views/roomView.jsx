@@ -1,0 +1,56 @@
+// View: shares the host's room code and tracks the live team rosters.
+import { RoomCode } from "./roomCode.jsx";
+import { StatusMessage } from "./statusMessage.jsx";
+import { TeamRoster } from "./teamRoster.jsx";
+import "./roomView.css";
+
+export function RoomView(props) {
+  function renderLobby() {
+    return (
+      <>
+        <div className="room-share">
+          <RoomCode code={props.code} />
+          <p>Enter this code on each phone, or share the phone invite.</p>
+          <a className="button button-text" href={"#/play/join?code=" + props.code} target="_blank" rel="noopener">Open phone invite</a>
+        </div>
+        <div className="room-teams">
+          <TeamRoster team="a" players={props.teams.a} youId={props.userId} />
+          <TeamRoster team="b" players={props.teams.b} youId={props.userId} />
+        </div>
+        <div className="room-actions">
+          {props.ready
+            ? <a className="button" href="#/room/game">Open game board</a>
+            : <StatusMessage kind="empty">Two players on each team can start the round.</StatusMessage>}
+          <button type="button" className="button button-text" disabled={props.loading || !props.connected} onClick={props.onLeave}>
+            Close room
+          </button>
+        </div>
+      </>
+    );
+  }
+
+  function renderContent() {
+    if (!props.authChecked) return <StatusMessage>Checking sign-in…</StatusMessage>;
+    if (!props.userId) return <a className="button" href="#/room/login">Sign in with Google</a>;
+    if (!props.available) return <StatusMessage kind="error">Room sync is unavailable.</StatusMessage>;
+    if (props.code) return renderLobby();
+    return (
+      <button className="button" type="button" disabled={props.loading || !props.connected}
+        aria-busy={props.loading} onClick={props.onCreate}>
+        Create room
+      </button>
+    );
+  }
+
+  return (
+    <main className="room room-host">
+      <a className="button button-text" href="#/">Back to home</a>
+      <h1>Host a room</h1>
+      {props.available && props.userId && !props.connected && <StatusMessage kind="waiting">Reconnecting…</StatusMessage>}
+      {props.loading && <StatusMessage>{props.code ? "Closing room…" : "Opening room…"}</StatusMessage>}
+      {props.code && props.connected && !props.hostOnline && <StatusMessage kind="waiting">Waiting for the host to connect…</StatusMessage>}
+      {props.error && <StatusMessage kind="error">{props.error}</StatusMessage>}
+      {renderContent()}
+    </main>
+  );
+}

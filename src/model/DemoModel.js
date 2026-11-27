@@ -28,6 +28,7 @@ export const demoModel = makeAutoObservable({
   seconds: ROUND_SECONDS,
   deadline: 0,
   roundNumber: 0,
+  remoteRoom: null,
   ticks: 0,
   weather: null,
   events: [],
@@ -41,6 +42,7 @@ export const demoModel = makeAutoObservable({
   },
 
   get inputs() {
+    if (this.remoteRoom) return this.remoteRoom.steering;
     const latestFirst = this.pressed.slice().reverse();
     return keyGroups.map(function directionForPlayerCB(group) {
       const key = latestFirst.find(function isPlayerKeyCB(code) { return group.codes.includes(code); });
@@ -88,8 +90,10 @@ export const demoModel = makeAutoObservable({
     return sticksCancel(first, second);
   },
 
-  startRound(weatherResult) {
+  startRound(weatherResult, remoteRoom = null) {
     if (this.playing) return;
+    if (remoteRoom && !remoteRoom.canStart) return;
+    this.remoteRoom = remoteRoom;
     this.pressed = [];
     this.seconds = ROUND_SECONDS;
     this.deadline = performance.now() + ROUND_SECONDS * 1000;
@@ -119,7 +123,7 @@ export const demoModel = makeAutoObservable({
   },
 
   changeKey(code, down) {
-    if (!this.playing) return;
+    if (!this.playing || this.remoteRoom) return;
     const index = this.pressed.indexOf(code);
     if (down && index === -1) this.pressed.push(code);
     if (!down && index !== -1) this.pressed.splice(index, 1);
@@ -131,6 +135,7 @@ export const demoModel = makeAutoObservable({
 
   leaveDemo() {
     this.clearKeys();
+    this.remoteRoom = null;
     this.round = null;
     this.seconds = ROUND_SECONDS;
     this.roundNumber = 0;

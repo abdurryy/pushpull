@@ -4,7 +4,7 @@ import { promiseStatus } from "../model/resolvePromise.js";
 import { signInWithGoogle, signOutUser } from "../persistence/firebaseAuth.js";
 import { LoginView } from "../views/loginView.jsx";
 
-export const LoginPresenter = observer(function LoginPresenter({ model, view: View = LoginView }) {
+export const LoginPresenter = observer(function LoginPresenter({ model, view: View = LoginView, host }) {
   function signInRequestedACB() {
     signInWithGoogle(model);
   }
@@ -15,6 +15,7 @@ export const LoginPresenter = observer(function LoginPresenter({ model, view: Vi
 
   return (
     <View
+      host={host}
       user={model.user}
       authChecked={model.authChecked}
       status={promiseStatus(model.authPromiseState)}

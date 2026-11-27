@@ -18,7 +18,9 @@ function isInstalled() {
     || window.matchMedia("(display-mode: standalone), (display-mode: fullscreen)").matches;
 }
 
-export function ControllerView({ onClear, onStick, onAction, direction, ...heldActions }) {
+export function ControllerView({
+  onClear, onStick, onAction, direction, roomCode, team, unavailable, reconnecting, hostAway, error, ...heldActions
+}) {
   const screen = useRef(null);
   const stickPointer = useRef(null);
   const buttonPointers = useRef(new Map());
@@ -173,14 +175,28 @@ export function ControllerView({ onClear, onStick, onAction, direction, ...heldA
   }
   const active = mode === "active" || mode === "fullscreen";
 
+  if (unavailable) {
+    return (
+      <main ref={screen} className="controller controller-unavailable">
+        <p role="status">Your room is unavailable. Join a room and choose a team to use this controller.</p>
+        <a className="button" href="#/play/join">Go to room setup</a>
+      </main>
+    );
+  }
+
+  let roomStatus = team ? "Team " + team.toUpperCase() + " · " + roomCode : null;
+  if (hostAway) roomStatus = "Waiting for the host to reconnect…";
+  if (reconnecting) roomStatus = "Reconnecting…";
+  if (error) roomStatus = error;
+
   return (
-    <main ref={screen} className="controller" aria-label="Push/Pull controller preview">
+    <main ref={screen} className="controller" aria-label={team ? "Push/Pull room controller" : "Push/Pull controller preview"}>
       <p className="controller-portrait">Turn your phone sideways</p>
       {!active ? (
         <div className="controller-landscape controller-setup">
-          <a href="#/">Back to home</a>
-          <h1>Controller preview</h1>
-          <p>Try the stick and buttons on this phone.</p>
+          <a href={team ? "#/play/join" : "#/"}>{team ? "Back to room" : "Back to home"}</a>
+          <h1>{team ? "Room controller" : "Controller preview"}</h1>
+          {team ? <p role="status">{roomStatus}</p> : <p>Try the stick and buttons on this phone.</p>}
           {mode === "fallback" ? (
             <>
               <p role="status">Fullscreen is unavailable here. On iPhone, open this page in Safari and use Share → Add to Home Screen, then launch Push/Pull from the icon.</p>
@@ -190,6 +206,7 @@ export function ControllerView({ onClear, onStick, onAction, direction, ...heldA
         </div>
       ) : (
         <div className="controller-landscape controller-inputs" onContextMenu={contextMenuACB}>
+          {roomStatus && <p className="controller-room-status" role="status">{roomStatus}</p>}
           <div className="controller-stick" role="group" aria-label={"Joystick: " + direction}
             onPointerDown={stickDownACB} onPointerMove={stickMoveACB} onPointerUp={stickReleaseACB}
             onPointerCancel={stickReleaseACB} onLostPointerCapture={stickReleaseACB}>

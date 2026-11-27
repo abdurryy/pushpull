@@ -19,6 +19,17 @@
   max-width: calc(var(--hit-min) * 6);  /* four chunky boxes, not stretched across a wide phone */
 }
 
+.room-code-character {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  text-align: center;
+}
+
+.room-code-position {
+  color: var(--color-muted);
+}
+
 .room-code-input-box {
   box-sizing: border-box;
   width: 100%;
