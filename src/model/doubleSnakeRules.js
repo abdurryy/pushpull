@@ -1,4 +1,6 @@
-// Game model rules: each tick returns a new board from the same pair of team inputs.
+// Game model rules: each substep returns a new board from the same pair of team inputs.
+import { advanceLuckyBox, freeCells, hasCell, openLuckyBox, pickCell, sameCell, snakeLength } from "./luckyBoxRules.js";
+
 export const COLUMNS = 20;
 export const ROWS = 12;
 export const TICK_MS = 240;
@@ -21,46 +23,38 @@ export function combineSticks(first, second, heading) {
   return first;
 }
 
-function sameCell(a, b) {
-  return a.x === b.x && a.y === b.y;
-}
-
-function hasCell(cells, target) {
-  return cells.some(function matchesCB(cell) { return sameCell(target, cell); });
-}
-
-function spawnApple(a, b, random) {
-  const open = [];
-  for (let y = 0; y < ROWS; y += 1) {
-    for (let x = 0; x < COLUMNS; x += 1) {
-      const cell = { x, y };
-      if (!hasCell(a.body, cell) && !hasCell(b.body, cell)) open.push(cell);
-    }
-  }
-  if (!open.length) return null;
-  return open[Math.floor(random() * open.length)];
+function spawnApple(round, random) {
+  return pickCell(freeCells(round, COLUMNS, ROWS, [round.box]), random);
 }
 
 export function createRound(score = { a: 0, b: 0 }, random = Math.random) {
   const a = { heading: "right", body: [{ x: 4, y: 6 }, { x: 3, y: 6 }, { x: 2, y: 6 }] };
   const b = { heading: "left", body: [{ x: 15, y: 6 }, { x: 16, y: 6 }, { x: 17, y: 6 }] };
-  return {
-    a, b, score,
-    apple: spawnApple(a, b, random),
-    outcome: null,
-  };
+  const round = { a, b, score, apple: spawnApple({ a, b }, random), outcome: null, stepEvents: [] };
+  return advanceLuckyBox(round, COLUMNS, ROWS, random);
 }
 
 function moveSnake(snake, heading, apple) {
-  if (!heading) return { snake, ate: false, moved: false };
+  if (!heading || snake.frozenTicks) return { snake, ate: false, moved: false };
   const step = directions[heading];
   const current = snake.body[0];
   // Reversing into the neck is a collision, just like entering any other occupied cell.
   const head = { x: current.x + step.x, y: current.y + step.y };
-  const ate = apple !== null && sameCell(head, apple);
+  const ate = Boolean(apple && sameCell(head, apple));
   const body = [head, ...snake.body];
-  if (!ate) body.pop();
-  return { snake: { heading, body }, ate, moved: true };
+  let growth = snake.growth ?? 0;
+  let bonusApples = snake.bonusApples ?? 0;
+  if (ate) {
+    if (bonusApples) {
+      growth += 2;
+      bonusApples -= 1;
+    }
+  } else if (growth) {
+    growth -= 1;
+  } else {
+    body.pop();
+  }
+  return { snake: { ...snake, heading, body, growth, bonusApples }, ate, moved: true };
 }
 
 function outside({ x, y }) {
@@ -77,6 +71,7 @@ function finishRound(round, outcome) {
   return {
     ...round,
     outcome,
+    stepEvents: [],
     score: {
       a: round.score.a + Number(outcome === "a"),
       b: round.score.b + Number(outcome === "b"),
@@ -84,10 +79,23 @@ function finishRound(round, outcome) {
   };
 }
 
+function finishCrash(round, crashed) {
+  let outcome = "tie";
+  if (crashed.length === 1) outcome = crashed[0] === "a" ? "b" : "a";
+  return {
+    ...finishRound(round, outcome),
+    stepEvents: crashed.map(function crashEventCB(team) {
+      return { kind: "crash", team, ...round[team].body[0] };
+    }),
+  };
+}
+
 export function timeOutRound(round) {
   if (round.outcome) return round;
-  if (round.a.body.length > round.b.body.length) return finishRound(round, "a");
-  if (round.b.body.length > round.a.body.length) return finishRound(round, "b");
+  const aLength = snakeLength(round.a);
+  const bLength = snakeLength(round.b);
+  if (aLength > bLength) return finishRound(round, "a");
+  if (bLength > aLength) return finishRound(round, "b");
   return finishRound(round, "tie");
 }
 
@@ -98,18 +106,30 @@ export function stepRound(round, inputs, random = Math.random) {
   const a = moveSnake(round.a, aDirection, round.apple);
   const b = moveSnake(round.b, bDirection, round.apple);
 
-  // Check both proposed positions before committing either one.
+  // Check both proposed positions before either team can collect a pickup.
   const sameHead = sameCell(a.snake.body[0], b.snake.body[0]);
   const swappedHeads = sameCell(a.snake.body[0], round.b.body[0])
     && sameCell(b.snake.body[0], round.a.body[0]);
-  if ((a.moved && b.moved) && (sameHead || swappedHeads)) return finishRound(round, "tie");
-  const aCrashed = crashesMove(a, b);
-  const bCrashed = crashesMove(b, a);
-  if (aCrashed && bCrashed) return finishRound(round, "tie");
-  if (aCrashed) return finishRound(round, "b");
-  if (bCrashed) return finishRound(round, "a");
+  if (a.moved && b.moved && (sameHead || swappedHeads)) return finishCrash(round, ["a", "b"]);
+  const crashed = [];
+  if (crashesMove(a, b)) crashed.push("a");
+  if (crashesMove(b, a)) crashed.push("b");
+  if (crashed.length) return finishCrash(round, crashed);
 
-  const apple = a.ate || b.ate ? spawnApple(a.snake, b.snake, random) : round.apple;
-  const next = { ...round, a: a.snake, b: b.snake, apple };
-  return apple ? next : timeOutRound(next);
+  let next = { ...round, a: a.snake, b: b.snake, stepEvents: [] };
+  if (a.ate || b.ate) {
+    const team = a.ate ? "a" : "b";
+    next.apple = spawnApple(next, random);
+    next.stepEvents.push({ kind: "eat", team, ...next[team].body[0] });
+  }
+
+  if (next.box) {
+    if (a.moved && sameCell(a.snake.body[0], next.box)) {
+      next = openLuckyBox(next, "a", COLUMNS, ROWS, random);
+    } else if (b.moved && sameCell(b.snake.body[0], next.box)) {
+      next = openLuckyBox(next, "b", COLUMNS, ROWS, random);
+    }
+  }
+  if (!next.apple) next.apple = spawnApple(next, random);
+  return next.apple || next.box ? next : { ...timeOutRound(next), stepEvents: next.stepEvents };
 }

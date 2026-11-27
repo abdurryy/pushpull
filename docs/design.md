@@ -191,7 +191,8 @@ Rules:
 - **Floor:** `--color-board` with faint seams and a dot in each cell, both using `--color-board-dot`.
 - **Snakes** have continuous, rounded bodies in their team colours, 84% of a cell thick (`--tile-inset` on each side). Short, staggered rows of scales use each team's soft colour. The rows follow a rounded curve through turns and narrow at tight bends to keep the marks spaced apart. The smooth snout continues from the neck at the same width. Pupils look where the team steers, even before the body turns. When teammates pull apart the snake goes cross-eyed. A crashed snake has ink crosses on white eyes so they stay visible during the crash flash.
 - **Movement:** snakes glide from cell to cell over one tick. The gallery's wrapping snakes cross the rim smoothly and stay connected on both sides.
-- **Apples** are ink, with a two-lobed silhouette, a curved stalk, a leaf and a small white shine. They pop in when they appear and bob gently.
+- **Apples** have a red, two-lobed body, dark outline, green leaf and a white shine. They pop in when they appear and bob gently.
+- **Lucky Boxes** have a cream top, dark wood side and a question mark on the front. A box appears on a free square, including under its own pool of light at night. The notice under the scores shows which team opened it and what changed.
 - **Both teammates' sticks** show as ink chevrons by the head. Two the same way make a double chevron and opposite ones point apart, so everyone can see why a snake stopped.
 - **Weather from Open-Meteo is visible:** rain falls in slanted streaks, wind blows streaks the way the apples drift, and at night the board goes dark except for a light around each head.
 - **Reduced motion:** snakes jump cell to cell, and nothing moves on its own (no gliding, bobbing, blinking, rain, wind or effects). Night stays dark.
@@ -217,7 +218,8 @@ Ready-made View components in `src/views/`. **Use them before writing your own**
 | `RoomCodeInput` | `value`, `onCodeChange(code)`, `disabled`, `invalid`, `label`. Put it inside a `<form>` so Enter submits | Join (#25) |
 | `ScoreBar` | `scoreA`, `scoreB`, `teamAName`, `teamBName`, `title`, `secondsLeft` | Game board (#28) |
 | `Countdown` | `value` (`"3"`, `"2"`, `"1"`, `"Go!"` or nothing). The parent needs `position: relative` | Game board (#28) |
-| `GameBoard` | `columns`, `rows`, `snakes` (`[{ team, heading, body, crashed, looking, torn }]`, where `looking` is the direction the team steers and `torn` means teammates pull apart), `apples`, `effects` (`[{ id, kind: "eat" or "crash", team, x, y }]`, other kinds are ignored), `inputs` (`{ a: [dir, dir], b: [dir, dir] }`), `weather` (`{ wet, wind, night }`), `tickMs`, `label`. Drawn on a canvas, see Game board above | Game board (#28) |
+| `GameBoard` | `columns`, `rows`, `snakes` (`[{ team, heading, body, crashed, looking, torn }]`, where `looking` is the direction the team steers and `torn` means teammates pull apart), `apples`, `box` (`{ x, y }` or `null`), `effects` (`[{ id, kind, team, x, y, outcome? }]`; the board draws apple, crash and Lucky Box effects), `inputs` (`{ a: [dir, dir], b: [dir, dir] }`), `weather` (`{ wet, wind, night }`), `tickMs`, `label`. Drawn on a canvas, see Game board above | Game board (#28) |
+| `LuckyBoxNotice` | `event` (the latest box outcome, with `id`, `outcome`, `team` and `amount` where applicable), `box` (the visible crate), `playing` | Double Snake score area and shared board preview |
 | `SoundCues` | `cues`: the same event list as `GameBoard`. Plays each new `id` once; `kind` is a sound name from `src/sound/effects.js` | Every TV screen with events |
 | `MusicTrack` | `name` (`lobby`, `round`, `trivia`, `results` or nothing), `intensity` (1 in the last 10 seconds), `muted`. One per screen | Every TV screen |
 | `SoundToggle` | `muted`, `onToggle` | Every TV screen |

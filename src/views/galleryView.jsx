@@ -11,6 +11,7 @@ import { RoomCodeInput } from "./roomCodeInput.jsx";
 import { ScoreBar } from "./scoreBar.jsx";
 import { Countdown } from "./countdown.jsx";
 import { GameBoard } from "./gameBoard.jsx";
+import { LuckyBoxIcon, LuckyBoxNotice, luckyResults } from "./luckyBoxNotice.jsx";
 import { SoundToggle } from "./soundToggle.jsx";
 import { MusicTrack } from "./musicTrack.jsx";
 import { SoundCues } from "./soundCues.jsx";
@@ -23,6 +24,17 @@ const SAMPLE_SNAKES = [
   { team: "b", heading: "left", torn: true, body: [{ x: 13, y: 6 }, { x: 14, y: 6 }, { x: 15, y: 6 }, { x: 15, y: 5 }] },
 ];
 const SAMPLE_APPLES = [{ x: 10, y: 5 }, { x: 11, y: 9 }];
+const SAMPLE_BOX = { x: 9, y: 7 };
+const LUCKY_SAMPLES = {
+  growth: { amount: 3 },
+  shrink: { amount: 2, kind: "luckyLoss" },
+  steal: { amount: 2 },
+  snip: { amount: 2 },
+  swap: { amount: -2, kind: "luckyTrade" },
+  bonusApple: {},
+  freeze: {},
+  appleDelivery: { amount: 1 },
+};
 // Team A's teammates push the same way (a double chevron), Team B's push apart (they cancel out).
 const SAMPLE_INPUTS = { a: ["down", "down"], b: ["up", "down"] };
 const SAMPLE_WEATHER = {
@@ -72,6 +84,7 @@ export function GalleryView() {
   const [countdownStep, setCountdownStep] = useState(4);
   // One list of events feeds both GameBoard (pictures) and SoundCues (sounds), like the model's event list will.
   const [events, setEvents] = useState([]);
+  const [luckyPreview, setLuckyPreview] = useState(null);
   const [soundOff, setSoundOff] = useState(false);
   const [soundTeam, setSoundTeam] = useState("a");
   const [lastSound, setLastSound] = useState("");
@@ -93,7 +106,9 @@ export function GalleryView() {
 
   function retryACB() { setRetryKind("loading"); }
   function addEvent(event) {
-    setEvents([...events, { ...event, id: events.length + 1 }]);
+    const numbered = { ...event, id: events.length + 1 };
+    setEvents([...events, numbered]);
+    return numbered;
   }
   function teamAEatsACB() { addEvent({ kind: "eat", team: "a", x: 10, y: 5 }); }
   function teamBEatsACB() { addEvent({ kind: "eat", team: "b", x: 11, y: 9 }); }
@@ -103,8 +118,25 @@ export function GalleryView() {
     setSnakes(snakes.map(crashTeamBCB));
     addEvent({ kind: "crash", team: "b", x: head.x, y: head.y });
   }
-  // Only the snakes go back: the board and SoundCues remember event ids, so the event list keeps growing.
-  function resetSnakesACB() { setSnakes(SAMPLE_SNAKES); }
+  // Keep event ids increasing when the board resets so old effects and sounds don't replay.
+  function resetBoardACB() {
+    setSnakes(SAMPLE_SNAKES);
+    setLuckyPreview(null);
+  }
+
+  function previewLuckyACB(event) {
+    const outcome = event.currentTarget.dataset.outcome;
+    const preview = addEvent({ ...SAMPLE_BOX, team: soundTeam, outcome, kind: "luckyGain", ...LUCKY_SAMPLES[outcome] });
+    setLuckyPreview(preview);
+  }
+
+  function renderLuckyButtonCB([outcome, result]) {
+    return (
+      <button className="gallery-lucky-button" key={outcome} type="button" data-outcome={outcome} onClick={previewLuckyACB}>
+        <LuckyBoxIcon outcome={outcome} /> {result.label}
+      </button>
+    );
+  }
 
   function scoreAACB() {
     setScore({ a: score.a + 1, b: score.b });
@@ -230,19 +262,26 @@ export function GalleryView() {
           title="Double Snake · Round 2"
           secondsLeft={secondsLeft}
         />
-        <div className="gallery-board">
-          <GameBoard columns={20} rows={12} snakes={snakes} apples={SAMPLE_APPLES}
-            effects={events.filter(function hasPositionCB(event) { return event.x !== undefined; })}
-            inputs={SAMPLE_INPUTS} weather={SAMPLE_WEATHER[weatherName]} tickMs={240}
-            label={snakes.map(describeSnakeCB).join(", ")} />
-          <Countdown value={COUNTDOWN_STEPS[countdownStep]} />
+        <div className="gallery-pickup-preview">
+          <LuckyBoxNotice event={luckyPreview} box={!luckyPreview && SAMPLE_BOX} />
+          <div className="gallery-board">
+            <GameBoard columns={20} rows={12} snakes={snakes} apples={SAMPLE_APPLES}
+              box={luckyPreview ? null : SAMPLE_BOX}
+              effects={events.filter(function hasPositionCB(event) { return event.x !== undefined; })}
+              inputs={SAMPLE_INPUTS} weather={SAMPLE_WEATHER[weatherName]} tickMs={240}
+              label={snakes.map(describeSnakeCB).join(", ")} />
+            <Countdown value={COUNTDOWN_STEPS[countdownStep]} />
+          </div>
+        </div>
+        <div className="gallery-row" role="group" aria-label="Preview Lucky Box outcomes">
+          {Object.entries(luckyResults).map(renderLuckyButtonCB)}
         </div>
         <div className="gallery-row">
           <button type="button" onClick={teamAEatsACB}>Team A eats</button>
           <button type="button" onClick={teamBEatsACB}>Team B eats</button>
           <button type="button" onClick={crashACB}>Crash</button>
           <button type="button" onClick={stepSnakesACB}>Step snakes</button>
-          <button type="button" onClick={resetSnakesACB}>Reset snakes</button>
+          <button type="button" onClick={resetBoardACB}>Reset board</button>
           <button type="button" onClick={scoreAACB}>Team A scores</button>
           <button type="button" onClick={scoreBACB}>Team B scores</button>
           <button type="button" onClick={nextSecondACB}>Next second</button>

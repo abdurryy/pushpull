@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import { PushMark } from "./pushMark.jsx";
 import { GameBoard } from "./gameBoard.jsx";
+import { LuckyBoxNotice } from "./luckyBoxNotice.jsx";
 import { SoundCues } from "./soundCues.jsx";
 import { MusicTrack } from "./musicTrack.jsx";
 import { SoundToggle } from "./soundToggle.jsx";
@@ -22,11 +23,18 @@ function renderWeatherStatus(status, city) {
 }
 
 // The board is a picture, so screen readers get the same facts in words.
-function boardLabel(snakes) {
+function boardLabel(snakes, box) {
   if (snakes.length === 0) return "Empty game board";
-  return snakes.map(function describeSnakeCB(snake) {
-    return "Team " + snake.team.toUpperCase() + "'s snake is " + snake.body.length + " long" + (snake.crashed ? " and crashed" : "");
-  }).join(", ");
+  const descriptions = snakes.map(function describeSnakeCB(snake) {
+    const team = "Team " + snake.team.toUpperCase();
+    const length = snake.body.length + (snake.growth ?? 0);
+    let state = " has " + length + " length";
+    if (snake.crashed) state += " and crashed";
+    if (snake.frozenTicks) state += " and is frozen";
+    return team + state;
+  });
+  if (box) descriptions.push("Lucky Box at column " + (box.x + 1) + ", row " + (box.y + 1));
+  return descriptions.join(". ");
 }
 
 // Round music while playing, the results track after a round, nothing before the first one.
@@ -118,6 +126,7 @@ export function DemoView(props) {
           <strong className="numbers" aria-label={seconds + " seconds left"}>{seconds}s</strong>
           <strong className="demo-team demo-b">Team B <span className="numbers">{score.b}</span></strong>
         </div>
+        <LuckyBoxNotice event={props.luckyResult} box={playing && props.box} playing={playing} />
         <div className="demo-arena" ref={arena} tabIndex={playing ? 0 : -1} aria-label="Game board keyboard controls"
           onKeyDown={keyDownACB} onKeyUp={keyUpACB} onBlur={onClearKeys}>
           <GameBoard
@@ -125,11 +134,12 @@ export function DemoView(props) {
             rows={props.rows}
             snakes={props.snakes}
             apples={props.apples}
+            box={props.box}
             effects={props.events}
             inputs={playing ? props.inputs : {}}
             weather={playing ? weather : null}
             tickMs={props.tickMs}
-            label={boardLabel(props.snakes)}
+            label={boardLabel(props.snakes, props.box)}
           />
           {!round && <p className="demo-overlay">Start a round to place both snakes on the board.</p>}
           {round?.outcome && <p className="demo-overlay" role="status">{outcomeText(round.outcome)}</p>}

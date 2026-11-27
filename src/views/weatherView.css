@@ -16,12 +16,18 @@
   gap: var(--space-2);
 }
 
-.weather-header a {
+.weather-header a,
+.weather-play {
   display: inline-flex;
   align-items: center;
   justify-self: start;
   min-height: var(--hit-min);
   color: var(--color-ink);
+}
+
+.weather-play {
+  align-self: start;
+  font-weight: var(--weight-bold);
 }
 
 .weather-title {

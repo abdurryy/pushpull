@@ -211,6 +211,11 @@
 }
 
 @media (min-width: 80rem) and (orientation: landscape) {
+  .demo {
+    max-width: calc(var(--phone-max-width) * 4);
+    padding-block: calc(var(--tv-safe) * 9 / 16);
+  }
+
   .demo,
   .demo-score,
   .demo h2 {
@@ -218,4 +223,9 @@
   }
 
   .demo h1 { font-size: var(--tv-title); }
+}
+
+/* Leave vertical room for the score, pickup result and weather on short displays. */
+@media (min-width: 80rem) and (max-height: 48rem) and (orientation: landscape) {
+  .demo-playfield { max-width: calc((100svh - var(--space-8) * 3) * 5 / 3); }
 }
