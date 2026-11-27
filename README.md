@@ -21,14 +21,14 @@ The first game mode is **Double Snake**: eat apples to grow and make the other t
 
 ## Team
 
-| Name | KTH/GitHub username | Project email | Owns |
+| Name | GitHub | Project email | Owns |
 |---|---|---|---|
-| Casper Waller | CasperWaller | [casper@pushpull.live](mailto:casper@pushpull.live) | |
-| Abdurrahman Giumale | abdurryy | [abdurrahman@pushpull.live](mailto:abdurrahman@pushpull.live) | |
-| Faraz Ahmad | faraz539 | [faraz@pushpull.live](mailto:faraz@pushpull.live) | |
-| Aryan Masiul | aryanmasiul007 | [aryan@pushpull.live](mailto:aryan@pushpull.live) | |
+| Abdurrahman Giumale | [@abdurryy](https://github.com/abdurryy) | [abdurrahman@pushpull.live](mailto:abdurrahman@pushpull.live) | **Phone & match flow** · Sign-in, join, controls, voting and ready screens, round order, audio, and deployment.<br>**Modes:** In Sync, Switcheroo |
+| Casper Waller | [@CasperWaller](https://github.com/CasperWaller) | [casper@pushpull.live](mailto:casper@pushpull.live) | **TV & game art** · Home, lobby and QR code, board, scores, mode picker and vote display, countdown, rematch, art, effects, and gallery.<br>**Mode:** Orchard Sprint |
+| Aryan Masiul | [@aryanmasiul007](https://github.com/aryanmasiul007) | [aryan@pushpull.live](mailto:aryan@pushpull.live) | **Game rules & APIs** · Double Snake, shared mode interface, keyboard demo, weather, trivia, and round results.<br>**Modes:** Wraparound, Closing Walls |
+| Faraz Ahmad | [@faraz539](https://github.com/faraz539) | [faraz@pushpull.live](mailto:faraz@pushpull.live) | **Profiles & Firebase** *(proposed)* · Player settings, data design and rules, room and vote sync.<br>**Modes:** Checkpoint Chase, Hot Apple |
 
-"Owns" means the presenter/view pairs, model, API module, persistence or auth that this person is responsible for. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Screen owners maintain both the Presenter and the View. Abdurrahman coordinates the shared app model, routes, and room Presenter, with Casper reviewing the TV flow. Aryan coordinates the game model. Faraz is the proposed owner for the room model and persistence. See [the contribution guide](CONTRIBUTING.md#who-owns-what).
 
 ## Getting started
 
