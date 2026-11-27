@@ -1,7 +1,9 @@
 // Presenter for the TV lobby: reads the app and room models, passes props to the view, and turns each view event into one model method.
 import { observer } from "mobx-react-lite";
 import { promiseStatus } from "../model/resolvePromise.js";
+import { AccountSignIn } from "../views/accountSignIn.jsx";
 import { LobbyView } from "../views/lobbyView.jsx";
+import { LoginPresenter } from "./loginPresenter.jsx";
 
 export const LobbyPresenter = observer(function LobbyPresenter(props) {
   const roomModel = props.roomModel;
@@ -25,6 +27,8 @@ export const LobbyPresenter = observer(function LobbyPresenter(props) {
     roomModel.startRound();
   }
 
+  // The sign-in control is the login presenter's, like on the home screen, so the lobby never calls the auth service.
+  // Firebase signs in with a popup, so the host stays on #/tv and the auth listener updates the model here.
   return (
     <LobbyView
       authChecked={props.model.authChecked}
@@ -41,6 +45,7 @@ export const LobbyPresenter = observer(function LobbyPresenter(props) {
       weatherStatus={promiseStatus(weatherState)}
       weatherResult={weatherState.data}
       weatherError={weatherState.error}
+      signIn={<LoginPresenter model={props.model} view={AccountSignIn} />}
       onCreateRoom={createRoomACB}
       onCityChange={cityChangedACB}
       onSearchWeather={searchWeatherACB}
