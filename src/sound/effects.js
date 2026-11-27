@@ -1,15 +1,7 @@
 // Sound (output layer): one sound effect per event in design.md's Game feel table.
 // Each effect gets an output node, a start time, a pitch (1 is normal, soundPlayer varies it a little) and the team.
-import { instruments, noteFrequency } from "./instruments.js";
-
-// Team B's sounds are a fourth (five semitones) higher, so you can hear which team it was.
-// Effects use only C, D, E, G and A, which every track's key contains. A fourth up turns them into F, G, A, C and D,
-// which every key contains too, so neither team's sounds ever clash with the music.
-const TEAM_B_LIFT = Math.pow(2, 5 / 12);
-
-function pitchFor(team, pitch) {
-  return team === "b" ? pitch * TEAM_B_LIFT : pitch;
-}
+import { instruments, noteFrequency, pitchFor } from "./instruments.js";
+import { luckyBoxEffects } from "./luckyBoxEffects.js";
 
 // Plays notes one after another: [[note, delay in seconds], ...].
 function melody(instrument, output, time, pitch, volume, notes) {
@@ -24,56 +16,7 @@ export const soundEffects = {
     melody(instruments.marimba, output, time, pitchFor(team, pitch), 0.5, [["E5", 0], ["A5", 0.07]]);
   },
 
-  // Growth spurt: three rising wooden notes, one for each segment.
-  luckyGrowth(output, time, pitch, team) {
-    melody(instruments.marimba, output, time, pitchFor(team, pitch), 0.32, [["C5", 0], ["G5", 0.08], ["C6", 0.16]]);
-  },
-
-  // Shrink: two short wooden taps fall a fifth.
-  luckyShrink(output, time, pitch, team) {
-    melody(instruments.woodblock, output, time, pitchFor(team, pitch), 0.88, [["G5", 0], ["C5", 0.08]]);
-  },
-
-  // Length heist: a knock is answered by two quick plucks in a higher register.
-  luckySteal(output, time, pitch, team) {
-    const tuned = pitchFor(team, pitch);
-    melody(instruments.woodblock, output, time, tuned, 0.76, [["D5", 0]]);
-    melody(instruments.pluck, output, time, tuned, 0.48, [["A5", 0.10], ["D6", 0.15]]);
-  },
-
-  // Tail snip: two scissor clicks, with the second punctuated by a wooden tap.
-  luckySnip(output, time, pitch, team) {
-    instruments.snip(output, time, 0, 0.65);
-    instruments.snip(output, time + 0.065, 0, 0.45);
-    melody(instruments.woodblock, output, time, pitchFor(team, pitch), 0.78, [["E5", 0.09]]);
-  },
-
-  // Length swap: a plucked phrase steps away and returns to its first note.
-  luckySwap(output, time, pitch, team) {
-    melody(instruments.pluck, output, time, pitchFor(team, pitch), 0.52, [["E5", 0], ["A5", 0.07], ["E5", 0.16]]);
-  },
-
-  // Triple bite: three quick knocks, with a higher third note.
-  luckyBonusApple(output, time, pitch, team) {
-    melody(instruments.marimba, output, time, pitchFor(team, pitch), 0.29, [["E5", 0], ["E5", 0.055], ["A5", 0.11]]);
-  },
-
-  // Freeze: a bright chord struck all at once.
-  luckyFreeze(output, time, pitch, team) {
-    melody(instruments.pluck, output, time, pitchFor(team, pitch), 0.44, [["D5", 0], ["A5", 0], ["E6", 0]]);
-  },
-
-  // Apple delivery: a quick rush of taps lands on a ringing wooden note.
-  luckyAppleDelivery(output, time, pitch, team) {
-    const tuned = pitchFor(team, pitch);
-    melody(instruments.woodblock, output, time, tuned, 0.7, [["C5", 0], ["D5", 0.045]]);
-    melody(instruments.marimba, output, time, tuned, 0.36, [["E5", 0.095]]);
-  },
-
-  // The box opened, but nothing on the board could change.
-  luckyNoChange(output, time, pitch, team) {
-    melody(instruments.pluck, output, time, pitchFor(team, pitch), 0.6, [["C5", 0]]);
-  },
+  ...luckyBoxEffects,
 
   // Snake crashed: a low thud and a falling tone.
   crash(output, time, pitch) {
