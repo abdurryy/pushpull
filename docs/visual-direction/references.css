@@ -1,0 +1,524 @@
+/* Design reference styles (issue 133), not app code. Token values only, so Views can copy any rule as it is.
+   The one exception is the comparison sheet at the end, which needs real device sizes for its frames. */
+
+/* ---------- Shared pieces ---------- */
+
+.ref-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  white-space: nowrap;
+}
+
+.ref-brand .push-mark {
+  width: 2em;
+  height: 1em;
+}
+
+.ref-muted {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.ref-strong {
+  font-weight: var(--weight-bold);
+}
+
+/* The keyboard focus ring, drawn on purpose so it shows in a still screenshot. */
+.ref-focus {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+/* Annotation numbers: only with "/notes" at the end of the address. README.md explains each one. */
+.ref-note {
+  display: none;
+}
+
+/* On the TV a number sits in the margin left of its zone, so it never covers what it explains. */
+.ref-notes .ref-note {
+  --note-size: calc(var(--tv-text) * 1.5);
+  position: absolute;
+  z-index: 2;
+  inset-block-start: 0;
+  inset-inline-start: calc(var(--note-size) * -1 - var(--space-2));
+  display: grid;
+  place-items: center;
+  width: var(--note-size);
+  aspect-ratio: 1;
+  border-radius: var(--radius-round);
+  background: var(--color-ink);
+  color: var(--color-surface);
+  font-family: var(--font-display);
+  font-size: var(--tv-text);
+  font-weight: var(--weight-display);
+  line-height: 1;
+}
+
+/* The phone has no side margin, so its numbers sit on the right edge of their zone. */
+.ref-notes .ref-phone .ref-note {
+  inset-inline: auto 0;
+}
+
+.ref-notes :has(> .ref-note) {
+  position: relative;
+}
+
+/* ---------- TV frame: rail, stage, next step. Same on every TV screen. ---------- */
+
+.ref-tv {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-6);
+  box-sizing: border-box;
+  height: 100vh;
+  /* 5% of the height top and bottom, 5% of the width at the sides, as in demoView.css. */
+  padding: min(var(--tv-safe), 5svh) var(--tv-safe);
+  overflow: hidden;
+  font-size: var(--tv-text);
+}
+
+.ref-tv-rail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.ref-tv-context {
+  color: var(--color-muted);
+  font-weight: var(--weight-bold);
+}
+
+.ref-tv-rail .sound-toggle {
+  justify-self: end;
+}
+
+.ref-stage {
+  min-height: 0;
+}
+
+/* Players read the status from the sofa, so the next-step row is --tv-title, not --tv-text. */
+.ref-tv-next {
+  font-size: var(--tv-title);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  min-height: calc(var(--hit-min) * 1.5);
+}
+
+.ref-tv-next-text {
+  margin: 0;
+  font-weight: var(--weight-bold);
+}
+
+.ref-tv-next .button {
+  min-height: calc(var(--hit-min) * 1.5);
+  padding-inline: var(--space-6);
+}
+
+.ref-tv-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--tv-title);
+  font-weight: var(--weight-display);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+/* ---------- Lobby ---------- */
+
+/* Join strip on top (the loudest thing), the two teams under it, Team A left and Team B right. */
+.ref-lobby {
+  display: grid;
+  align-content: center;
+  gap: var(--space-6);
+}
+
+.ref-join-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-7);
+  padding: var(--space-5) var(--space-7);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.ref-qr {
+  display: grid;
+  place-items: center;
+  width: 10em;
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  background: var(--color-sunken);
+}
+
+.ref-qr .icon {
+  font-size: 8em;
+}
+
+.ref-join-text {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.ref-hero-code {
+  font-size: calc(var(--tv-score) * 1.5);
+}
+
+.ref-lobby-teams {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+}
+
+/* Players look for their own name from the sofa, so the rosters use --tv-title. */
+.ref-lobby-teams .team-roster {
+  padding: var(--space-5);
+  font-size: var(--tv-title);
+}
+
+/* ---------- Mode intro ---------- */
+
+.ref-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 11fr) minmax(0, 9fr);
+  align-items: center;
+  gap: var(--space-7);
+}
+
+.ref-intro-art {
+  margin: 0;
+}
+
+.ref-intro-text {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-4);
+}
+
+.ref-intro-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--tv-score);
+  font-weight: var(--weight-display);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.ref-intro-goal {
+  margin: 0;
+  font-size: var(--tv-title);
+  font-weight: var(--weight-bold);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.ref-intro-rules {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ref-intro-rules li,
+.ref-play-goal {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ref-intro-teams {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-block-start: var(--space-4);
+}
+
+.ref-intro-teams .team-chip {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- In play (the countdown state of the intro): the board is the stage ---------- */
+
+.ref-play {
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-5);
+}
+
+.ref-play-top {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.ref-play-goal {
+  justify-self: center;
+  margin: 0;
+  font-weight: var(--weight-bold);
+}
+
+.ref-play-board {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+}
+
+/* The board keeps its shape and fills the height that is left. */
+.ref-play-board-box {
+  position: relative;
+  height: 100%;
+  aspect-ratio: 20 / 12;
+  max-width: 100%;
+}
+
+.ref-play-board-box .game-board {
+  height: 100%;
+}
+
+/* ---------- Scoreboard between modes ---------- */
+
+.ref-scoreboard {
+  display: grid;
+  align-content: center;
+  gap: var(--space-6);
+}
+
+.ref-tally {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: var(--space-5);
+}
+
+.ref-tally-team {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-3) var(--space-5);
+  padding: var(--space-6);
+  border-radius: var(--radius);
+}
+
+.ref-tally-a { background: var(--color-team-a-soft); }
+.ref-tally-b { background: var(--color-team-b-soft); }
+
+.ref-tally-team .team-chip {
+  justify-self: start;
+}
+
+.ref-tally-players {
+  grid-column: 1;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Scores face the middle, so the two numbers read as one "2 – 1". */
+.ref-tally-score {
+  grid-row: 1 / -1;
+  grid-column: 2;
+  align-self: center;
+  font-family: var(--font-display);
+  font-size: calc(var(--tv-score) * 2);
+  font-weight: var(--weight-display);
+  line-height: 1;
+}
+
+.ref-tally-changed {
+  animation: pop var(--duration-effect) var(--ease-out);
+}
+
+.ref-tally-b .ref-tally-score {
+  grid-column: 1;
+  justify-self: start;
+}
+
+.ref-tally-b .team-chip,
+.ref-tally-b .ref-tally-players {
+  grid-column: 2;
+  justify-self: end;
+  text-align: end;
+}
+
+.ref-tally-dash {
+  align-self: center;
+  color: var(--color-muted);
+  font-family: var(--font-display);
+  font-size: calc(var(--tv-score) * 2);
+  line-height: 1;
+}
+
+.ref-scoreboard-headline {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--tv-title);
+  font-weight: var(--weight-display);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.ref-rounds {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ref-round {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+/* The next round is the only one with an ink outline: "this is where we are". */
+.ref-round-next {
+  outline: var(--focus-ring);
+  outline-offset: calc(var(--focus-offset) * -1);
+}
+
+.ref-round-mode {
+  font-weight: var(--weight-bold);
+}
+
+/* ---------- Phone join ---------- */
+
+.ref-phone {
+  display: grid;
+  align-content: start;
+  gap: var(--space-6);
+  box-sizing: border-box;
+  min-height: 100svh;
+  max-width: var(--phone-max-width);
+  margin-inline: auto;
+  padding: max(var(--space-4), env(safe-area-inset-top)) max(var(--space-4), env(safe-area-inset-right))
+    max(var(--space-5), env(safe-area-inset-bottom)) max(var(--space-4), env(safe-area-inset-left));
+}
+
+.ref-phone-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--hit-min);
+}
+
+.ref-phone-account {
+  justify-self: end;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ref-phone-intro {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.ref-phone-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-hero);
+  font-weight: var(--weight-display);
+  line-height: 1.15;
+}
+
+.ref-phone-form,
+.ref-phone-teams {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.ref-phone-primary {
+  width: 100%;
+}
+
+.ref-phone-teams {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+/* A team toggle: the shared secondary button, tall enough to read the team at a glance. */
+.ref-team-choice {
+  flex-direction: column;
+  align-items: start;
+  gap: var(--space-2);
+  min-height: calc(var(--hit-min) * 2.5);
+  padding: var(--space-4);
+  text-align: start;
+}
+
+.ref-team-choice-names {
+  font-weight: var(--weight-regular);
+}
+
+/* ---------- Comparison sheet ---------- */
+
+/* Device sizes for the frames: a 1080p TV shown at a quarter, and a 390 × 844 phone at real size. */
+.ref-sheet {
+  --tv-frame-width: 1920px;
+  --tv-frame-height: 1080px;
+  --phone-frame-width: 390px;
+  --phone-frame-height: 844px;
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-4);
+}
+
+/* Three quarter-size TVs and one phone just fit side by side on a 1920px wide screen. */
+.ref-sheet-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: var(--space-4);
+}
+
+.ref-sheet-tv,
+.ref-sheet-phone {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.ref-sheet-window {
+  overflow: hidden;
+  border-radius: var(--radius);
+  outline: 1px solid var(--color-line);
+}
+
+.ref-sheet-tv .ref-sheet-window {
+  width: calc(var(--tv-frame-width) / 4);
+  height: calc(var(--tv-frame-height) / 4);
+}
+
+.ref-sheet-tv iframe {
+  width: var(--tv-frame-width);
+  height: var(--tv-frame-height);
+  border: 0;
+  transform: scale(0.25);
+  transform-origin: 0 0;
+}
+
+.ref-sheet-phone iframe {
+  display: block;
+  width: var(--phone-frame-width);
+  height: var(--phone-frame-height);
+  border: 0;
+}
+
+.ref-sheet figcaption a {
+  color: var(--color-ink);
+}

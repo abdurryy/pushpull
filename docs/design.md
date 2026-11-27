@@ -27,6 +27,7 @@ Push/Pull is a party game for four friends with one TV and their own phones. It 
 - **Light everywhere:** the same light theme on the TV and the phones.
 - **Flat fills:** surfaces are separated by colour, not by borders or shadows.
 - **Two screens, two jobs.** The TV is read from the sofa, 2–3 m away. The phone is a controller that players use **without looking at it**.
+- **Whole screens:** [visual-direction/](visual-direction/README.md) shows how a full TV or phone screen is put together (frame, hierarchy, type and art scale, motion limits), with four reference screens to copy.
 
 ## Layout and navigation
 

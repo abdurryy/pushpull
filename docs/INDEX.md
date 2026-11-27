@@ -7,6 +7,7 @@ Read this first, then open only the file you need.
 | File | What it is |
 |---|---|
 | [design.md](design.md) | **Design system:** look, colours with contrast checks, fonts, components, controller touch rules, UI PR checklist. Values in `src/styles/tokens.css` |
+| [visual-direction/](visual-direction/README.md) | **Screen direction for the revamp (#133):** four annotated reference screens (TV lobby, mode intro, scoreboard, phone join), type and art scale, motion limits, and who owns each shared piece |
 | [proposal.md](proposal.md) | Idea brainstorm, requirements checklist, and the proposal we submit |
 | [user-testing/](user-testing/README.md) | One file per user test session plus a template (required for submission) |
 | [../README.md](../README.md) | Team, setup, project structure, status, third-party components |
