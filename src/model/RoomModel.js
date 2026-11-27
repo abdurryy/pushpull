@@ -1,8 +1,9 @@
 // Model: tracks an active room and routes room operations through the persistence service.
-import { makeAutoObservable, reaction } from "mobx";
+import { makeAutoObservable, reaction, runInAction } from "mobx";
 import { normalizeRoomCode, validRoomCode } from "../persistence/roomSync.js";
 
 const SIDES = ["a", "b", "center"];
+const TEAM_SIZE = 2;
 const STICKS = ["idle", "up", "down", "left", "right"];
 const BUTTONS = ["dash", "ping", "shed", "hold"];
 
@@ -16,6 +17,7 @@ export function makeRoomModel(sync, appModel) {
     connected: false,
     inputReady: false,
     loading: false,
+    pendingSide: null,
     error: null,
     stick: "idle",
     requestId: 0,
@@ -23,6 +25,8 @@ export function makeRoomModel(sync, appModel) {
     get user() { return appModel.user; },
 
     get side() { return this.room?.players?.[this.user?.uid]?.side; },
+
+    get joined() { return this.role === "player" && Boolean(this.side); },
 
     get teams() {
       const teams = { a: [], b: [] };
@@ -34,9 +38,16 @@ export function makeRoomModel(sync, appModel) {
       return teams;
     },
 
+    get openTeamSeats() {
+      return {
+        a: Math.max(0, TEAM_SIZE - this.teams.a.length),
+        b: Math.max(0, TEAM_SIZE - this.teams.b.length),
+      };
+    },
+
     get canStart() {
       return this.role === "host" && this.connected && this.room?.hostOnline === true
-        && this.teams.a.length === 2 && this.teams.b.length === 2;
+        && this.teams.a.length === TEAM_SIZE && this.teams.b.length === TEAM_SIZE;
     },
 
     get steering() {
@@ -51,7 +62,7 @@ export function makeRoomModel(sync, appModel) {
     },
 
     setCodeInput(code) {
-      this.codeInput = code;
+      this.codeInput = normalizeRoomCode(code).replace(/[^A-Z0-9]/g, "").slice(0, 4);
       this.error = null;
     },
 
@@ -60,6 +71,7 @@ export function makeRoomModel(sync, appModel) {
     },
 
     async joinRoom(rawCode = this.codeInput) {
+      if (this.loading) return;
       const code = normalizeRoomCode(rawCode);
       if (!validRoomCode(code)) {
         this.setError(new Error("Enter a valid four-character room code."));
@@ -70,6 +82,7 @@ export function makeRoomModel(sync, appModel) {
 
     beginRequest() {
       this.loading = true;
+      this.pendingSide = null;
       this.error = null;
       this.requestId += 1;
       return this.requestId;
@@ -114,11 +127,21 @@ export function makeRoomModel(sync, appModel) {
       this.inputReady = true;
     },
 
-    pickSide(side) {
-      if (!this.connected || this.role !== "player" || !this.room || !SIDES.includes(side)) return;
-      if (side === this.side || this.teams[side]?.length >= 2) return;
+    async pickSide(side) {
+      if (!this.connected || !this.joined || this.loading || this.pendingSide || !SIDES.includes(side)) return;
+      if (side === this.side || this.openTeamSeats[side] === 0) return;
       this.error = null;
-      sync.setSide(this.code, this.user.uid, side).catch(reportRoomError());
+      this.pendingSide = side;
+      const { requestId } = this;
+      try {
+        await sync.setSide(this.code, this.user.uid, side);
+      } catch (error) {
+        if (this.requestId === requestId && this.joined) this.setError(error);
+      } finally {
+        runInAction(function clearPendingSideACB() {
+          if (model.requestId === requestId) model.pendingSide = null;
+        });
+      }
     },
 
     setStick(direction) {
@@ -138,6 +161,7 @@ export function makeRoomModel(sync, appModel) {
       this.room = null;
       this.role = null;
       this.loading = false;
+      this.pendingSide = null;
       this.inputReady = false;
       this.stick = "idle";
       this.error = null;
@@ -148,7 +172,7 @@ export function makeRoomModel(sync, appModel) {
         this.leaveRoom();
         return;
       }
-      if (!this.connected || this.loading) return;
+      if (!this.connected || this.loading || this.pendingSide) return;
       const { role, code, user } = this;
       const request = this.beginRequest();
       try {

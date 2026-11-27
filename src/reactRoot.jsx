@@ -3,6 +3,7 @@ import { createHashRouter, RouterProvider } from "react-router-dom";
 import { HomePresenter } from "./presenters/homePresenter.jsx";
 import { WeatherPresenter } from "./presenters/weatherPresenter.jsx";
 import { LoginPresenter } from "./presenters/loginPresenter.jsx";
+import { JoinPresenter } from "./presenters/joinPresenter.jsx";
 import { RoomPresenter } from "./presenters/roomPresenter.jsx";
 import { DemoPresenter } from "./presenters/demoPresenter.jsx";
 import { ControllerPresenter } from "./presenters/controllerPresenter.jsx";
@@ -10,18 +11,26 @@ import { GalleryPresenter } from "./presenters/galleryPresenter.jsx";
 import { ProfilePresenter } from "./presenters/profilePresenter.jsx";
 
 function makeRouter({ model, roomModel, roomController }) {
+  function loadJoinCodeACB({ request }) {
+    const code = new URL(request.url).searchParams.get("code");
+    if (code !== null) roomModel.setCodeInput(code);
+    return null;
+  }
+
+  const join = <JoinPresenter app={model} room={roomModel} />;
+
   return createHashRouter([
     { path: "/", element: <HomePresenter model={model} /> },
     { path: "/profile", element: <ProfilePresenter model={model} /> },
     { path: "/demo", element: <DemoPresenter model={model} /> },
-    { path: "/room", element: <RoomPresenter key="host" app={model} room={roomModel} host /> },
+    { path: "/room", element: <RoomPresenter key="host" app={model} room={roomModel} /> },
     { path: "/room/login", element: <LoginPresenter model={model} host /> },
-    { path: "/room/game", element: <RoomPresenter key="board" app={model} room={roomModel} host board /> },
+    { path: "/room/game", element: <RoomPresenter key="board" app={model} room={roomModel} board /> },
     // The shared screen. Shows the weather check for now; the lobby and game board come later.
     { path: "/tv", element: <WeatherPresenter model={model} /> },
     // The phone flow starts with logging in: Log in -> Join a room -> Controller.
     { path: "/play/login", element: <LoginPresenter model={model} /> },
-    { path: "/play/join", element: <RoomPresenter key="phone" app={model} room={roomModel} /> },
+    { path: "/play/join", loader: loadJoinCodeACB, element: join, hydrateFallbackElement: join },
     { path: "/play/controller", element: <ControllerPresenter /> },
     { path: "/play/room-controller", element: <ControllerPresenter key="live" room={roomModel} controller={roomController} /> },
     // Dev page: every shared component in every state.

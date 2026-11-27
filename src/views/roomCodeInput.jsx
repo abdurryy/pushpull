@@ -44,6 +44,14 @@ export function RoomCodeInput(props) {
     if (event.key === "ArrowRight") focusBox(index + 1);
   }
 
+  function boxPasteACB(event) {
+    const pasted = cleanCode(event.clipboardData.getData("text"));
+    if (pasted.length !== CODE_LENGTH) return;
+    event.preventDefault();
+    props.onCodeChange(pasted);
+    focusBox(CODE_LENGTH - 1);
+  }
+
   // Selecting the character means typing replaces it instead of adding a second one.
   function boxFocusACB(event) {
     event.target.select();
@@ -54,25 +62,28 @@ export function RoomCodeInput(props) {
       boxes.current[index] = element;
     }
     return (
-      <input
-        key={index}
-        ref={keepBoxACB}
-        className="room-code-input-box numbers"
-        data-index={index}
-        value={code.charAt(index)}
-        onChange={boxChangeACB}
-        onKeyDown={boxKeyDownACB}
-        onFocus={boxFocusACB}
-        disabled={props.disabled}
-        aria-label={"Character " + (index + 1) + " of " + CODE_LENGTH}
-        aria-invalid={props.invalid || undefined}
-        inputMode="text"
-        autoCapitalize="characters"
-        autoComplete="off"
-        autoCorrect="off"
-        spellCheck={false}
-        enterKeyHint={index === CODE_LENGTH - 1 ? "go" : "next"}
-      />
+      <label className="room-code-character" key={index}>
+        <span className="room-code-position">{index + 1}</span>
+        <input
+          ref={keepBoxACB}
+          className="room-code-input-box numbers"
+          data-index={index}
+          value={code.charAt(index)}
+          onChange={boxChangeACB}
+          onKeyDown={boxKeyDownACB}
+          onPaste={boxPasteACB}
+          onFocus={boxFocusACB}
+          disabled={props.disabled}
+          aria-label={"Character " + (index + 1) + " of " + CODE_LENGTH}
+          aria-invalid={props.invalid || undefined}
+          inputMode="text"
+          autoCapitalize="characters"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          enterKeyHint={index === CODE_LENGTH - 1 ? "go" : "next"}
+        />
+      </label>
     );
   }
 
