@@ -47,13 +47,13 @@ export function HomeView(props) {
     }
     if (props.user) {
       return (
-        <a className="button button-text" href="#/profile">
+        <a className="button button-secondary" href="#/profile">
           <span className="icon" aria-hidden="true">account_circle</span>
           View profile
         </a>
       );
     }
-    return <AccountSignIn status={props.status} error={props.error} onSignIn={props.onSignIn} label="Sign in" textAction />;
+    return <AccountSignIn status={props.status} error={props.error} onSignIn={props.onSignIn} label="Sign in" secondary />;
   }
 
   return (

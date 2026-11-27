@@ -36,6 +36,18 @@
   justify-self: end;
 }
 
+.home-account > .button {
+  padding-inline: var(--space-3);
+  background: transparent;
+}
+
+@media (hover: hover) {
+  .home-account > .button:hover:not(:disabled) {
+    background: var(--color-sunken);
+    text-decoration: none;
+  }
+}
+
 .home-account > .status-message-error {
   grid-column: 1 / -1;
   max-width: 42ch;

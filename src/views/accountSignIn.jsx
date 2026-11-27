@@ -13,9 +13,9 @@ const ERROR_MESSAGES = {
   "auth/unauthorized-domain": "Signing in isn't allowed from this web address yet.",
 };
 
-export function AccountSignIn({ status, error, onSignIn, textAction = false, label = "Continue with Google" }) {
+export function AccountSignIn({ status, error, onSignIn, secondary = false, label = "Continue with Google" }) {
   const pending = status === "loading";
-  const buttonClass = textAction ? "button button-text" : "button";
+  const buttonClass = secondary ? "button button-secondary" : "button";
 
   function signInClickACB() {
     onSignIn();
