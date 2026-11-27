@@ -62,8 +62,9 @@ Full detail: `docs/course/project/keeping-presenter-simple.md`.
 Every task: **issue → branch → PR → auto-merge.** Details and how to write issues and PRs: `CONTRIBUTING.md`.
 
 1. Reuse the task's issue (`gh issue list`), or create a full one from `.github/ISSUE_TEMPLATE/task.md` with a milestone and area label. Check its board fields.
-2. Branch from an up-to-date `main`: `feature/<issue>-<thing>`, `fix/<issue>-<thing>` or `docs/<issue>-<thing>`.
-3. Push, open a PR into `main` with `Closes #<issue>`, fill in the PR template, then `gh pr merge <pr> --auto --merge`.
+2. **Check for blockers before branching or editing.** Read the issue's GitHub **Blocked by** list (`gh api --paginate 'repos/{owner}/{repo}/issues/<number>/dependencies/blocked_by'`) and check the issue description for explicit prerequisites. Verify the status of each prerequisite. If any are still open, tell the developer which issue they chose and name every open blocker by number, for example, “Issue #42 is blocked by #17 and #23.” Wait until the blockers are resolved before starting work.
+3. Branch from an up-to-date `main`: `feature/<issue>-<thing>`, `fix/<issue>-<thing>` or `docs/<issue>-<thing>`.
+4. Push, open a PR into `main` with `Closes #<issue>`, fill in the PR template, then `gh pr merge <pr> --auto --merge`.
 
 Never:
 
