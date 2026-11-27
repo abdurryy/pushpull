@@ -85,6 +85,11 @@
   padding-inline: var(--space-1);
 }
 
+.join-side-button.button[aria-pressed="true"],
+.join-side-button.button:hover:not(:disabled) {
+  text-decoration: none;
+}
+
 .join-side-button .team-chip {
   max-width: 100%;
   padding-inline: var(--space-2);
