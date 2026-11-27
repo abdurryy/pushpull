@@ -1,5 +1,6 @@
 // View: code entry and a three-column side picker for phones.
 import { useRef } from "react";
+import { Link } from "react-router-dom";
 import { PushMark } from "./pushMark.jsx";
 import { RoomCodeInput } from "./roomCodeInput.jsx";
 import { StatusMessage } from "./statusMessage.jsx";
@@ -102,7 +103,7 @@ export function JoinView(props) {
           </StatusMessage>
         )}
         <div className="join-actions">
-          {props.side !== "center" && <a className="button" href="#/play/room-controller">Open controller</a>}
+          {props.side !== "center" && <Link className="button" to="/play/room-controller">Open controller</Link>}
           <button className="button button-text" type="button" disabled={!props.connected || props.loading || Boolean(props.changingSide)} onClick={props.onLeave}>
             Leave room
           </button>
@@ -139,7 +140,7 @@ export function JoinView(props) {
         <>
           <h1>Join a room</h1>
           <p className="join-instructions">Sign in so your team can see your name.</p>
-          <a className="button" href="#/play/login">Sign in with Google</a>
+          <Link className="button" to="/play/login">Sign in with Google</Link>
         </>
       );
     }
@@ -164,7 +165,7 @@ export function JoinView(props) {
   return (
     <main className="join">
       <header className="join-header">
-        <a className="button button-text" href="#/" aria-label="Push/Pull home"><PushMark /> PUSH/PULL</a>
+        <Link className="button button-text" to="/" aria-label="Push/Pull home"><PushMark /> PUSH/PULL</Link>
         {props.user && <span className="join-name">{props.user.name}</span>}
       </header>
       <div className="join-content">{renderContent()}</div>

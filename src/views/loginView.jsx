@@ -1,4 +1,5 @@
 // View (phone): sign in with Google. Shows checking, signed-out, signing-in, error and signed-in states.
+import { Link } from "react-router-dom";
 import "./loginView.css";
 import { AccountAvatar } from "./accountAvatar.jsx";
 import { AccountSignIn } from "./accountSignIn.jsx";
@@ -18,8 +19,8 @@ export function LoginView(props) {
           <p className="login-text">Signed in as <strong>{props.user.name}</strong></p>
         </div>
         {props.host
-          ? <a className="button" href="#/room">Continue to host a room</a>
-          : <a className="button" href="#/play/join">Continue to join a room</a>}
+          ? <Link className="button" to="/room">Continue to host a room</Link>
+          : <Link className="button" to="/play/join">Continue to join a room</Link>}
         <button className="button button-secondary" type="button" onClick={signOutClickACB} disabled={props.status === "loading"} aria-busy={props.status === "loading"}>
           {props.status === "loading" && <PushMark variant="loading" />}
           {props.status === "loading" ? "Signing out…" : "Sign out"}
@@ -51,7 +52,7 @@ export function LoginView(props) {
 
   return (
     <main className="login">
-      <a className="login-home-link" href="#/">Back to home</a>
+      <Link className="login-home-link" to="/">Back to home</Link>
       <h1 className="login-logo">
         <PushMark variant={props.user && props.status === "done" ? "success" : "static"} />
         PUSH/PULL

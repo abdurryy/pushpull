@@ -28,7 +28,7 @@ export const LobbyPresenter = observer(function LobbyPresenter(props) {
   }
 
   // The sign-in control is the login presenter's, like on the home screen, so the lobby never calls the auth service.
-  // Firebase signs in with a popup, so the host stays on #/tv and the auth listener updates the model here.
+  // Firebase signs in with a popup, so the host stays on /tv and the auth listener updates the model here.
   return (
     <LobbyView
       authChecked={props.model.authChecked}

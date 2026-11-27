@@ -1,5 +1,5 @@
-// Root component: navigation. Maps each route to its presenter. Hash routes (#/tv) work on any static host, like Firebase Hosting.
-import { createHashRouter, RouterProvider } from "react-router-dom";
+// Root component: navigation. Maps each route to its presenter. Plain paths (/tv) work because Firebase Hosting serves index.html for every route.
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { HomePresenter } from "./presenters/homePresenter.jsx";
 import { LobbyPresenter } from "./presenters/lobbyPresenter.jsx";
 import { LoginPresenter } from "./presenters/loginPresenter.jsx";
@@ -10,6 +10,26 @@ import { ControllerPresenter } from "./presenters/controllerPresenter.jsx";
 import { GalleryPresenter } from "./presenters/galleryPresenter.jsx";
 import { ProfilePresenter } from "./presenters/profilePresenter.jsx";
 
+// "#/play/join?code=K7M4" becomes "/play/join?code=K7M4". An old invite carried its room code inside the
+// fragment, so the query comes along to the new path.
+function hashAsPath() {
+  const target = new URL(window.location.hash.slice(1), window.location.origin);
+  return target.pathname + target.search;
+}
+
+// Links we shared before put the route in the fragment (/#/tv). Old bookmarks and invites keep working because
+// we turn them into a path (/tv). index.jsx calls this before the router reads the address.
+export function keepOldHashLinksWorking() {
+  if (window.location.hash.startsWith("#/")) {
+    window.history.replaceState(null, "", hashAsPath());
+  }
+  // An old link can also be opened while the app is already running. That only changes the fragment,
+  // which this router ignores, so load the path instead.
+  window.addEventListener("hashchange", function hashChangedACB() {
+    if (window.location.hash.startsWith("#/")) window.location.replace(hashAsPath());
+  });
+}
+
 function makeRouter({ model, roomModel, roomController }) {
   function loadJoinCodeACB({ request }) {
     const code = new URL(request.url).searchParams.get("code");
@@ -19,7 +39,7 @@ function makeRouter({ model, roomModel, roomController }) {
 
   const join = <JoinPresenter app={model} room={roomModel} />;
 
-  return createHashRouter([
+  return createBrowserRouter([
     { path: "/", element: <HomePresenter model={model} /> },
     { path: "/profile", element: <ProfilePresenter model={model} /> },
     { path: "/demo", element: <DemoPresenter model={model} /> },

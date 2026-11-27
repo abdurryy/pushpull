@@ -1,5 +1,6 @@
 // View: a landscape controller with a floating stick and four independent touch zones.
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import "./controllerView.css";
 
 const buttons = [
@@ -179,7 +180,7 @@ export function ControllerView({
     return (
       <main ref={screen} className="controller controller-unavailable">
         <p role="status">Your room is unavailable. Join a room and choose a team to use this controller.</p>
-        <a className="button" href="#/play/join">Go to room setup</a>
+        <Link className="button" to="/play/join">Go to room setup</Link>
       </main>
     );
   }
@@ -194,7 +195,7 @@ export function ControllerView({
       <p className="controller-portrait">Turn your phone sideways</p>
       {!active ? (
         <div className="controller-landscape controller-setup">
-          <a href={team ? "#/play/join" : "#/"}>{team ? "Back to room" : "Back to home"}</a>
+          <Link to={team ? "/play/join" : "/"}>{team ? "Back to room" : "Back to home"}</Link>
           <h1>{team ? "Room controller" : "Controller preview"}</h1>
           {team ? <p role="status">{roomStatus}</p> : <p>Try the stick and buttons on this phone.</p>}
           {mode === "fallback" ? (

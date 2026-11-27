@@ -1,4 +1,5 @@
 // View: shows the current Google account and offers sign-in or sign-out.
+import { Link } from "react-router-dom";
 import { AccountAvatar } from "./accountAvatar.jsx";
 import { AccountSignIn } from "./accountSignIn.jsx";
 import { PushMark } from "./pushMark.jsx";
@@ -45,7 +46,7 @@ export function ProfileView(props) {
 
   return (
     <main className="login">
-      <a className="login-home-link" href="#/">Back to home</a>
+      <Link className="login-home-link" to="/">Back to home</Link>
       <h1 className="login-logo"><PushMark />Your profile</h1>
       {renderContent()}
     </main>

@@ -25,16 +25,16 @@ npx playwright install chromium
 
 | Command | What it saves |
 |---|---|
-| `npm run shots -- "#/tv"` | Screenshots of one or more routes at small phone, phone, phone sideways, laptop and TV size |
+| `npm run shots -- "/tv"` | Screenshots of one or more routes at small phone, phone, phone sideways, laptop and TV size |
 | `npm run shots:controller` | The controller after "Enter controller", with the stick and buttons showing |
-| `npm run frames -- "#/components" --click="Team A eats" --selector=".gallery-board"` | Frames of an effect over time, plus one with reduced motion |
+| `npm run frames -- "/components" --click="Team A eats" --selector=".gallery-board"` | Frames of an effect over time, plus one with reduced motion |
 | `npm run frames:crash` | Frames of the crash on the gallery board |
 | `npm run sounds` | Every sound effect and music track as a WAV file, with loudness warnings |
 
 - `--sizes=laptop,tv` takes only the sizes you name (`phone-small`, `phone`, `phone-sideways`, `laptop`, `tv`). Pick the ones the screen is used at: every picture costs your agent tokens to read.
 - `--click="Button text"` presses a button before the picture. Repeat it to press several, in order.
 - `--name=<folder>` saves the run in its own folder. Without it, screenshots go in a folder named after the route and frames in one named after the button. Each run prints where its files are (the system temp folder, under `pushpull-screenshots`, `pushpull-frames` or `pushpull-audio`).
-- In Git Bash, a route like `"#/tv"` turns into a Windows path before the script sees it. Start the command with `MSYS_NO_PATHCONV=1`, or use PowerShell.
+- In Git Bash, a route like `"/tv"` turns into a Windows path before the script sees it. Start the command with `MSYS_NO_PATHCONV=1`, or use PowerShell.
 
 ## Git and pull requests
 

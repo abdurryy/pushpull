@@ -25,7 +25,7 @@ Read with it: `docs/design.md` (Game feel, Motion, Shared components) and `src/s
 
 1. design.md: the Game feel table and its rules, Motion, Shared components.
 2. `src/views/boardPainter.js`: the board's burst, swallow bulge, crash flash and shake are the house style for board effects. Copy their pattern: a function that gets the effect's age and draws it, fully visible for the first half, then fading. For effects outside the board, the `pop` keyframes in tokens.css and `scoreBar.css` are the pattern.
-3. Open `#/components` and press the board buttons to see the existing effects.
+3. Open `/components` and press the board buttons to see the existing effects.
 4. If the event is new, check with the model owner (README Team table) that the model will emit it (#27 is the game model).
 
 ## Step 2: Write the effect brief
@@ -79,7 +79,7 @@ A normal screenshot catches an effect at a random moment, or not at all. Capture
 
 ```
 npm run dev   # keeps running: start it in its own terminal or in the background first
-npm run frames -- "#/components" --click="Team A eats" --selector=".gallery-board"
+npm run frames -- "/components" --click="Team A eats" --selector=".gallery-board"
 ```
 
 It presses the button, then moves time forward exactly: Playwright's paused fake clock drives the canvas, and every CSS animation is paused at the same time. It saves frames at 0, 60, 120, 200, 300 and 450ms, then one frame with reduced motion. Use `--js="..."` to start an effect with a model action instead of a click, and `--times="0,100,200"` for other times. Frames land in the system temp folder under `pushpull-frames`, in a folder named after the button, or after `--name=<folder>`. `npm run frames:crash` captures the gallery's crash.
@@ -92,7 +92,7 @@ Open the frames and check:
 4. **Reduced motion:** nothing extra on screen, and the change itself (longer snake, new score) is still visible.
 5. **Next to the other effects:** this one is the right size for its event (eat smaller than crash, crash smaller than winning).
 
-If something fails, fix it and capture again. If you can't run a browser, say so and list what the developer should look at on `#/components`.
+If something fails, fix it and capture again. If you can't run a browser, say so and list what the developer should look at on `/components`.
 
 ## The noisy look: what to avoid
 

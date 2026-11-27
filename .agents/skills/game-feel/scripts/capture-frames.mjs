@@ -1,7 +1,7 @@
 // Dev tool (not app code): saves frames of an animation so an effect can be checked by eye, like a flipbook.
 // It presses a button (or runs a script), then moves time forward exactly: Playwright's fake clock drives canvas drawing
 // (requestAnimationFrame, performance.now) and every CSS animation is paused and moved to the same time before each picture.
-// Usage:  npm run frames -- "#/components" --click="Team A eats" --selector=".gallery-board"
+// Usage:  npm run frames -- "/components" --click="Team A eats" --selector=".gallery-board"
 // Options: --js="code to run instead of a click"  --times="0,60,120,200,300,450" (milliseconds)
 //          --name=crash saves this run in its own folder (default: named after the button)
 // Needs:  the dev server running (npm run dev) and Playwright's browser (see the ui-design skill, step 5).
@@ -25,7 +25,7 @@ function loadPlaywright() {
 
 // --name=value pairs, plus the route as the one argument without "--".
 function readArguments(args) {
-  const options = { route: "#/", click: "", js: "", selector: "", times: "0,60,120,200,300,450", name: "" };
+  const options = { route: "/", click: "", js: "", selector: "", times: "0,60,120,200,300,450", name: "" };
   for (const arg of args) {
     const match = arg.match(/^--(\w+)=(.*)$/);
     if (match) options[match[1]] = match[2];

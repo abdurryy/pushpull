@@ -1,4 +1,5 @@
 // View: introduces Push/Pull and lets visitors choose this device's role.
+import { Link } from "react-router-dom";
 import "./homeView.css";
 import { AccountSignIn } from "./accountSignIn.jsx";
 import { GameBoard } from "./gameBoard.jsx";
@@ -47,10 +48,10 @@ export function HomeView(props) {
     }
     if (props.user) {
       return (
-        <a className="button button-secondary" href="#/profile">
+        <Link className="button button-secondary" to="/profile">
           <span className="icon" aria-hidden="true">account_circle</span>
           View profile
-        </a>
+        </Link>
       );
     }
     return <AccountSignIn status={props.status} error={props.error} onSignIn={props.onSignIn} label="Sign in" secondary />;
@@ -77,25 +78,25 @@ export function HomeView(props) {
           </p>
 
           <nav className="home-choices" aria-label="Choose this device’s role">
-            <a className="button home-choice" href="#/tv">
+            <Link className="button home-choice" to="/tv">
               <span className="icon" aria-hidden="true">tv</span>
               <span className="home-choice-label">
                 Play on TV
                 <span className="home-choice-role">Shared board</span>
               </span>
-            </a>
-            <a className="button button-secondary home-choice" href="#/play/login">
+            </Link>
+            <Link className="button button-secondary home-choice" to="/play/login">
               <span className="icon" aria-hidden="true">smartphone</span>
               <span className="home-choice-label">
                 Use phone
                 <span className="home-choice-role">Your controller</span>
               </span>
-            </a>
+            </Link>
           </nav>
           <nav className="home-extras" aria-label="Demo and testing">
-            <a href="#/room">Host a room playtest</a>
-            <a href="#/demo">Keyboard demo</a>
-            <a href="#/components">Component gallery</a>
+            <Link to="/room">Host a room playtest</Link>
+            <Link to="/demo">Keyboard demo</Link>
+            <Link to="/components">Component gallery</Link>
           </nav>
         </section>
 

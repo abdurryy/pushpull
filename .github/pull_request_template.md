@@ -14,7 +14,7 @@ Closes #<!-- issue number -->
 
 ### Visual work
 <!-- Anything a player sees or hears. Write "none" on each line if nothing on screen or in the sound changed. -->
-- Route or scenario: <!-- e.g. #/components → Crash, or npm run shots:controller -->
+- Route or scenario: <!-- e.g. /components → Crash, or npm run shots:controller -->
 - Before / after: <!-- captures from npm run shots or npm run frames, dragged into this PR -->
 - Real devices: <!-- what you tried on a real phone or TV, e.g. "iPhone 13 Safari, sideways: stick and buttons". Or "none". -->
 

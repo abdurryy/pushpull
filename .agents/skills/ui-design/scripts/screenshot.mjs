@@ -1,5 +1,5 @@
 // Dev tool (not app code): saves screenshots of app routes at phone, laptop and TV sizes, so UI work can be checked by eye.
-// Usage:  npm run shots -- "#/tv" "#/play/login" [--js="myModel.findWeather()"]
+// Usage:  npm run shots -- "/tv" "/play/login" [--js="myModel.findWeather()"]
 // Options: --click="Enter controller" presses a button by its text first (repeat it for more, in order)
 //          --name=controller saves this run in its own folder (default: named after the first route)
 //          --sizes=laptop,tv takes only these sizes (default: all five, see SIZES)
@@ -48,7 +48,7 @@ function readArguments(args) {
       options.routes.push(arg);
     }
   }
-  if (options.routes.length === 0) options.routes.push("#/");
+  if (options.routes.length === 0) options.routes.push("/");
   return options;
 }
 
@@ -67,7 +67,7 @@ function pickSizes(text) {
   });
 }
 
-// "#/play/controller" becomes "play-controller", safe as a file or folder name.
+// "/play/controller" becomes "play-controller", safe as a file or folder name.
 function safeName(text) {
   return text.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() || "home";
 }
