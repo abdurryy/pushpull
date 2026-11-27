@@ -17,7 +17,9 @@ export function LoginView(props) {
           <AccountAvatar name={props.user.name} photoUrl={props.user.photoUrl} />
           <p className="login-text">Signed in as <strong>{props.user.name}</strong></p>
         </div>
-        <a className="button" href="#/play/join">Continue to join a room</a>
+        {props.host
+          ? <a className="button" href="#/room">Continue to host a room</a>
+          : <a className="button" href="#/play/join">Continue to join a room</a>}
         <button className="button button-secondary" type="button" onClick={signOutClickACB} disabled={props.status === "loading"} aria-busy={props.status === "loading"}>
           {props.status === "loading" && <PushMark variant="loading" />}
           {props.status === "loading" ? "Signing out…" : "Sign out"}
@@ -29,7 +31,7 @@ export function LoginView(props) {
   function renderSignedOut() {
     return (
       <div className="login-card">
-        <p className="login-text">Log in to keep your name, settings and stats.</p>
+        <p className="login-text">{props.host ? "Sign in to host the room playtest." : "Log in to keep your name, settings and stats."}</p>
         <AccountSignIn status={props.status} error={props.error} onSignIn={props.onSignIn} />
       </div>
     );

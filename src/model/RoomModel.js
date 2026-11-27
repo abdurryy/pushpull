@@ -9,6 +9,7 @@ const BUTTONS = ["dash", "ping", "shed", "hold"];
 export function makeRoomModel(sync, appModel) {
   const model = makeAutoObservable({
     available: sync.available,
+    codeInput: "",
     code: null,
     room: null,
     role: null,
@@ -21,11 +22,44 @@ export function makeRoomModel(sync, appModel) {
 
     get user() { return appModel.user; },
 
+    get side() { return this.room?.players?.[this.user?.uid]?.side; },
+
+    get teams() {
+      const teams = { a: [], b: [] };
+      for (const [id, player] of Object.entries(this.room?.players || {})) {
+        if (player.side === "a" || player.side === "b") {
+          teams[player.side].push({ id, name: player.name });
+        }
+      }
+      return teams;
+    },
+
+    get canStart() {
+      return this.role === "host" && this.connected && this.room?.hostOnline === true
+        && this.teams.a.length === 2 && this.teams.b.length === 2;
+    },
+
+    get steering() {
+      if (!this.connected || this.room?.hostOnline !== true) return [null, null, null, null];
+      const { a, b } = this.teams;
+      const inputs = this.room.inputs;
+      function stickFor(player) {
+        const stick = inputs?.[player?.id]?.stick;
+        return stick !== "idle" && STICKS.includes(stick) ? stick : null;
+      }
+      return [stickFor(a[0]), stickFor(a[1]), stickFor(b[0]), stickFor(b[1])];
+    },
+
+    setCodeInput(code) {
+      this.codeInput = code;
+      this.error = null;
+    },
+
     async createRoom() {
       await openRoom("host");
     },
 
-    async joinRoom(rawCode) {
+    async joinRoom(rawCode = this.codeInput) {
       const code = normalizeRoomCode(rawCode);
       if (!validRoomCode(code)) {
         this.setError(new Error("Enter a valid four-character room code."));
@@ -57,11 +91,14 @@ export function makeRoomModel(sync, appModel) {
     receiveRoom(room) {
       this.room = room;
       this.loading = false;
-      if (!room) this.error = "This room is no longer available.";
+      if (!room) {
+        this.inputReady = false;
+        this.error = "This room is no longer available.";
+      }
     },
 
     setError(error) {
-      this.error = error.message || "Room sync failed. Try again.";
+      this.error = !error.code && error.message ? error.message : "Room sync failed. Try again.";
       this.loading = false;
     },
 
@@ -79,6 +116,8 @@ export function makeRoomModel(sync, appModel) {
 
     pickSide(side) {
       if (!this.connected || this.role !== "player" || !this.room || !SIDES.includes(side)) return;
+      if (side === this.side || this.teams[side]?.length >= 2) return;
+      this.error = null;
       sync.setSide(this.code, this.user.uid, side).catch(reportRoomError());
     },
 
@@ -102,6 +141,23 @@ export function makeRoomModel(sync, appModel) {
       this.inputReady = false;
       this.stick = "idle";
       this.error = null;
+    },
+
+    async departRoom() {
+      if (!this.room || !this.user) {
+        this.leaveRoom();
+        return;
+      }
+      if (!this.connected || this.loading) return;
+      const { role, code, user } = this;
+      const request = this.beginRequest();
+      try {
+        if (role === "host") await sync.closeRoom(code);
+        else await sync.removePlayer(code, user.uid);
+        if (this.requestId === request) this.leaveRoom();
+      } catch (error) {
+        if (this.requestId === request) this.setError(error);
+      }
     },
   }, {}, { autoBind: true });
 
@@ -152,7 +208,7 @@ export function makeRoomModel(sync, appModel) {
   );
   const stopInput = reaction(
     function connectionAndRoomACB() { return [model.code, model.role, model.connected, model.user?.uid]; },
-    async function registerInputACB([code, role, connected, uid]) {
+    async function registerPresenceACB([code, role, connected, uid]) {
       const registration = ++inputRegistration;
       // Keep the last connected input location in case a queued write replays after reconnecting.
       if (!connected) return;
@@ -162,8 +218,12 @@ export function makeRoomModel(sync, appModel) {
         sync.clearInput(previousInput.code, uid).catch(reportRoomError());
       }
       previousInput = next;
-      if (!next) return;
       try {
+        if (code && role === "host") {
+          await sync.trackHostConnection(code);
+          return;
+        }
+        if (!next) return;
         // Schedule server cleanup before accepting movement, including after reconnecting.
         await sync.trackInputDisconnect(code, uid);
         if (registration !== inputRegistration) return;

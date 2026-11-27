@@ -36,7 +36,7 @@ Needs Node.js 22.12 or newer (Vite 8 requires it).
 
 Copy `.env.example` to `.env.local` and fill in the Firebase web config (Firebase console > Project settings > Your apps, or ask the team). `.env.local` is git-ignored; never commit the real values.
 
-Without Firebase config, the home and weather screens still work and sign-in shows a setup message. Sign in from the home page and choose **View profile** to see your account at `#/profile`. The phone sign-in screen still links to the join destination. Room codes and team selection are being built separately in #25.
+Without Firebase config, the home and weather screens still work and sign-in shows a setup message. Sign in from the home page and choose **View profile** to see your account at `#/profile`.
 
 ```sh
 npm install
@@ -49,6 +49,16 @@ Open http://localhost:8080 and pick **Use this screen as the TV**, or go straigh
 Tip: in the browser console, `myModel` shows the current application state.
 
 Building a screen? Open http://localhost:8080/#/components first: it shows every shared component (status lines, team chips and seats, room code boxes, score bar, countdown and the game board with its effects) in every state.
+
+### Room playtest
+
+On the host screen, choose **Host a room playtest**, sign in with Google, and create a room. On four phones, choose **Use phone**, sign in with four separate accounts, and enter the host's code. Put two players on each team and open their controllers. On the host, open the game board and start the round. Hold opposite directions on one team to stop its snake.
+
+For a local run, start the Firebase Auth and Realtime Database emulators with `npx firebase-tools emulators:start --project demo-pushpull --only auth,database`. Set `VITE_USE_FIREBASE_EMULATORS=true` in your shell before starting Vite. Open the app in separate browser profiles or contexts and use the emulator's mock Google accounts. The emulator flag applies only to the dev server and uses the local demo project.
+
+When a phone drops offline, its last direction becomes idle once Firebase detects the disconnect. A player can leave the room to free their seat. Closing the room from the host lobby gives players a link back to room setup.
+
+For the hosted playtest, publish the matching Realtime Database rules from `main` with `npx firebase-tools deploy --only database --project pushpull-1df2e`. The Hosting workflow publishes the web build.
 
 ### Double Snake rules tests
 
@@ -115,6 +125,7 @@ _Required in the mid-project review._
 - Account profile (`#/profile`): shows the current Google account and lets the player sign out
 - Local Double Snake demo: shared keyboard, two teams, apples, eight Lucky Box outcomes, crashes, timer and replay. Open it from the TV weather screen or the homepage.
 - Firebase project and Google sign-in on the phone (`#/play/login`)
+- Room-code playtest with four signed-in phone controllers and the shared Double Snake board
 - Game feel and sound designed in design.md: the picture, sound and phone buzz for every game event
 - Shared View components for the next screens (status lines, team seats, room code boxes, score bar, countdown, game board), shown in every state on `#/components`
 - Sound effects for every game event and music for the lobby, round, trivia and results, made in code with the Web Audio API
@@ -124,7 +135,7 @@ _Required in the mid-project review._
 
 **Planned**
 - MobX model with the game rules, plus per-user persistence in Firebase
-- Screens on the phone: room joining, controller, profile settings and stats
+- Screens on the phone: full room join flow, controller actions, profile settings and stats
 - Screens on the TV: lobby, game board, round results
 - First user test with paper controllers
 
