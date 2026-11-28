@@ -270,19 +270,40 @@ async function playOnPhones(players, signal) {
   });
 }
 
-async function leavePlayer(phone) {
+async function confirmPhoneAccount(phone, uid) {
+  await phone.waitForFunction(function checkedACB() { return window.myModel?.authChecked === true; });
+  const currentUid = await phone.evaluate(function accountACB() { return window.roomModel.user?.uid; });
+  assert.equal(currentUid, uid, "The original test account must be signed in to release its seat.");
+}
+
+async function leavePlayer({ phone, uid }, inviteUrl, code) {
   await phone.mouse.up();
-  const { pathname } = new URL(phone.url());
   // The controller link added a history entry. Going back keeps the joined room in memory.
-  if (pathname === "/play/room-controller") await phone.goBack();
-  else if (pathname !== "/play/join") throw new Error(`Could not confirm the seat was released from ${pathname}.`);
+  if (new URL(phone.url()).pathname === "/play/room-controller") await phone.goBack();
   const leave = phone.getByRole("button", { name: "Leave room" });
-  const joinForm = phone.getByRole("button", { name: /^(Join room|Try again)$/ }).and(phone.locator(":enabled"));
-  await leave.or(joinForm).first().waitFor();
-  if (await leave.isVisible()) {
-    await leave.tap();
-    await expectRoomResult(phone, joinForm);
-  } else if (await joinForm.innerText() !== "Try again") throw new Error("Could not confirm the test seat was released.");
+  const joinForm = phone.getByRole("button", { name: /^(Join room|Try again)$/ });
+  const onJoin = new URL(phone.url()).pathname === "/play/join";
+  if (onJoin) {
+    await confirmPhoneAccount(phone, uid);
+    await leave.or(joinForm).first().waitFor();
+  }
+  if (!onJoin || !(await leave.isVisible())) {
+    // A reload or a failed input registration can hide the join state while Firebase still holds the seat.
+    await phone.goto(inviteUrl);
+    await confirmPhoneAccount(phone, uid);
+    await phone.getByRole("button", { name: "Join room", exact: true }).tap();
+    const error = phone.getByRole("alert");
+    await leave.or(error).first().waitFor();
+    if (!(await leave.isVisible())) {
+      const reason = await error.innerText();
+      // The server checks existing membership before rejecting a full or reserved room.
+      if (reason.startsWith(`No room with code ${code}.`) || reason.startsWith("This room is full.")
+        || reason.startsWith("The host is testing this room.")) return;
+      throw new Error(`Could not confirm the test seat was released. ${reason}`);
+    }
+  }
+  await leave.tap();
+  await expectRoomResult(phone, joinForm.and(phone.locator(":enabled")));
 }
 
 async function saveFailure(players) {
@@ -319,6 +340,7 @@ async function signInPhones(browser, baseUrl, hosted, startedAt, ask) {
       const uid = await phone.evaluate(function accountACB() { return window.roomModel.user?.uid; });
       assert.ok(uid && !usedAccounts.has(uid), "Each seat needs its own signed-in test account.");
       usedAccounts.add(uid);
+      player.uid = uid;
     });
     players.push(player);
   }
@@ -361,7 +383,9 @@ async function playOperatorRoom(browser, baseUrl, { code, hosted, headed }, sign
   }
 
   try {
-    await runForPhones(attemptingJoin, function leaveCB() { return "Release input and leave room"; }, leavePlayer);
+    const inviteUrl = new URL(invite, baseUrl).href;
+    await runForPhones(attemptingJoin, function leaveCB() { return "Release input and leave room"; },
+      function leaveACB(phone, index) { return leavePlayer(attemptingJoin[index], inviteUrl, code); });
   } catch (error) {
     if (!failure) await saveFailure(players).catch(function reportACB(diagnosticError) { console.error(diagnosticError.message); });
     throw new AggregateError([failure, error].filter(Boolean), `Could not confirm that every test player left room ${code}.`);
