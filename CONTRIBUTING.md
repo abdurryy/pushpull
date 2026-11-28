@@ -72,6 +72,14 @@ When all four phones are ready, choose **Open game board** and **Start round** o
 
 Press Ctrl+C to stop a run early. The runner releases the sticks and uses **Leave room** on the test phones so you can reuse the seats. If a phone cannot confirm that it left, the runner reports the cleanup failure. On failures after playtest recording begins, the terminal prints a temporary folder containing per-phone PNGs and Playwright trace ZIPs. Open a trace locally with `npx playwright show-trace <path-to-zip>`. Recording starts after sign-in. Keep the files private because they can contain room and session data.
 
+### Run scripted players from the app
+
+Keep an empty TV room open at `/room`. In a second tab on the same site, open `/test-suite` while signed in with the TV host's account. Paste the room code and choose **Run test**. The TV opens the board and starts the round. Watch both teams cancel their inputs, move together, then finish with a Team B win at 0–1. The panel shows the result and releases the test seats. **Stop test** also releases them and keeps the room open.
+
+For local testing, start the Auth and Realtime Database emulators and run Vite with `VITE_USE_FIREBASE_EMULATORS=true`. In the Emulator UI, set `roomTesters/<host-auth-uid>` to the boolean `true` in the Realtime Database. Use the mock TV account's UID from the Authentication tab. Run the rules check with `node test/roomTestSuite.emulator.mjs` while the emulators are running.
+
+For a deployed build, publish the matching `database.rules.json` using the team's Firebase rules deployment workflow. A Firebase administrator can grant or revoke access by setting or removing the same boolean entry for a teammate's Auth UID in the deployed database. The browser cannot grant access, and even a tester can only operate their own empty rooms.
+
 ## Git and pull requests
 
 `main` is protected (see [Repo setup](#repo-setup-once-by-the-repo-owner)). You can't push to it directly, force-push it or delete it. Every change follows the same path: **issue → branch → pull request → review → auto-merge.**
