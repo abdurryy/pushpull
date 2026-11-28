@@ -29,7 +29,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .image-skeleton[data-state="ready"] .image-skeleton-placeholder {
-    animation: image-skeleton-reveal calc(var(--duration) * 3) ease-in-out both;
+    animation: image-skeleton-reveal var(--duration-fast) var(--ease-out) both;
   }
 
   .image-skeleton-placeholder::after {

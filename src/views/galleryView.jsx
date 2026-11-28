@@ -76,7 +76,7 @@ const TRACKS = ["lobby", "round", "trivia", "results"];
 const AYA = { id: "u1", name: "Aya" };
 const BO = { id: "u2", name: "Bo" };
 const LONG_NAME = { id: "u3", name: "Maximiliana Oxenstierna" };
-const IMAGE_PREVIEW_DELAY_MS = 1500;
+const IMAGE_PREVIEW_DELAY_MS = 350;
 
 export function GalleryView() {
   const soundHeading = useRef(null);
