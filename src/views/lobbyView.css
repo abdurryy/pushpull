@@ -175,16 +175,40 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-6);
-  min-height: calc(var(--hit-min) * 1.5);
-  font-size: var(--tv-title);
+  min-height: var(--hit-min);
 }
 
-.lobby-next .recovery-message .status-message { font-size: var(--tv-text); }
+.lobby-next > .status-message {
+  overflow-wrap: anywhere;
+}
 
-.lobby-next .button {
+/* The wordmark in the rail already identifies the lobby during routine readiness updates. */
+.lobby-next .status-message-waiting .push-mark,
+.lobby-next .status-message-success .push-mark {
+  display: none;
+}
+
+.lobby-next > .button,
+.lobby-actions {
   flex: none;
-  min-height: calc(var(--hit-min) * 1.5);
-  padding-inline: var(--space-6);
+}
+
+.lobby-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.lobby-actions > .button-text {
+  padding-inline: var(--space-4);
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .lobby-actions > .button-text:hover:not(:disabled) {
+    background: var(--color-sunken);
+    text-decoration: none;
+  }
 }
 
 /* Sign-in: the button where Create room will be, with the failed sign-in in words under it. */
@@ -194,10 +218,9 @@
   gap: var(--space-3);
 }
 
-/* The reason a sign-in failed is a whole sentence, so it drops to the TV body size and wraps. */
+/* Keep a wrapped sign-in error aligned with its first line. */
 .lobby-signin .status-message {
   justify-items: start;
   max-width: 28em;
-  font-size: var(--tv-text);
   text-align: start;
 }

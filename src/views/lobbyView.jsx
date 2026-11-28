@@ -161,11 +161,13 @@ export function LobbyView(props) {
     return (
       <>
         {status}
-        <CloseRoomButton disabled={props.closing || !props.connected} onCloseRoom={props.onCloseRoom} />
-        <button className="button" type="button" onClick={startRoundACB}
-          disabled={Boolean(props.startBlockedReason) || props.roundStarting} aria-busy={props.roundStarting}>
-          Start round
-        </button>
+        <div className="lobby-actions">
+          <CloseRoomButton disabled={props.closing || !props.connected} onCloseRoom={props.onCloseRoom} />
+          <button className="button" type="button" onClick={startRoundACB}
+            disabled={Boolean(props.startBlockedReason) || props.roundStarting} aria-busy={props.roundStarting}>
+            Start round
+          </button>
+        </div>
       </>
     );
   }
