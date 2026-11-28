@@ -1,0 +1,17 @@
+/* View styles: keep the title, reason and recovery action together. */
+.recovery-message {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  text-align: start;
+}
+
+.recovery-message .recovery-title {
+  margin: 0;
+  font: var(--weight-display) var(--recovery-title-size, var(--text-title)) / 1.15 var(--font-display);
+  text-wrap: balance;
+}
+
+.recovery-message .status-message { max-inline-size: 42ch; }
+.recovery-message > .button { margin-block-start: var(--space-2); }

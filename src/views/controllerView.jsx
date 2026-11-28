@@ -1,7 +1,7 @@
 // View: a landscape controller with a floating stick and four independent touch zones.
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { StatusMessage } from "./statusMessage.jsx";
+import { RecoveryMessage } from "./recoveryMessage.jsx";
 import { TeamChip } from "./teamChip.jsx";
 import "./controllerView.css";
 
@@ -244,20 +244,31 @@ export function ControllerView({
     setMode("active");
   }
   if (unavailable || hostAway) {
+    let recovery = {
+      title: "Controller unavailable",
+      reason: "Join a room and choose a team to use the controller.",
+      action: "Join a room",
+    };
+    if (hostAway) {
+      recovery = {
+        title: "TV disconnected",
+        reason: "You can keep playing when the host reconnects.",
+        kind: "waiting",
+        action: "Back to room",
+      };
+    } else if (closedRoomCode) {
+      recovery = {
+        title: "Room closed",
+        reason: "The host closed room " + closedRoomCode + ".",
+        kind: "empty",
+        action: "Join another room",
+      };
+    }
     return (
       <main ref={screen} className="controller controller-unavailable">
-        {hostAway ? (
-          <StatusMessage kind="waiting">The TV lost its connection. Waiting for the host to reconnect…</StatusMessage>
-        ) : (
-          <p role="status">
-            {closedRoomCode
-              ? "The host closed room " + closedRoomCode + "."
-              : "Your room is unavailable. Join a room and choose a team to use this controller."}
-          </p>
-        )}
-        <Link className="button" to="/play/join">
-          {hostAway ? "Back to room" : closedRoomCode ? "Join another room" : "Go to room setup"}
-        </Link>
+        <RecoveryMessage as="h1" title={recovery.title} reason={recovery.reason} kind={recovery.kind}>
+          <Link className="button" to="/play/join">{recovery.action}</Link>
+        </RecoveryMessage>
       </main>
     );
   }

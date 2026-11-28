@@ -1,5 +1,6 @@
 /* View styles: a portrait join flow with a full-width next action. */
 .join {
+  --recovery-title-size: var(--text-hero);
   box-sizing: border-box;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -43,6 +44,8 @@
 .join-heading {
   gap: var(--space-2);
 }
+
+.join .recovery-message h2 { font-size: var(--text-title); }
 
 .join h1,
 .join-context,

@@ -170,6 +170,7 @@
 
 /* The next step: status in words on the left, the one primary button on the right. */
 .lobby-next {
+  --recovery-title-size: var(--tv-title);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -177,6 +178,8 @@
   min-height: calc(var(--hit-min) * 1.5);
   font-size: var(--tv-title);
 }
+
+.lobby-next .recovery-message .status-message { font-size: var(--tv-text); }
 
 .lobby-next .button {
   flex: none;

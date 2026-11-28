@@ -4,13 +4,15 @@ import { RoomView } from "../views/roomView.jsx";
 import { DemoPresenter } from "./demoPresenter.jsx";
 import { demoModel } from "../model/DemoModel.js";
 
-export const RoomPresenter = observer(function RoomPresenter({ app, room, board }) {
+export const RoomPresenter = observer(function RoomPresenter({ app, room, board, modeUnavailable }) {
   const active = room.role === "host" && Boolean(room.room);
 
-  if (board && active) return <DemoPresenter model={app} room={room} />;
+  if (board && active && !modeUnavailable) return <DemoPresenter model={app} room={room} />;
 
   return (
     <RoomView
+      gameUnavailable={board && app.authChecked && !active && !room.loading}
+      modeUnavailable={modeUnavailable}
       authChecked={app.authChecked}
       userId={app.user?.uid}
       available={room.available}

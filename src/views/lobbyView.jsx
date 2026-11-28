@@ -4,6 +4,7 @@ import QRCode from "react-qr-code";
 import { Link } from "react-router-dom";
 import { CloseRoomButton } from "./closeRoomButton.jsx";
 import { PushMark } from "./pushMark.jsx";
+import { RecoveryMessage } from "./recoveryMessage.jsx";
 import { RoomCode } from "./roomCode.jsx";
 import { TeamRoster } from "./teamRoster.jsx";
 import { StatusMessage } from "./statusMessage.jsx";
@@ -130,11 +131,16 @@ export function LobbyView(props) {
       );
     }
     if (!props.roomsAvailable) {
-      return <StatusMessage kind="error">Rooms aren't set up on this copy of Push/Pull.</StatusMessage>;
+      return (
+        <>
+          <RecoveryMessage title="Rooms unavailable" reason="This copy of Push/Pull can't connect to rooms." />
+          <Link className="button" to="/">Back to home</Link>
+        </>
+      );
     }
     let status = <StatusMessage kind="empty">Create a room, then everyone joins on their phone.</StatusMessage>;
     if (props.creating) status = <StatusMessage kind="loading">Creating your room…</StatusMessage>;
-    else if (props.roomError) status = <StatusMessage kind="error">{props.roomError}</StatusMessage>;
+    else if (props.roomError) status = <RecoveryMessage title="Couldn't open room" reason={props.roomError} />;
     return (
       <>
         {status}

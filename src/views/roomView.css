@@ -9,6 +9,11 @@
   padding: var(--space-5) var(--space-4);
 }
 
+.room-game-recovery {
+  min-block-size: 100svh;
+  align-content: safe center;
+}
+
 .room h1,
 .room p {
   margin: 0;
@@ -38,9 +43,15 @@
 
 @media (min-width: 60rem) and (orientation: landscape) {
   .room-host {
+    --recovery-title-size: var(--tv-title);
     max-width: none;
     padding: min(var(--tv-safe), 5svh) var(--tv-safe);
     font-size: var(--tv-text);
+  }
+
+  .room-game-recovery {
+    --recovery-title-size: var(--tv-score);
+    font-size: var(--tv-title);
   }
 
   .room-host h1 { font-size: var(--tv-title); }
