@@ -113,19 +113,15 @@ The image skeleton uses `--color-sunken` for the warm fill and `--color-bg` for 
 
 ### Animated push mark
 
-Use `PushMark` from `src/views/pushMark.jsx` alongside a visible heading or status message. The two arrows, loading ring, search beam and round-start traces use `--color-ink`. The success halo and error spark use the status palette. The SVG is decorative. With reduced motion, every variant renders as the static two-arrow mark.
+Use `PushMark` from `src/views/pushMark.jsx` in the app wordmark and at round start. The SVG is decorative, and the two arrows and round-start traces use `--color-ink`. With reduced motion, the mark stays static.
 
 | Variant | Motion | Use |
 |---|---|---|
+| `static` | None | Alongside the Push/Pull wordmark |
 | `entry` | Arrows glide together with a brief glint | On entering the homepage |
-| `loading` | Arrows separate and meet, with a pulse at the join | While checking a session or signing in or out |
-| `searching` | A scan sweeps across the mark | While looking up weather |
-| `success` | Arrows snap into place with a green halo | After signing in |
-| `failure` | Arrows shake apart with a red split | Beside the login or weather error |
-| `waiting` | Arrows separate briefly around three dots | While the join screen checks the session, and later while waiting in the lobby |
-| `game-start` | The outlines trace before the arrows fill | When the TV lobby starts a round (issue #24) |
+| `game-start` | The outlines trace before the arrows fill | When the Double Snake round starts |
 
-Loading and searching repeat only while the request is pending. The other variants play once per appearance. Start the round and enable controls on their normal schedule, independently of the animation.
+Start the round and enable controls on their normal schedule, independently of the animation.
 
 ## Game feel
 
@@ -209,10 +205,11 @@ All roles have at least `--hit-min` height (48px), a keyboard focus ring and imm
 
 **Score bar (TV).** A full-width bar on top, in `--font-display` 800 for scores and `--font-numbers` for the timer.
 
-**Loading, empty and error.** Every View that shows data has all three, plus content:
-- **Loading:** an animated push mark plus a sentence saying what is loading ("Checking the weather in Stockholm…"). The rest of the screen stays usable (a course requirement).
-- **Empty:** what's missing and what to do ("No games yet. Join a room to play your first one.").
-- **Error:** what went wrong and a button to try again. `StatusMessage` places the text-style retry button below the message. Use `--color-error` for the message, never for the whole screen.
+**Status messages** use plain text for loading, waiting, searching, empty, success and error states. Write what is happening or what the player can do. Keep the rest of the screen usable while a request is pending.
+
+- **Loading** can read “Checking the weather in Stockholm…”. A pending button can use a label such as “Signing in…”.
+- **Empty** can read “No games yet. Join a room to play your first one.”
+- **Error** explains what went wrong. `StatusMessage` places the optional retry button below the message and aligns it with the text. Use `--color-error` for the message.
 
 ### Shared components
 

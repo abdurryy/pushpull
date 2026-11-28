@@ -18,9 +18,6 @@
   text-wrap: pretty;
 }
 
-/* The heading already identifies the state in words. */
-.recovery-message .push-mark { display: none; }
-
 .recovery-panel {
   box-sizing: border-box;
   inline-size: 100%;

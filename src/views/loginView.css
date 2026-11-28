@@ -19,10 +19,7 @@
   color: var(--color-ink);
 }
 
-.login-logo {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
+.profile-title {
   margin: 0;
   font-family: var(--font-display);
   font-weight: var(--weight-display);

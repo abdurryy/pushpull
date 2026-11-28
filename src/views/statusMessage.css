@@ -1,21 +1,14 @@
 /* View styles: status lines. Sizes follow the parent's font size, so the same line works on a phone and a TV. */
 .status-message {
-  --status-mark-width: 1.5em;
   display: grid;
   justify-items: start;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
 }
 
 .status-message-text {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-2);
   margin: 0;
-}
-
-.status-message-text .push-mark {
-  width: var(--status-mark-width);
-  height: calc(var(--status-mark-width) / 2);
-  margin-block-start: calc((1lh - var(--status-mark-width) / 2) / 2);
 }
 
 .status-message-loading,
@@ -27,7 +20,3 @@
 
 .status-message-success { color: var(--color-success); }
 .status-message-error { color: var(--color-error); }
-
-.status-message-retry {
-  margin-inline-start: calc(var(--status-mark-width) + var(--space-2));
-}

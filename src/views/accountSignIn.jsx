@@ -1,5 +1,4 @@
 // View component: Google sign-in and its feedback, shared by the account entry points.
-import { PushMark } from "./pushMark.jsx";
 import { StatusMessage } from "./statusMessage.jsx";
 
 const ERROR_MESSAGES = {
@@ -24,7 +23,7 @@ export function AccountSignIn({ status, error, onSignIn, secondary = false, labe
   return (
     <>
       <button className={buttonClass} type="button" onClick={signInClickACB} disabled={pending} aria-busy={pending}>
-        {pending ? <PushMark variant="loading" /> : <span className="icon" aria-hidden="true">login</span>}
+        {!pending && <span className="icon" aria-hidden="true">login</span>}
         {pending ? "Signing in…" : label}
       </button>
       {status === "error" && (

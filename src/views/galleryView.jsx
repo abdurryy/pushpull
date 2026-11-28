@@ -231,14 +231,14 @@ export function GalleryView() {
       </header>
 
       <section className="gallery-section" aria-labelledby="gallery-status">
-        <h2 id="gallery-status">StatusMessage</h2>
+        <h2 id="gallery-status">Status messages</h2>
         <StatusMessage kind="loading">Joining room K7M4…</StatusMessage>
         <StatusMessage kind="waiting">Waiting for 2 more players…</StatusMessage>
         <StatusMessage kind="searching">Checking the weather in Stockholm…</StatusMessage>
         <StatusMessage kind="empty">No games yet. Join a room to play your first one.</StatusMessage>
         <StatusMessage kind="success">You're in. Pick a team.</StatusMessage>
         <StatusMessage kind={retryKind} onRetry={retryACB}>
-          {retryKind === "error" ? "Couldn't reach the room. Check your connection." : "Trying again…"}
+          {retryKind === "error" ? "Couldn't reach the room. Check your internet connection before you try again." : "Trying again…"}
         </StatusMessage>
       </section>
 

@@ -33,7 +33,6 @@ export function LoginView(props) {
           </Link>
         )}
         <button className="button button-text login-sign-out" type="button" onClick={signOutClickACB} disabled={busy} aria-busy={busy}>
-          {busy && <PushMark variant="loading" />}
           {busy ? "Signing out…" : "Sign out"}
         </button>
       </>

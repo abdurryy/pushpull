@@ -10,49 +10,20 @@ The same shape as the weather status in `lobbyView.jsx`: one function picks what
 function renderContent() {
   if (props.status === "loading") {
     return (
-      <p className="xxx-status" role="status">
-        <PushMark variant="loading" />
-        Joining room {props.code}…
-      </p>
+      <StatusMessage kind="loading">Joining room {props.code}…</StatusMessage>
     );
   }
   if (props.status === "error") {
     return (
-      <div className="xxx-error">
-        <p className="xxx-status" role="alert">
-          <PushMark variant="failure" />
-          Couldn't join the room. Check the code and try again.
-        </p>
-        <button className="xxx-button xxx-button-secondary" type="button" onClick={retryACB}>Try again</button>
-      </div>
+      <StatusMessage kind="error" onRetry={retryACB}>
+        Couldn't join the room. Check the code and try again.
+      </StatusMessage>
     );
   }
   if (props.players.length === 0) {
-    return <p className="xxx-empty">No players yet. Scan the code with your phone to join.</p>;
+    return <StatusMessage kind="empty">No players yet. Scan the code with your phone to join.</StatusMessage>;
   }
   return renderPlayers();
-}
-```
-
-```css
-.xxx-status {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin: 0;
-}
-
-.xxx-error {
-  display: grid;
-  justify-items: start;
-  gap: var(--space-3);
-}
-
-.xxx-error .xxx-status { color: var(--color-error); }
-
-.xxx-empty {
-  margin: 0;
-  color: var(--color-muted);
 }
 ```
 

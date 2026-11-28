@@ -2,7 +2,6 @@
 import { Link } from "react-router-dom";
 import { AccountAvatar } from "./accountAvatar.jsx";
 import { AccountSignIn } from "./accountSignIn.jsx";
-import { PushMark } from "./pushMark.jsx";
 import { StatusMessage } from "./statusMessage.jsx";
 import "./loginView.css";
 
@@ -36,7 +35,6 @@ export function ProfileView(props) {
           </div>
         </div>
         <button className="button button-secondary" type="button" onClick={signOutClickACB} disabled={pending} aria-busy={pending}>
-          {pending && <PushMark variant="loading" />}
           {pending ? "Signing out…" : "Sign out"}
         </button>
         {props.status === "error" && <StatusMessage kind="error">Signing out didn't work. Try again.</StatusMessage>}
@@ -47,7 +45,7 @@ export function ProfileView(props) {
   return (
     <main className="login">
       <Link className="login-home-link" to="/">Back to home</Link>
-      <h1 className="login-logo"><PushMark />Your profile</h1>
+      <h1 className="profile-title">Your profile</h1>
       {renderContent()}
     </main>
   );
