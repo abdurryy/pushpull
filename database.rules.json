@@ -1,5 +1,8 @@
 {
   "rules": {
+    "roomTesters": {
+      "$uid": { ".read": "auth != null && auth.uid == $uid" }
+    },
     "rooms": {
       "$code": {
         ".read": "auth != null",
@@ -19,6 +22,20 @@
           ".write": "auth != null && root.child('rooms').child($code).child('meta/hostUid').val() == auth.uid && root.child('rooms').child($code).child('meta/expiresAt').val() > now && newData.exists()",
           ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9-]{36}$/)"
         },
+        "testRun": {
+          ".write": "auth != null && root.child('rooms').child($code).child('meta/hostUid').val() == auth.uid && (!newData.exists() || (root.child('roomTesters').child(auth.uid).val() == true && root.child('rooms').child($code).child('meta/expiresAt').val() > now && root.child('rooms').child($code).child('hostOnline').val() == true && !newData.parent().child('players').exists() && !newData.parent().child('seats').exists() && ((data.exists() && newData.child('id').val() == data.child('id').val() && newData.child('expiresAt').val() == data.child('expiresAt').val() && data.child('live').child(data.child('id').val()).val() == true) || (newData.child('phase').val() == 'ready' && newData.child('live').child(newData.child('id').val()).val() == true && (!data.exists() || data.child('expiresAt').val() <= now || data.child('phase').val() == 'passed' || data.child('phase').val() == 'failed' || !data.child('live').child(data.child('id').val()).exists())))))",
+          ".validate": "newData.hasChildren(['id', 'expiresAt', 'phase'])",
+          "id": { ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9-]{36}$/)" },
+          "expiresAt": { ".validate": "newData.isNumber() && newData.val() > now && newData.val() <= now + 120000" },
+          "phase": { ".validate": "newData.val() == 'ready' || newData.val() == 'cancelling' || newData.val() == 'moving' || newData.val() == 'finishing' || newData.val() == 'passed' || newData.val() == 'failed'" },
+          "live": {
+            "$id": {
+              ".write": "auth != null && !newData.exists() && root.child('rooms').child($code).child('meta/hostUid').val() == auth.uid",
+              ".validate": "$id == newData.parent().parent().child('id').val() && newData.val() == true"
+            }
+          },
+          "$other": { ".validate": false }
+        },
         "seats": {
           "$seat": {
             ".write": "auth != null && $seat.matches(/^s[1-4]$/) && root.child('rooms').child($code).child('meta/expiresAt').val() > now && ((!data.exists() && newData.val() == auth.uid && newData.parent().parent().child('players').child(auth.uid).child('seat').val() == $seat) || (data.val() == auth.uid && !newData.exists() && !newData.parent().parent().child('players').child(auth.uid).exists()))"
@@ -26,7 +43,7 @@
         },
         "players": {
           "$uid": {
-            ".write": "auth != null && auth.uid == $uid && root.child('rooms').child($code).child('meta/expiresAt').val() > now && (newData.exists() || !newData.parent().parent().child('seats').child(data.child('seat').val()).exists())",
+            ".write": "auth != null && auth.uid == $uid && root.child('rooms').child($code).child('meta/expiresAt').val() > now && (newData.exists() || !newData.parent().parent().child('seats').child(data.child('seat').val()).exists()) && (data.exists() || !root.child('rooms').child($code).child('testRun').exists() || root.child('rooms').child($code).child('testRun/expiresAt').val() <= now || root.child('rooms').child($code).child('testRun/phase').val() == 'passed' || root.child('rooms').child($code).child('testRun/phase').val() == 'failed' || !root.child('rooms').child($code).child('testRun/live').child(root.child('rooms').child($code).child('testRun/id').val()).exists())",
             ".validate": "newData.hasChildren(['name', 'side', 'seat'])",
             "seat": { ".validate": "newData.isString() && newData.val().matches(/^s[1-4]$/) && (!data.exists() || data.val() == newData.val()) && newData.parent().parent().parent().child('seats').child(newData.val()).val() == $uid" },
             "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80" },

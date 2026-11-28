@@ -1,6 +1,7 @@
 // Model: tracks an active room and routes room operations through the persistence service.
 import { makeAutoObservable, reaction, runInAction } from "mobx";
-import { normalizeRoomCode, validRoomCode } from "../persistence/roomSync.js";
+import { activeRoomTest, normalizeRoomCode, validRoomCode } from "../persistence/roomSync.js";
+import { TEST_TEAMS } from "./roomTestScenario.js";
 
 const SIDES = ["a", "b", "center"];
 const STICKS = ["idle", "up", "down", "left", "right"];
@@ -33,6 +34,7 @@ export function makeRoomModel(sync, appModel) {
     hostRecovery: null,
     stick: "idle",
     requestId: 0,
+    testTime: Date.now(),
     // Set when the host starts a round. The game board (#28) takes over from here.
     roundStarting: false,
 
@@ -45,8 +47,11 @@ export function makeRoomModel(sync, appModel) {
       return !this.connected || this.room?.hostOnline !== true || this.hostRecovery === "connecting";
     },
 
+    get activeTest() { return activeRoomTest(this.room, this.testTime); },
+
     // The room's players grouped by the side they picked, in seat order: { a, b, center }.
     get teams() {
+      if (this.activeTest) return TEST_TEAMS;
       const teams = { a: [], b: [], center: [] };
       const players = this.room?.players || {};
       function toPlayerCB(uid) {
@@ -172,6 +177,15 @@ export function makeRoomModel(sync, appModel) {
       }
       this.room = room;
       this.finishHostRecovery();
+      this.updateTestTime();
+    },
+
+    updateTestTime() { this.testTime = Date.now(); },
+
+    reportTestPhase(id, phase) {
+      if (this.role === "host" && this.activeTest?.id === id) {
+        sync.setTestPhase(this.code, id, phase).catch(reportRoomError());
+      }
     },
 
     setError(error) {
@@ -313,6 +327,14 @@ export function makeRoomModel(sync, appModel) {
       stopRoom = code ? sync.watchRoom(code, model.receiveRoom, reportRoomError()) : null;
     },
   );
+  let testExpiry;
+  const stopTestExpiry = reaction(
+    function expiryACB() { return model.room?.testRun?.expiresAt; },
+    function scheduleExpiryACB(expiresAt) {
+      clearTimeout(testExpiry);
+      if (expiresAt) testExpiry = setTimeout(model.updateTestTime, Math.max(0, expiresAt - Date.now()));
+    },
+  );
   const stopInput = reaction(
     function connectionAndRoomACB() {
       const hostOnline = model.role === "player" ? model.room?.hostOnline : undefined;
@@ -365,6 +387,8 @@ export function makeRoomModel(sync, appModel) {
       stopConnection();
       stopRoom?.();
       stopRoomReaction();
+      stopTestExpiry();
+      clearTimeout(testExpiry);
       stopAuth();
       stopInput();
       inputRegistration += 1;

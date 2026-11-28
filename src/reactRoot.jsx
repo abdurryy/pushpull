@@ -1,5 +1,6 @@
 // Root component: navigation. Maps each route to its presenter. Plain paths (/tv) work because Firebase Hosting serves index.html for every route.
 import { createBrowserRouter, RouterProvider, useSearchParams } from "react-router-dom";
+import { reaction } from "mobx";
 import { HomePresenter } from "./presenters/homePresenter.jsx";
 import { LobbyPresenter } from "./presenters/lobbyPresenter.jsx";
 import { LoginPresenter } from "./presenters/loginPresenter.jsx";
@@ -10,6 +11,8 @@ import { ControllerPresenter } from "./presenters/controllerPresenter.jsx";
 import { GalleryPresenter } from "./presenters/galleryPresenter.jsx";
 import { ProfilePresenter } from "./presenters/profilePresenter.jsx";
 import { NotFoundView } from "./views/notFoundView.jsx";
+import { TestSuitePresenter } from "./presenters/testSuitePresenter.jsx";
+import { demoModel } from "./model/DemoModel.js";
 
 // "#/play/join?code=K7M4" becomes "https://pushpull.live/play/join?code=K7M4". An old invite carried its room
 // code inside the fragment, so the query comes along to the new address.
@@ -42,7 +45,7 @@ function PhoneLoginRoute({ model }) {
   return <LoginPresenter model={model} joinSearch={joinSearch} />;
 }
 
-function makeRouter({ model, roomModel, roomController }) {
+function makeRouter({ model, roomModel, roomController, testSuiteModel }) {
   function loadJoinCodeACB({ request }) {
     const code = new URL(request.url).searchParams.get("code");
     if (code !== null) roomModel.setCodeInput(code);
@@ -51,7 +54,7 @@ function makeRouter({ model, roomModel, roomController }) {
 
   const join = <JoinPresenter app={model} room={roomModel} />;
 
-  return createBrowserRouter([
+  const router = createBrowserRouter([
     { path: "/", element: <HomePresenter model={model} /> },
     { path: "/profile", element: <ProfilePresenter model={model} /> },
     { path: "/demo", element: <DemoPresenter model={model} /> },
@@ -67,8 +70,23 @@ function makeRouter({ model, roomModel, roomController }) {
     { path: "/play/room-controller", element: <ControllerPresenter key="live" room={roomModel} controller={roomController} /> },
     // Dev page: every shared component in every state.
     { path: "/components", element: <GalleryPresenter /> },
+    { path: "/test-suite", element: <TestSuitePresenter app={model} testSuite={testSuiteModel} /> },
     { path: "*", element: <NotFoundView /> },
   ]);
+
+  const stopTestLaunch = reaction(
+    function readyTestACB() {
+      return roomModel.canStart && roomModel.activeTest?.phase === "ready" ? roomModel.activeTest.id : null;
+    },
+    async function showTestBoardACB(id) {
+      const path = router.state.location.pathname;
+      if (!id || !["/room", "/tv", "/room/game"].includes(path)) return;
+      if (path !== "/room/game") await router.navigate("/room/game");
+      if (router.state.location.pathname === "/room/game") demoModel.startRoomTest(roomModel, id);
+    },
+  );
+  if (import.meta.hot) import.meta.hot.dispose(stopTestLaunch);
+  return router;
 }
 
 export function ReactRoot(props) {

@@ -2,6 +2,7 @@
 import { makeAutoObservable, reaction } from "mobx";
 import { combineSticks, createRound, ROUND_SECONDS, TICK_MS, timeOutRound } from "./doubleSnakeRules.js";
 import { roundWeather, weatherStep } from "./demoWeather.js";
+import { checkTestRound, testSticks } from "./roomTestScenario.js";
 
 export const keyGroups = [
   { player: "A1", keys: ["W", "A", "S", "D"], codes: ["KeyW", "KeyA", "KeyS", "KeyD"] },
@@ -30,6 +31,8 @@ export const demoModel = makeAutoObservable({
   roundNumber: 0,
   remoteRoom: null,
   interruptedRoomRound: null,
+  testId: null,
+  regularScore: undefined,
   ticks: 0,
   weather: null,
   events: [],
@@ -43,6 +46,7 @@ export const demoModel = makeAutoObservable({
   },
 
   get inputs() {
+    if (this.testId && this.playing) return testSticks(this.ticks);
     if (this.remoteRoom) return this.remoteRoom.steering;
     const latestFirst = this.pressed.slice().reverse();
     return keyGroups.map(function directionForPlayerCB(group) {
@@ -94,20 +98,31 @@ export const demoModel = makeAutoObservable({
   startRound(weatherResult, remoteRoom = null) {
     if (this.playing) return;
     if (remoteRoom && !remoteRoom.canStart) return;
+    const test = remoteRoom?.activeTest;
+    if (test && test.phase !== "ready") return;
     const savedRound = remoteRoom && this.interruptedRoomRound?.code === remoteRoom.code
       ? this.interruptedRoomRound : null;
-    if (remoteRoom) this.interruptedRoomRound = null;
+    if (remoteRoom && !test) this.interruptedRoomRound = null;
     this.remoteRoom = remoteRoom;
+    this.testId = test?.id ?? null;
     this.pressed = [];
     this.seconds = ROUND_SECONDS;
     this.deadline = performance.now() + ROUND_SECONDS * 1000;
     this.ticks = 0;
-    this.weather = roundWeather(weatherResult);
-    this.round = createRound(savedRound?.score ?? this.round?.score);
+    this.weather = test ? null : roundWeather(weatherResult);
+    this.round = test ? createRound(undefined, () => 0) : createRound(savedRound?.score ?? this.regularScore);
     this.roundNumber = (savedRound?.roundNumber ?? this.roundNumber) + 1;
     this.crashed = [];
     this.luckyResult = null;
     this.addEvents([{ kind: "go" }]);
+    if (test) remoteRoom.reportTestPhase(test.id, "cancelling");
+  },
+
+  startRoomTest(room, id) {
+    if (!room.canStart || room.activeTest?.id !== id || room.activeTest.phase !== "ready") return;
+    // A test reserves an empty room. A round left running after the last player left can end here.
+    if (this.playing) this.stopTestRound();
+    this.startRound(null, room);
   },
 
   // Gives each event a new id (the board and the sounds play each id once) and keeps only the latest few.
@@ -140,11 +155,13 @@ export const demoModel = makeAutoObservable({
   interruptRound() {
     if (!this.playing || !this.remoteRoom?.code) return;
     // Preserve the completed rounds when the board returns to the lobby.
-    this.interruptedRoomRound = {
-      code: this.remoteRoom.code,
-      score: this.round.score,
-      roundNumber: this.roundNumber - 1,
-    };
+    if (!this.testId || this.interruptedRoomRound?.code !== this.remoteRoom.code) {
+      this.interruptedRoomRound = {
+        code: this.remoteRoom.code,
+        score: this.testId ? this.regularScore ?? { a: 0, b: 0 } : this.round.score,
+        roundNumber: this.roundNumber - 1,
+      };
+    }
     this.round = null;
     this.events = [];
     this.luckyResult = null;
@@ -154,6 +171,8 @@ export const demoModel = makeAutoObservable({
   leaveDemo() {
     this.clearKeys();
     this.remoteRoom = null;
+    this.testId = null;
+    this.regularScore = undefined;
     this.round = null;
     this.seconds = ROUND_SECONDS;
     this.roundNumber = 0;
@@ -163,19 +182,42 @@ export const demoModel = makeAutoObservable({
 
   tick() {
     if (!this.playing) return;
+    if (this.testId && (!this.remoteRoom.connected || this.remoteRoom.room?.hostOnline !== true
+      || this.remoteRoom.activeTest?.id !== this.testId)) {
+      this.stopTestRound();
+      return;
+    }
     this.seconds = Math.max(0, Math.ceil((this.deadline - performance.now()) / 1000));
     if (this.seconds === 0) {
       this.round = timeOutRound(this.round);
     } else {
+      const inputs = this.inputs;
       this.ticks += 1;
       if (this.luckyResult?.until <= this.ticks) this.luckyResult = null;
-      this.round = weatherStep(this.round, this.inputs, this.weather, this.ticks);
+      this.round = weatherStep(this.round, inputs, this.weather, this.ticks);
+    }
+    if (this.testId) {
+      const phase = checkTestRound(this.round, this.ticks);
+      if (phase) this.remoteRoom.reportTestPhase(this.testId, phase);
+      if (phase === "failed" && this.playing) {
+        this.stopTestRound();
+        return;
+      }
+    } else if (this.round.outcome) {
+      this.regularScore = this.round.score;
     }
     const events = [...this.round.stepEvents];
     this.crashed = events.filter(function isCrashCB(event) { return event.kind === "crash"; })
       .map(function teamCB(event) { return event.team; });
     if (this.round.outcome) events.push(outcomeEvent(this.round.outcome));
     if (events.length) this.addEvents(events);
+  },
+
+  stopTestRound() {
+    this.round = null;
+    this.testId = null;
+    this.seconds = ROUND_SECONDS;
+    this.crashed = [];
   },
 }, {}, { autoBind: true });
 

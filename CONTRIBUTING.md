@@ -52,6 +52,14 @@ npx firebase-tools emulators:start --project demo-pushpull --only auth,database
 
 In another terminal, run `npm run test:room`. It starts its own local Vite server, uses the Auth emulator's Google accounts, and opens one TV session and four phone-sized sessions in headless Chromium. It checks when the board unlocks, what the TV shows when phone inputs cancel, and whether a win adds one point and carries it into the next round. The output names each step and prints the final score. Rerun it against the same emulators to test a fresh room.
 
+### Run scripted players from the app
+
+Keep an empty TV room open at `/room`. In a second tab on the same site, open `/test-suite` while signed in with the TV host's account. Paste the room code and choose **Run test**. The TV opens the board and starts the round. Watch both teams cancel their inputs, move together, then finish with a Team B win at 0–1. The panel shows the result and releases the test seats. **Stop test** also releases them and keeps the room open.
+
+For local testing, start the Auth and Realtime Database emulators and run Vite with `VITE_USE_FIREBASE_EMULATORS=true`. In the Emulator UI, set `roomTesters/<host-auth-uid>` to the boolean `true` in the Realtime Database. Use the mock TV account's UID from the Authentication tab. Run the rules check with `node test/roomTestSuite.emulator.mjs` while the emulators are running.
+
+For a deployed build, publish the matching `database.rules.json` using the team's Firebase rules deployment workflow. A Firebase administrator can grant or revoke access by setting or removing the same boolean entry for a teammate's Auth UID in the deployed database. The browser cannot grant access, and even a tester can only operate their own empty rooms.
+
 ## Git and pull requests
 
 `main` is protected (see [Repo setup](#repo-setup-once-by-the-repo-owner)). You can't push to it directly, force-push it or delete it. Every change follows the same path: **issue → branch → pull request → review → auto-merge.**
