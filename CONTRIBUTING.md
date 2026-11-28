@@ -52,6 +52,26 @@ npx firebase-tools emulators:start --project demo-pushpull --only auth,database
 
 In another terminal, run `npm run test:room`. It starts its own local Vite server, uses the Auth emulator's Google accounts, and opens one TV session and four phone-sized sessions in headless Chromium. It checks when the board unlocks, what the TV shows when phone inputs cancel, and whether a win adds one point and carries it into the next round. The output names each step and prints the final score. Rerun it against the same emulators to test a fresh room.
 
+#### Drive the phones for a TV room you host
+
+For an emulator playtest, start the emulators as above. Set `VITE_USE_FIREBASE_EMULATORS=true` in the shell that runs `npm run dev`, then open `/room` in your own browser. Sign in with a mock account, create an empty room, and copy its code into the command below. The runner serves its own copy of the app against the same emulators. Add `--headed` to show the four phone windows.
+
+```sh
+npm run test:room -- --room YOUR_CODE
+```
+
+For a hosted playtest, use an HTTPS pull-request preview whose hostname is in Firebase Authentication's authorized domains. Open `/room` on that preview and create an empty room. Set aside four distinct Google test accounts for Ada, Max, Bo and Kim, and use a separate account for the TV. Install Google Chrome for this mode.
+
+```sh
+npm run test:room -- --room YOUR_CODE --preview-url https://YOUR_PREVIEW.web.app
+```
+
+The hosted run opens visible Chrome windows so you can sign in manually. In each fresh window, choose **Continue with Google**, sign in with the designated test account, then return to the terminal and press Enter. Have any second-factor prompts ready. The runner keeps each phone in its own disposable browser context.
+
+When all four phones are ready, choose **Open game board** and **Start round** on your TV, then press Enter in the terminal. Watch both teams cancel opposite inputs, return to idle, and then move briefly with matching inputs. Once the sticks are idle again, Ada taps Dash, Max taps Ping, Bo taps Shed, and Kim taps Hold up. Each action counts once another phone receives it from Firebase. The terminal logs each player's team, action and elapsed time. It then asks whether the round was still running on the TV after the taps. Type `y` to pass, or `n` if the round ended, which fails the run.
+
+Press Ctrl+C to stop a run early. The runner releases the sticks and uses **Leave room** on the test phones so you can reuse the seats. If a phone cannot confirm that it left, the runner reports the cleanup failure. On failures after playtest recording begins, the terminal prints a temporary folder containing per-phone PNGs and Playwright trace ZIPs. Open a trace locally with `npx playwright show-trace <path-to-zip>`. Recording starts after sign-in. Keep the files private because they can contain room and session data.
+
 ### Run scripted players from the app
 
 Keep an empty TV room open at `/room`. In a second tab on the same site, open `/test-suite` while signed in with the TV host's account. Paste the room code and choose **Run test**. The TV opens the board and starts the round. Watch both teams cancel their inputs, move together, then finish with a Team B win at 0–1. The panel shows the result and releases the test seats. **Stop test** also releases them and keeps the room open.
