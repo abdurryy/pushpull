@@ -116,6 +116,8 @@ Run `node --test test/doubleSnakeRules.test.mjs` from the project root. The test
 
 _Required in the mid-project review._
 
+- Team room testing at `/test-suite`: authorized hosts can use a room code to run four scripted Double Snake players and verify the TV result and score.
+
 **Done**
 - Documented the design system and shared CSS tokens, including reduced motion
 - Picked the idea and wrote the project proposal
