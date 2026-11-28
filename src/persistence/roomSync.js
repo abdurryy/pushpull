@@ -149,7 +149,13 @@ export function makeRoomSync(database) {
     async trackHostConnection(code) {
       const presence = roomRef(code, "/hostOnline");
       await onDisconnect(presence).set(false);
-      await set(presence, true);
+      // Publish the new input epoch with presence so a queued write from before the outage cannot steer.
+      try {
+        await update(roomRef(code), { hostOnline: true, hostInputEpoch: crypto.randomUUID() });
+      } catch (error) {
+        if (error.message !== "permission_denied" && error.code !== "PERMISSION_DENIED") throw error;
+        throw new Error("Could not confirm the TV connection. Check the Firebase room rules and reopen the room.", { cause: error });
+      }
     },
 
     closeRoom(code) {
@@ -173,6 +179,8 @@ export function makeRoomSync(database) {
       }
     },
 
+    // Stick and button writes leave the TV's epoch alone. Only openInput writes it, so a write
+    // replayed after the server removed this record has no epoch and the TV ignores it.
     setStick(code, uid, stick) {
       return update(roomRef(code, "/inputs/" + uid), { stick });
     },
@@ -183,6 +191,11 @@ export function makeRoomSync(database) {
 
     trackInputDisconnect(code, uid) {
       return onDisconnect(roomRef(code, "/inputs/" + uid)).remove();
+    },
+
+    // Runs after the disconnect cleanup is scheduled: a fresh idle record for the TV's current epoch.
+    openInput(code, uid, hostInputEpoch) {
+      return set(roomRef(code, "/inputs/" + uid), { stick: "idle", hostInputEpoch: hostInputEpoch ?? null });
     },
 
     clearInput(code, uid) {

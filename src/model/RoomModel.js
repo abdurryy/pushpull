@@ -31,7 +31,10 @@ export function makeRoomModel(sync, appModel) {
     pendingSide: null,
     error: null,
     closedRoomCode: null,
+    hostRecovery: null,
     stick: "idle",
+    // Counts how often the server dropped this phone's input record, so the phone registers again.
+    inputResets: 0,
     requestId: 0,
     testTime: Date.now(),
     // Set when the host starts a round. The game board (#28) takes over from here.
@@ -42,6 +45,9 @@ export function makeRoomModel(sync, appModel) {
     get side() { return this.room?.players?.[this.user?.uid]?.side; },
 
     get joined() { return this.role === "player" && Boolean(this.side); },
+    get reconnectingHost() {
+      return !this.connected || this.room?.hostOnline !== true || this.hostRecovery === "connecting";
+    },
 
     get activeTest() { return activeRoomTest(this.room, this.testTime); },
 
@@ -72,11 +78,13 @@ export function makeRoomModel(sync, appModel) {
     },
 
     get steering() {
-      if (!this.connected || this.room?.hostOnline !== true) return [null, null, null, null];
+      if (this.reconnectingHost) return [null, null, null, null];
       const { a, b } = this.teams;
       const inputs = this.room.inputs;
+      const epoch = this.room.hostInputEpoch;
       function stickFor(player) {
-        const stick = inputs?.[player?.id]?.stick;
+        const input = inputs?.[player?.id];
+        const stick = input?.hostInputEpoch === epoch ? input?.stick : null;
         return stick !== "idle" && STICKS.includes(stick) ? stick : null;
       }
       return [stickFor(a[0]), stickFor(a[1]), stickFor(b[0]), stickFor(b[1])];
@@ -90,7 +98,8 @@ export function makeRoomModel(sync, appModel) {
       if (!this.connected) return "Reconnecting… Players can join again once the TV is back online.";
       // hostOnline is the room's own record of the host screen being present. Without it the
       // roster on screen may already be stale, so a round must not start from it.
-      if (this.room.hostOnline !== true) return "Reconnecting this screen to the room… Start works again once it is back.";
+      if (this.reconnectingHost) return "Reconnecting this screen to the room… Start works again once it is back.";
+      if (this.hostRecovery === "clearing") return "Waiting for the phones to clear their steering…";
       const { a, b } = this.teams;
       if (a.length > TEAM_SIZE) return "Team A has " + a.length + " players. One of them needs to switch to Team B.";
       if (b.length > TEAM_SIZE) return "Team B has " + b.length + " players. One of them needs to switch to Team A.";
@@ -145,8 +154,8 @@ export function makeRoomModel(sync, appModel) {
       this.role = role;
       this.room = null;
       this.loading = true;
-      this.inputReady = false;
-      this.stick = "idle";
+      this.clearSteering();
+      this.hostRecovery = null;
       this.roundStarting = false;
     },
 
@@ -165,8 +174,23 @@ export function makeRoomModel(sync, appModel) {
         return;
       }
       if (!this.room) this.loading = false;
+      if (this.role === "player" && (room.hostOnline !== true || this.room?.hostInputEpoch !== room.hostInputEpoch)) {
+        this.clearSteering();
+      }
       this.room = room;
+      if (this.lostInputRecord()) {
+        this.clearSteering();
+        this.inputResets += 1;
+      }
+      this.finishHostRecovery();
       this.updateTestTime();
+    },
+
+    // A late disconnect cleanup on the server can remove the record after the phone registered.
+    // Later stick writes would then carry no epoch and never steer, so the phone registers again.
+    lostInputRecord() {
+      if (this.role !== "player" || !this.joined || !this.inputReady) return false;
+      return this.room.inputs?.[this.user.uid]?.hostInputEpoch !== this.room.hostInputEpoch;
     },
 
     updateTestTime() { this.testTime = Date.now(); },
@@ -185,8 +209,25 @@ export function makeRoomModel(sync, appModel) {
     setConnected(connected) {
       this.connected = connected;
       if (!connected) {
-        this.inputReady = false;
-        this.stick = "idle";
+        this.clearSteering();
+        if (this.role === "host") this.hostRecovery = "connecting";
+      }
+    },
+
+    clearSteering() {
+      this.inputReady = false;
+      this.stick = "idle";
+    },
+
+    hostPresenceRestored() {
+      if (this.hostRecovery !== "connecting") return;
+      this.hostRecovery = "clearing";
+      this.finishHostRecovery();
+    },
+
+    finishHostRecovery() {
+      if (this.hostRecovery === "clearing" && !this.reconnectingHost && !this.steering.some(Boolean)) {
+        this.hostRecovery = null;
       }
     },
 
@@ -212,13 +253,13 @@ export function makeRoomModel(sync, appModel) {
     },
 
     setStick(direction) {
-      if (!this.inputReady || !STICKS.includes(direction) || this.stick === direction) return;
+      if (!this.inputReady || this.reconnectingHost || !STICKS.includes(direction) || this.stick === direction) return;
       this.stick = direction;
       sync.setStick(this.code, this.user.uid, direction).catch(reportRoomError());
     },
 
     pressButton(button) {
-      if (!this.inputReady || !BUTTONS.includes(button)) return;
+      if (!this.inputReady || this.reconnectingHost || !BUTTONS.includes(button)) return;
       sync.sendButton(this.code, this.user.uid, button, this.stick).catch(reportRoomError());
     },
 
@@ -229,8 +270,8 @@ export function makeRoomModel(sync, appModel) {
       this.role = null;
       this.loading = false;
       this.pendingSide = null;
-      this.inputReady = false;
-      this.stick = "idle";
+      this.clearSteering();
+      this.hostRecovery = null;
       this.error = null;
       this.closedRoomCode = null;
       this.roundStarting = false;
@@ -308,8 +349,12 @@ export function makeRoomModel(sync, appModel) {
     },
   );
   const stopInput = reaction(
-    function connectionAndRoomACB() { return [model.code, model.role, model.connected, model.user?.uid]; },
-    async function registerPresenceACB([code, role, connected, uid]) {
+    function connectionAndRoomACB() {
+      const hostOnline = model.role === "player" ? model.room?.hostOnline : undefined;
+      const epoch = model.role === "player" ? model.room?.hostInputEpoch : undefined;
+      return [model.code, model.role, model.connected, model.user?.uid, hostOnline, epoch, model.inputResets];
+    },
+    async function registerPresenceACB([code, role, connected, uid, hostOnline, epoch]) {
       const registration = ++inputRegistration;
       // Keep the last connected input location in case a queued write replays after reconnecting.
       if (!connected) return;
@@ -324,17 +369,28 @@ export function makeRoomModel(sync, appModel) {
       try {
         if (code && role === "host") {
           await sync.trackHostConnection(code);
+          if (registration === inputRegistration) model.hostPresenceRestored();
           return;
         }
-        if (!next) return;
+        if (!next || hostOnline === undefined) return;
+        if (!hostOnline) {
+          await sync.clearInput(code, uid);
+          return;
+        }
         // Schedule server cleanup before accepting movement, including after reconnecting.
         await sync.trackInputDisconnect(code, uid);
         if (registration !== inputRegistration) return;
-        await sync.clearInput(code, uid);
+        await sync.openInput(code, uid, epoch);
         if (registration === inputRegistration) model.setInputReady();
       } catch (error) {
         if (registration === inputRegistration) model.setError(error);
       }
+    },
+    // Steering snapshots replace the room object even when the host's presence has not changed.
+    {
+      equals(first, second) {
+        return first.every(function sameValueCB(value, index) { return value === second[index]; });
+      },
     },
   );
 

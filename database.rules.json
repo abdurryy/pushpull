@@ -18,6 +18,10 @@
           ".write": "auth != null && root.child('rooms').child($code).child('meta/hostUid').val() == auth.uid && root.child('rooms').child($code).child('meta/expiresAt').val() > now",
           ".validate": "newData.isBoolean()"
         },
+        "hostInputEpoch": {
+          ".write": "auth != null && root.child('rooms').child($code).child('meta/hostUid').val() == auth.uid && root.child('rooms').child($code).child('meta/expiresAt').val() > now && newData.exists()",
+          ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9-]{36}$/)"
+        },
         "testRun": {
           ".write": "auth != null && root.child('rooms').child($code).child('meta/hostUid').val() == auth.uid && (!newData.exists() || (root.child('roomTesters').child(auth.uid).val() == true && root.child('rooms').child($code).child('meta/expiresAt').val() > now && root.child('rooms').child($code).child('hostOnline').val() == true && !newData.parent().child('players').exists() && !newData.parent().child('seats').exists() && ((data.exists() && newData.child('id').val() == data.child('id').val() && newData.child('expiresAt').val() == data.child('expiresAt').val() && data.child('live').child(data.child('id').val()).val() == true) || (newData.child('phase').val() == 'ready' && newData.child('live').child(newData.child('id').val()).val() == true && (!data.exists() || data.child('expiresAt').val() <= now || data.child('phase').val() == 'passed' || data.child('phase').val() == 'failed' || !data.child('live').child(data.child('id').val()).exists())))))",
           ".validate": "newData.hasChildren(['id', 'expiresAt', 'phase'])",
@@ -52,6 +56,7 @@
             ".write": "auth != null && auth.uid == $uid && root.child('rooms').child($code).child('meta/expiresAt').val() > now && (!newData.exists() || newData.parent().parent().child('players').child($uid).exists())",
             ".validate": "newData.hasChildren(['stick'])",
             "stick": { ".validate": "newData.val() == 'idle' || newData.val() == 'up' || newData.val() == 'down' || newData.val() == 'left' || newData.val() == 'right'" },
+            "hostInputEpoch": { ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9-]{36}$/)" },
             "button": { ".validate": "newData.val() == 'dash' || newData.val() == 'ping' || newData.val() == 'shed' || newData.val() == 'hold'" },
             "buttonAt": { ".validate": "newData.isNumber() && newData.val() <= now" },
             "$other": { ".validate": false }

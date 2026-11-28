@@ -1,6 +1,6 @@
 // View: shows the local Double Snake board, keyboard controls, and round results.
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { PushMark } from "./pushMark.jsx";
 import { GameBoard } from "./gameBoard.jsx";
 import { LuckyBoxNotice } from "./luckyBoxNotice.jsx";
@@ -93,7 +93,8 @@ export function DemoView(props) {
   }
 
   const { round, roundNumber, seconds, weather } = props;
-  const score = round?.score || { a: 0, b: 0 };
+  const score = round?.score || props.interruptedScore || { a: 0, b: 0 };
+  if (props.interrupted && !props.reconnecting) return <Navigate to="/room" replace />;
 
   return (
     <main className="demo">
@@ -119,7 +120,7 @@ export function DemoView(props) {
             <p key={roundNumber} className="demo-round" role="status">
               <PushMark variant="game-start" /> Round {roundNumber}
             </p>
-          ) : (
+          ) : !props.interrupted && (
             <button ref={start} className="button" type="button" onClick={props.onStart} disabled={!props.canStart}>
               {round ? "Play another round" : "Start round"}
             </button>
@@ -129,7 +130,8 @@ export function DemoView(props) {
           )}
           <SoundToggle muted={!props.soundOn} onToggle={toggleSoundACB} />
         </div>
-        {props.reconnecting && <StatusMessage kind="waiting">Reconnecting to the room…</StatusMessage>}
+        {props.reconnecting && !props.interrupted && <StatusMessage kind="waiting">Reconnecting to the room…</StatusMessage>}
+        {props.roomError && <StatusMessage kind="error">{props.roomError}</StatusMessage>}
         {roomMode && !playing && !props.canStart && !props.reconnecting && (
           <StatusMessage kind="empty">Two players on each team can start the round.</StatusMessage>
         )}
@@ -137,10 +139,11 @@ export function DemoView(props) {
       <div className="demo-playfield">
         <div className="demo-score">
           <strong className="demo-team demo-a">Team A <span className="numbers">{score.a}</span></strong>
-          <strong className="numbers" aria-label={seconds + " seconds left"}>{seconds}s</strong>
+          {props.interrupted ? <strong>Round ended</strong>
+            : <strong className="numbers" aria-label={seconds + " seconds left"}>{seconds}s</strong>}
           <strong className="demo-team demo-b">Team B <span className="numbers">{score.b}</span></strong>
         </div>
-        <LuckyBoxNotice event={props.luckyResult} box={playing && props.box} playing={playing} />
+        {!props.interrupted && <LuckyBoxNotice event={props.luckyResult} box={playing && props.box} playing={playing} />}
         <div className="demo-arena" ref={arena} tabIndex={!roomMode && playing ? 0 : -1}
           aria-label={roomMode ? undefined : "Game board keyboard controls"}
           onKeyDown={roomMode ? undefined : keyDownACB} onKeyUp={roomMode ? undefined : keyUpACB}
@@ -157,7 +160,14 @@ export function DemoView(props) {
             tickMs={props.tickMs}
             label={boardLabel(props.snakes, props.box)}
           />
-          {!round && <p className="demo-overlay">Start a round to place both snakes on the board.</p>}
+          {!round && !props.interrupted && <p className="demo-overlay">Start a round to place both snakes on the board.</p>}
+          {props.interrupted && (
+            <div className="demo-overlay">
+              <StatusMessage kind="waiting">
+                The TV lost its connection. The round ended without a point. Reconnecting…
+              </StatusMessage>
+            </div>
+          )}
           {round?.outcome && <p className="demo-overlay" role="status">{outcomeText(round.outcome)}</p>}
         </div>
         {playing && weather && (

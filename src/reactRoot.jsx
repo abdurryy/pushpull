@@ -76,7 +76,7 @@ function makeRouter({ model, roomModel, roomController, testSuiteModel }) {
 
   const stopTestLaunch = reaction(
     function readyTestACB() {
-      return roomModel.role === "host" && roomModel.activeTest?.phase === "ready" ? roomModel.activeTest.id : null;
+      return roomModel.canStart && roomModel.activeTest?.phase === "ready" ? roomModel.activeTest.id : null;
     },
     async function showTestBoardACB(id) {
       const path = router.state.location.pathname;

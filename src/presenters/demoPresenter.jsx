@@ -8,6 +8,8 @@ import { DemoView } from "../views/demoView.jsx";
 export const DemoPresenter = observer(function DemoPresenter({ model, room = null }) {
   const weather = model.weatherPromiseState;
   const selectedWeather = model.cityQuery.trim() ? weather.data : null;
+  const savedRound = room && demoModel.interruptedRoomRound?.code === room.code
+    ? demoModel.interruptedRoomRound : null;
 
   function startRoundACB() { demoModel.startRound(selectedWeather, room); }
 
@@ -28,7 +30,10 @@ export const DemoPresenter = observer(function DemoPresenter({ model, room = nul
       keyGroups={keyGroups}
       roomCode={room?.code}
       teams={room?.teams}
-      reconnecting={Boolean(room && (!room.connected || room.room?.hostOnline !== true))}
+      reconnecting={Boolean(room?.reconnectingHost)}
+      roomError={room?.error}
+      interrupted={Boolean(savedRound && demoModel.remoteRoom === room && !demoModel.round)}
+      interruptedScore={savedRound?.score}
       canStart={room ? room.canStart : true}
       columns={COLUMNS}
       rows={ROWS}
