@@ -33,6 +33,8 @@ export function makeRoomModel(sync, appModel) {
     closedRoomCode: null,
     hostRecovery: null,
     stick: "idle",
+    // Counts how often the server dropped this phone's input record, so the phone registers again.
+    inputResets: 0,
     requestId: 0,
     testTime: Date.now(),
     // Set when the host starts a round. The game board (#28) takes over from here.
@@ -176,8 +178,19 @@ export function makeRoomModel(sync, appModel) {
         this.clearSteering();
       }
       this.room = room;
+      if (this.lostInputRecord()) {
+        this.clearSteering();
+        this.inputResets += 1;
+      }
       this.finishHostRecovery();
       this.updateTestTime();
+    },
+
+    // A late disconnect cleanup on the server can remove the record after the phone registered.
+    // Later stick writes would then carry no epoch and never steer, so the phone registers again.
+    lostInputRecord() {
+      if (this.role !== "player" || !this.joined || !this.inputReady) return false;
+      return this.room.inputs?.[this.user.uid]?.hostInputEpoch !== this.room.hostInputEpoch;
     },
 
     updateTestTime() { this.testTime = Date.now(); },
@@ -242,12 +255,12 @@ export function makeRoomModel(sync, appModel) {
     setStick(direction) {
       if (!this.inputReady || this.reconnectingHost || !STICKS.includes(direction) || this.stick === direction) return;
       this.stick = direction;
-      sync.setStick(this.code, this.user.uid, direction, this.room.hostInputEpoch).catch(reportRoomError());
+      sync.setStick(this.code, this.user.uid, direction).catch(reportRoomError());
     },
 
     pressButton(button) {
       if (!this.inputReady || this.reconnectingHost || !BUTTONS.includes(button)) return;
-      sync.sendButton(this.code, this.user.uid, button, this.stick, this.room.hostInputEpoch).catch(reportRoomError());
+      sync.sendButton(this.code, this.user.uid, button, this.stick).catch(reportRoomError());
     },
 
     leaveRoom() {
@@ -339,9 +352,9 @@ export function makeRoomModel(sync, appModel) {
     function connectionAndRoomACB() {
       const hostOnline = model.role === "player" ? model.room?.hostOnline : undefined;
       const epoch = model.role === "player" ? model.room?.hostInputEpoch : undefined;
-      return [model.code, model.role, model.connected, model.user?.uid, hostOnline, epoch];
+      return [model.code, model.role, model.connected, model.user?.uid, hostOnline, epoch, model.inputResets];
     },
-    async function registerPresenceACB([code, role, connected, uid, hostOnline]) {
+    async function registerPresenceACB([code, role, connected, uid, hostOnline, epoch]) {
       const registration = ++inputRegistration;
       // Keep the last connected input location in case a queued write replays after reconnecting.
       if (!connected) return;
@@ -367,7 +380,7 @@ export function makeRoomModel(sync, appModel) {
         // Schedule server cleanup before accepting movement, including after reconnecting.
         await sync.trackInputDisconnect(code, uid);
         if (registration !== inputRegistration) return;
-        await sync.clearInput(code, uid);
+        await sync.openInput(code, uid, epoch);
         if (registration === inputRegistration) model.setInputReady();
       } catch (error) {
         if (registration === inputRegistration) model.setError(error);

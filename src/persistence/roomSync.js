@@ -179,18 +179,23 @@ export function makeRoomSync(database) {
       }
     },
 
-    setStick(code, uid, stick, hostInputEpoch) {
-      return update(roomRef(code, "/inputs/" + uid), { stick, hostInputEpoch: hostInputEpoch ?? null });
+    // Stick and button writes leave the TV's epoch alone. Only openInput writes it, so a write
+    // replayed after the server removed this record has no epoch and the TV ignores it.
+    setStick(code, uid, stick) {
+      return update(roomRef(code, "/inputs/" + uid), { stick });
     },
 
-    sendButton(code, uid, button, stick, hostInputEpoch) {
-      return update(roomRef(code, "/inputs/" + uid), {
-        button, stick, buttonAt: serverTimestamp(), hostInputEpoch: hostInputEpoch ?? null,
-      });
+    sendButton(code, uid, button, stick) {
+      return update(roomRef(code, "/inputs/" + uid), { button, stick, buttonAt: serverTimestamp() });
     },
 
     trackInputDisconnect(code, uid) {
       return onDisconnect(roomRef(code, "/inputs/" + uid)).remove();
+    },
+
+    // Runs after the disconnect cleanup is scheduled: a fresh idle record for the TV's current epoch.
+    openInput(code, uid, hostInputEpoch) {
+      return set(roomRef(code, "/inputs/" + uid), { stick: "idle", hostInputEpoch: hostInputEpoch ?? null });
     },
 
     clearInput(code, uid) {

@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import { deleteApp, initializeApp } from "firebase/app";
 import { connectDatabaseEmulator, get, getDatabase, goOffline, goOnline, ref, set } from "firebase/database";
-import { makeAutoObservable, when } from "mobx";
+import { autorun, makeAutoObservable, when } from "mobx";
 import { makeRoomModel } from "../src/model/RoomModel.js";
 import { makeRoomSync } from "../src/persistence/roomSync.js";
 
@@ -128,6 +128,24 @@ async function check() {
   assert.deepEqual(host.model.steering.slice(0, 2).sort(), ["down", "up"]);
   assert.deepEqual(host.model.steering.slice(2), ["left", "left"]);
 
+  // A stick write queued during a phone outage replays after the server removed the record.
+  // It carries no epoch, so the TV must never steer with it, even before the phone re-registers.
+  let replaySteered = false;
+  const stopReplayWatch = autorun(() => {
+    if (host.model.steering.includes("right")) replaySteered = true;
+  });
+  goOffline(phone.db);
+  await eventually(() => !phone.model.connected && !host.model.room?.inputs?.phone);
+  const queuedStick = makeRoomSync(phone.db).setStick(code, "phone", "right");
+  goOnline(phone.db);
+  await queuedStick;
+  await eventually(() => phone.model.inputReady);
+  await eventually(() => host.model.room?.inputs?.phone?.stick === "idle");
+  stopReplayWatch();
+  assert.equal(replaySteered, false);
+  phone.model.setStick("up");
+  await eventually(() => host.model.steering.includes("up"));
+
   const previousEpoch = host.model.room.hostInputEpoch;
   assert.equal(typeof previousEpoch, "string");
   goOffline(host.db);
@@ -149,6 +167,9 @@ async function check() {
   await eventually(() => host.model.room?.inputs?.phone?.stick === "right");
   assert.equal(host.model.canStart, true);
   assert.deepEqual(host.model.steering, [null, null, null, null]);
+  // The phone notices its record lost the current epoch and registers again.
+  await eventually(() => phone.model.inputReady
+    && host.model.room?.inputs?.phone?.hostInputEpoch === host.model.room.hostInputEpoch);
   phone.model.setStick("up");
   await eventually(() => host.model.steering.includes("up"));
 

@@ -1,6 +1,7 @@
 // View: a landscape controller with a floating stick and four independent touch zones.
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { StatusMessage } from "./statusMessage.jsx";
 import "./controllerView.css";
 
 const buttons = [
@@ -243,11 +244,15 @@ export function ControllerView({
   if (unavailable || hostAway) {
     return (
       <main ref={screen} className="controller controller-unavailable">
-        <p role="status">
-          {hostAway ? "The TV lost its connection. Waiting for the host to reconnect…" : closedRoomCode
-            ? "The host closed room " + closedRoomCode + "."
-            : "Your room is unavailable. Join a room and choose a team to use this controller."}
-        </p>
+        {hostAway ? (
+          <StatusMessage kind="waiting">The TV lost its connection. Waiting for the host to reconnect…</StatusMessage>
+        ) : (
+          <p role="status">
+            {closedRoomCode
+              ? "The host closed room " + closedRoomCode + "."
+              : "Your room is unavailable. Join a room and choose a team to use this controller."}
+          </p>
+        )}
         <Link className="button" to="/play/join">
           {hostAway ? "Back to room" : closedRoomCode ? "Join another room" : "Go to room setup"}
         </Link>
