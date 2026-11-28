@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { StatusMessage } from "./statusMessage.jsx";
+import { TeamChip } from "./teamChip.jsx";
 import "./controllerView.css";
 
 const buttons = [
@@ -74,6 +75,7 @@ export function ControllerView({
   onClear, onStick, onAction, direction, roomCode, closedRoomCode, team, unavailable, reconnecting, hostAway, error, ...heldActions
 }) {
   const screen = useRef(null);
+  const stickPad = useRef(null);
   const stickPointer = useRef(null);
   const buttonPointers = useRef(new Map());
   const buttonKeys = useRef(new Map());
@@ -142,7 +144,7 @@ export function ControllerView({
   function stickDownACB(event) {
     if (inputPaused || stickPointer.current || (event.pointerType === "mouse" && event.button !== 0)) return;
     event.currentTarget.setPointerCapture(event.pointerId);
-    const bounds = event.currentTarget.getBoundingClientRect();
+    const bounds = stickPad.current.getBoundingClientRect();
     const radius = readToken("--controller-button") / 2;
     const point = { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
     stickPointer.current = {
@@ -260,36 +262,49 @@ export function ControllerView({
     );
   }
 
-  let roomStatus = team ? "Team " + team.toUpperCase() + " · " + roomCode : null;
-  if (reconnecting) roomStatus = "Reconnecting…";
-  if (error) roomStatus = error;
+  const roomStatus = error || (reconnecting ? "Reconnecting…" : null);
+  const statusRole = error ? "alert" : "status";
+  const teamAndRoom = team && <><TeamChip team={team} />{" · "}<span className="numbers">{roomCode}</span></>;
 
   return (
     <main ref={screen} className="controller" aria-label={team ? "Push/Pull room controller" : "Push/Pull controller preview"}>
-      <p className="controller-portrait">Turn your phone sideways</p>
+      <p className="controller-portrait">
+        <span className="icon" aria-hidden="true">screen_rotation</span>
+        <span>Turn your phone sideways</span>
+      </p>
       {!active ? (
         <div className="controller-landscape controller-setup">
-          <Link to={team ? "/play/join" : "/"}>{team ? "Back to room" : "Back to home"}</Link>
+          <Link className="button button-text" to={team ? "/play/join" : "/"}>{team ? "Back to room" : "Back to home"}</Link>
           <h1>{team ? "Room controller" : "Controller preview"}</h1>
-          {team ? <p role="status">{roomStatus}</p> : <p>Try the stick and buttons on this phone.</p>}
+          {team ? <p role={statusRole}>{roomStatus || teamAndRoom}</p> : <p>Try the stick and buttons on this phone.</p>}
           {mode === "fallback" ? (
             <>
-              <p role="status">Fullscreen is unavailable here. On iPhone, open this page in Safari and use Share → Add to Home Screen, then launch Push/Pull from the icon.</p>
-              <button type="button" onPointerDown={continueACB} onClick={continueACB}>Continue in browser</button>
+              <p role="status">For fullscreen on iPhone, open this page in Safari and choose Share → Add to Home Screen.</p>
+              <button className="button" type="button" onPointerDown={continueACB} onClick={continueACB}>Continue in browser</button>
             </>
-          ) : <button type="button" onClick={enterACB}>Enter controller</button>}
+          ) : <button className="button" type="button" onClick={enterACB}>Enter controller</button>}
         </div>
       ) : (
         <div className="controller-landscape controller-inputs" onContextMenu={contextMenuACB}>
-          {roomStatus && <p className="controller-room-status" role="status">{roomStatus}</p>}
-          <div className="controller-stick" role="group" aria-label={"Joystick: " + direction} aria-disabled={inputPaused}
+          <div className="controller-stick" role="group" aria-label={"Joystick: " + direction}
+            aria-disabled={inputPaused} data-dragging={Boolean(stick)}
             onPointerDown={stickDownACB} onPointerMove={stickMoveACB} onPointerUp={stickReleaseACB}
             onPointerCancel={stickReleaseACB} onLostPointerCapture={stickReleaseACB}>
-            <span className="controller-stick-ring" aria-hidden="true"
-              style={stick ? { "--stick-x": stick.x + "px", "--stick-y": stick.y + "px" } : undefined}>
-              <span className="controller-stick-thumb"
-                style={stick ? { transform: "translate(" + stick.dx + "px, " + stick.dy + "px)" } : undefined} />
-            </span>
+            <div className="controller-stick-pad" ref={stickPad}>
+              {(roomStatus || team) && <p className="controller-room-status" role={statusRole}>{roomStatus || teamAndRoom}</p>}
+              <span className="controller-stick-guide" aria-hidden="true">
+                <span className="icon">keyboard_arrow_up</span>
+                <span className="icon">keyboard_arrow_left</span>
+                <span className="icon">keyboard_arrow_right</span>
+                <span className="icon">keyboard_arrow_down</span>
+              </span>
+              <span className="controller-stick-label">Drag to steer</span>
+              <span className="controller-stick-ring" aria-hidden="true"
+                style={stick ? { "--stick-x": stick.x + "px", "--stick-y": stick.y + "px" } : undefined}>
+                <span className="controller-stick-thumb"
+                  style={stick ? { transform: "translate(" + stick.dx + "px, " + stick.dy + "px)" } : undefined} />
+              </span>
+            </div>
           </div>
           <div className="controller-actions" role="group" aria-label="Actions">
             {buttons.map(function actionButtonCB(button) {
