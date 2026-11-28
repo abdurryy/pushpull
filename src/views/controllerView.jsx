@@ -246,7 +246,8 @@ export function ControllerView({
   if (unavailable || hostAway) {
     let recovery = {
       title: "Controller unavailable",
-      reason: "Join a room and choose a team to use the controller.",
+      reason: "Join a room and pick a team first.",
+      kind: "empty",
       action: "Join a room",
     };
     if (hostAway) {
@@ -266,7 +267,7 @@ export function ControllerView({
     }
     return (
       <main ref={screen} className="controller controller-unavailable">
-        <RecoveryMessage as="h1" title={recovery.title} reason={recovery.reason} kind={recovery.kind}>
+        <RecoveryMessage as="h1" panel title={recovery.title} reason={recovery.reason} kind={recovery.kind}>
           <Link className="button" to="/play/join">{recovery.action}</Link>
         </RecoveryMessage>
       </main>

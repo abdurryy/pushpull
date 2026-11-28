@@ -191,7 +191,7 @@ export function JoinView(props) {
     }
     if (!props.available) {
       return (
-        <RecoveryMessage as="h1" title="Rooms unavailable" reason="This copy of Push/Pull can't connect to rooms.">
+        <RecoveryMessage as="h1" panel title="Rooms unavailable" reason="This copy of Push/Pull can't connect to rooms.">
           <Link className="button" to="/">Back to home</Link>
         </RecoveryMessage>
       );

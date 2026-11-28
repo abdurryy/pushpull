@@ -47,6 +47,17 @@
 
 .join .recovery-message h2 { font-size: var(--text-title); }
 
+.join-heading:has(.recovery-message),
+.join-heading .recovery-message {
+  justify-items: center;
+  text-align: center;
+}
+
+.join-heading .recovery-title {
+  font-family: var(--font-text);
+  font-weight: var(--weight-bold);
+}
+
 .join h1,
 .join-context,
 .join-instructions {

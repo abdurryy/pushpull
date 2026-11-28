@@ -20,7 +20,9 @@
 
 .controller-unavailable {
   display: grid;
-  place-content: safe center;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: safe center;
+  justify-items: center;
   overflow-y: auto;
   padding: max(var(--space-4), var(--controller-safe-top))
     max(var(--space-4), var(--controller-safe-right))

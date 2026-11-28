@@ -2,9 +2,9 @@
 import { StatusMessage } from "./statusMessage.jsx";
 import "./recoveryMessage.css";
 
-export function RecoveryMessage({ as: Heading = "h2", title, reason, kind = "error", children }) {
+export function RecoveryMessage({ as: Heading = "h2", title, reason, kind = "error", panel = false, children }) {
   return (
-    <div className="recovery-message">
+    <div className={panel ? "recovery-message recovery-panel" : "recovery-message"}>
       <Heading className="recovery-title">{title}</Heading>
       <StatusMessage kind={kind}>{reason}</StatusMessage>
       {children}
