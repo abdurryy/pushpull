@@ -1,0 +1,31 @@
+/* View styles: a compact operator panel that fits beside the TV. */
+.test-suite {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-4);
+  max-width: var(--phone-max-width);
+  margin-inline: auto;
+  padding: var(--space-5) var(--space-4);
+}
+
+.test-suite h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+}
+
+.test-suite p,
+.test-suite-steps { margin: 0; }
+
+.test-suite-form {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-4);
+}
+
+.test-suite-steps {
+  display: grid;
+  gap: var(--space-2);
+  padding-inline-start: var(--space-5);
+  color: var(--color-muted);
+}

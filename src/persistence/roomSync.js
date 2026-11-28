@@ -15,6 +15,12 @@ export function validRoomCode(code) {
   });
 }
 
+export function activeRoomTest(room, now = Date.now()) {
+  const test = room?.testRun;
+  if (!test?.live?.[test.id] || test.expiresAt <= now || test.phase === "passed" || test.phase === "failed") return null;
+  return test;
+}
+
 function randomCode() {
   const bytes = crypto.getRandomValues(new Uint8Array(4));
   return Array.from(bytes, function toCharacterCB(byte) {
@@ -69,6 +75,7 @@ export function makeRoomSync(database) {
       for (const seat of SEATS) {
         const current = (await get(room)).val();
         if (current?.players?.[user.uid]) return code;
+        if (activeRoomTest(current, Date.now() + offset)) throw new Error("The host is testing this room. Try again when the test ends.");
         if (current?.seats?.[seat]) continue;
         try {
           // Commit the seat and the player together. The rules reject an occupied seat.
@@ -80,6 +87,7 @@ export function makeRoomSync(database) {
         } catch (error) {
           const latest = (await get(room)).val();
           if (latest?.players?.[user.uid]) return code;
+          if (activeRoomTest(latest, Date.now() + offset)) throw new Error("The host is testing this room. Try again when the test ends.");
           if (!latest?.seats?.[seat]) throw error;
         }
       }
@@ -91,6 +99,44 @@ export function makeRoomSync(database) {
         const data = snapshot.val();
         receive(data?.meta ? { code, ...data } : null);
       }, fail);
+    },
+
+    async startTestRun(code, uid) {
+      const tester = await get(ref(database, "roomTesters/" + uid));
+      if (tester.val() !== true) throw new Error("This account does not have room test access.");
+      const room = (await get(roomRef(code))).val();
+      if (!room?.meta) throw new Error("No room with that code. Check the TV and try again.");
+      if (room.meta.hostUid !== uid) throw new Error("Use the same account that opened the TV room.");
+      const offset = await serverOffset();
+      const now = Date.now() + offset;
+      if (room.meta.expiresAt <= now || room.hostOnline !== true) throw new Error("Open an active room on the TV first.");
+      if (room.players || room.seats) throw new Error("Use an empty TV room for this test.");
+      if (activeRoomTest(room, now)) throw new Error("A test is already running in this room.");
+
+      const id = crypto.randomUUID();
+      const expiresAt = now + 115_000;
+      // A run-specific path lets a late disconnect from an old tab leave a newer run alone.
+      const disconnect = onDisconnect(roomRef(code, "/testRun/live/" + id));
+      await disconnect.remove();
+      try {
+        await set(roomRef(code, "/testRun"), { id, expiresAt, phase: "ready", live: { [id]: true } });
+      } catch (error) {
+        await disconnect.cancel();
+        throw error;
+      }
+      return { code, id, expiresAt: expiresAt - offset };
+    },
+
+    async setTestPhase(code, id, phase) {
+      const result = await runTransaction(roomRef(code, "/testRun"), function setPhaseACB(test) {
+        if (test?.id !== id || !test.live?.[id] || test.phase === "passed" || test.phase === "failed") return;
+        return { ...test, phase };
+      }, { applyLocally: false });
+      return result.committed;
+    },
+
+    async stopTestRun(code, id) {
+      await remove(roomRef(code, "/testRun/live/" + id));
     },
 
     watchConnection(receive) {
