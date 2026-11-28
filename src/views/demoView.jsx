@@ -131,6 +131,7 @@ export function DemoView(props) {
           <SoundToggle muted={!props.soundOn} onToggle={toggleSoundACB} />
         </div>
         {props.reconnecting && !props.interrupted && <StatusMessage kind="waiting">Reconnecting to the room…</StatusMessage>}
+        {props.roomError && <StatusMessage kind="error">{props.roomError}</StatusMessage>}
         {roomMode && !playing && !props.canStart && !props.reconnecting && (
           <StatusMessage kind="empty">Two players on each team can start the round.</StatusMessage>
         )}

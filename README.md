@@ -60,7 +60,7 @@ When a phone drops offline, its last direction becomes idle once Firebase detect
 
 If the TV loses its connection during a round, phones clear their controls and show a recovery message. When that TV reconnects, it returns to the lobby with the score from completed rounds. Players can also go back to room setup and leave if the TV stays offline.
 
-For the hosted playtest, publish the matching Realtime Database rules from `main` with `npx firebase-tools deploy --only database --project pushpull-1df2e`. The Hosting workflow publishes the web build.
+Publish the matching Realtime Database rules with `npx firebase-tools deploy --only database --project pushpull-1df2e` before releasing a Hosting build that needs new room fields. The TV requires these rules to confirm its connection. The Hosting workflow publishes the web build.
 
 A deploy reaches everyone on their next page load. The `headers` in `firebase.json` set this: the page and the manifest are `no-cache`, so the browser asks for them every time and Hosting sends them, about 400 bytes compressed for the page. The files in `/assets/` are cached for a year instead, because Vite puts the content's hash in their names, and they answer `304 Not Modified` when a browser checks. Without these headers, Hosting's default of one hour meant a fix could take an hour to reach a phone or a teammate who had opened the site already.
 

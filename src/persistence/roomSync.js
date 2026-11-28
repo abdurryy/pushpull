@@ -153,9 +153,8 @@ export function makeRoomSync(database) {
       try {
         await update(roomRef(code), { hostOnline: true, hostInputEpoch: crypto.randomUUID() });
       } catch (error) {
-        // Hosting may update before the matching database rules are published.
         if (error.message !== "permission_denied" && error.code !== "PERMISSION_DENIED") throw error;
-        await set(presence, true);
+        throw new Error("Could not confirm the TV connection. Check the Firebase room rules and reopen the room.", { cause: error });
       }
     },
 

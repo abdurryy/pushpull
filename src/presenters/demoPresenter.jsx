@@ -31,6 +31,7 @@ export const DemoPresenter = observer(function DemoPresenter({ model, room = nul
       roomCode={room?.code}
       teams={room?.teams}
       reconnecting={Boolean(room?.reconnectingHost)}
+      roomError={room?.error}
       interrupted={Boolean(savedRound && demoModel.remoteRoom === room)}
       interruptedScore={savedRound?.score}
       canStart={room ? room.canStart : true}
