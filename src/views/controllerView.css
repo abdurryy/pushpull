@@ -23,25 +23,32 @@
   place-content: center;
   justify-items: center;
   gap: var(--space-3);
-  padding: var(--space-4);
+  padding: max(var(--space-4), var(--controller-safe-top))
+    max(var(--space-4), var(--controller-safe-right))
+    max(var(--space-4), var(--controller-safe-bottom))
+    max(var(--space-4), var(--controller-safe-left));
   text-align: center;
 }
 
 .controller-room-status {
   position: absolute;
-  z-index: 1;
-  inset-block-start: max(var(--space-2), var(--controller-safe-top));
-  inset-inline-start: 50%;
-  transform: translateX(-50%);
-  width: max-content;
-  max-width: calc(100% - var(--space-8));
+  inset-block-start: var(--space-3);
+  inset-inline: var(--space-3);
+  justify-self: center;
   margin: 0;
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-small);
   background: var(--color-surface);
   text-align: center;
-  pointer-events: none;
+  overflow-wrap: anywhere;
 }
+
+.controller-room-status:has(.team-chip) {
+  padding: 0;
+  background: transparent;
+}
+
+.controller-room-status[role="alert"] { color: var(--color-error); }
 
 .controller-portrait,
 .controller-setup {
@@ -54,10 +61,16 @@
 .controller-portrait {
   display: grid;
   height: 100%;
-  place-items: center;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-display);
   font-size: var(--text-title);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-display);
+  text-wrap: balance;
 }
+
+.controller-portrait .icon { font-size: var(--space-7); }
 
 .controller-landscape { display: none; }
 
@@ -92,23 +105,54 @@
 
 .controller-setup h1,
 .controller-setup p { margin: 0; }
-.controller-setup h1 { font-size: var(--text-title); }
-.controller-setup a { color: inherit; }
-
-.controller-setup button {
-  min-height: var(--hit-min);
-  padding-inline: var(--space-4);
-  border: 0;
-  border-radius: var(--radius);
-  background: var(--color-ink);
-  color: var(--color-surface);
-  font: inherit;
-  font-weight: var(--weight-bold);
-  cursor: pointer;
+.controller-setup h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  font-weight: var(--weight-display);
+  text-wrap: balance;
 }
+.controller-setup p { max-inline-size: var(--phone-max-width); }
 
 .controller-stick {
   position: relative;
+}
+
+.controller-stick-pad {
+  position: absolute;
+  inset: calc(max(var(--space-3), var(--controller-safe-top)) + var(--space-2))
+    var(--space-2)
+    calc(max(var(--space-3), var(--controller-safe-bottom)) + var(--space-2))
+    max(var(--space-3), var(--controller-safe-left));
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius);
+  background: var(--color-sunken);
+  pointer-events: none;
+}
+
+.controller-stick-guide {
+  display: grid;
+  grid-template: 1fr var(--controller-button) 1fr / 1fr var(--controller-button) 1fr;
+  place-items: center;
+  inline-size: calc(var(--controller-button) + var(--space-7));
+  block-size: calc(var(--controller-button) + var(--space-7));
+  color: var(--color-muted);
+  font-size: var(--text-title);
+}
+
+.controller-stick-guide :nth-child(1) { grid-area: 1 / 2; }
+.controller-stick-guide :nth-child(2) { grid-area: 2 / 1; }
+.controller-stick-guide :nth-child(3) { grid-area: 2 / 3; }
+.controller-stick-guide :nth-child(4) { grid-area: 3 / 2; }
+
+.controller-stick[data-dragging="true"] .controller-stick-guide { visibility: hidden; }
+
+.controller-stick-label {
+  position: absolute;
+  inset-block-end: var(--space-3);
+  color: var(--color-muted);
+  font-weight: var(--weight-bold);
+  text-align: center;
 }
 
 .controller-stick-ring,
@@ -120,17 +164,15 @@
 }
 
 .controller-stick-ring {
-  /* Keep the drawing clear of cutouts without shrinking the touch zone. */
-  --ring-clearance: calc(var(--controller-button) / 2 + var(--space-3));
-  left: clamp(calc(var(--controller-safe-left) + var(--ring-clearance)),
-    var(--stick-x, 50%), calc(100% - var(--ring-clearance)));
-  top: clamp(calc(var(--controller-safe-top) + var(--ring-clearance)),
-    var(--stick-y, 50%), calc(100% - var(--controller-safe-bottom) - var(--ring-clearance)));
+  /* Clamp only the drawing so the whole left half still picks up a drag. */
+  --ring-clearance: calc(var(--controller-button) / 2 + var(--space-2));
+  left: clamp(var(--ring-clearance), var(--stick-x, 50%), calc(100% - var(--ring-clearance)));
+  top: clamp(var(--ring-clearance), var(--stick-y, 50%), calc(100% - var(--ring-clearance)));
   width: var(--controller-button);
   height: var(--controller-button);
   translate: -50% -50%;
   border: var(--space-1) solid var(--color-ink);
-  background: var(--color-sunken);
+  background: var(--color-surface);
 }
 
 .controller-stick-thumb {
@@ -138,15 +180,21 @@
   background: var(--color-ink);
 }
 
+.controller-stick[aria-disabled="true"] .controller-stick-ring { border-color: var(--color-muted); }
+.controller-stick[aria-disabled="true"] .controller-stick-thumb { background: var(--color-muted); }
+.controller-stick[aria-disabled="true"] .controller-stick-label { visibility: hidden; }
+
 .controller-actions {
   display: grid;
   --action-zone-min: calc(var(--controller-button) + var(--controller-gap));
   grid-template: repeat(2, minmax(var(--action-zone-min), 1fr)) / repeat(2, minmax(0, 1fr));
   padding-block: max(var(--space-3), var(--controller-safe-top)) max(var(--space-3), var(--controller-safe-bottom));
-  padding-inline: 0 max(var(--space-3), var(--controller-safe-right));
+  padding-inline: 0 max(var(--space-1), var(--controller-safe-right));
 }
 
 .controller-action {
+  --action-face-bg: var(--color-surface);
+  position: relative;
   display: grid;
   place-items: center;
   min-width: 0;
@@ -162,31 +210,58 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.controller-action::before {
+  /* Separate the visible faces while adjacent buttons still share a touch boundary. */
+  position: absolute;
+  inset: calc(var(--controller-gap) / 2);
+  border-radius: var(--radius);
+  background: var(--action-face-bg);
+  content: "";
+  pointer-events: none;
+}
+
 .controller-action-face {
+  position: relative;
   display: grid;
   align-content: center;
   justify-items: center;
   gap: var(--space-1);
   width: var(--controller-button);
   height: var(--controller-button);
-  border-radius: var(--radius-round);
-  background: var(--color-sunken);
   transition: transform var(--duration-fast) var(--ease-out);
   pointer-events: none;
 }
 
-.controller-action .icon { font-size: var(--text-title); }
-
-.controller-action:focus-visible {
-  outline-offset: calc(-1 * var(--space-2));
+.controller-action .icon {
+  display: grid;
+  place-items: center;
+  inline-size: var(--hit-min);
+  block-size: var(--hit-min);
+  border-radius: var(--radius-round);
+  background: var(--color-sunken);
+  font-size: var(--text-hero);
 }
 
-.controller-action:disabled { cursor: default; }
-.controller-action:disabled .controller-action-face { color: var(--color-muted); }
+.controller-action:focus-visible { outline: none; }
 
-.controller-action[data-held="true"] .controller-action-face {
+.controller-action:focus-visible::before {
+  outline: var(--focus-ring);
+  outline-offset: calc(-1 * var(--focus-offset));
+}
+
+.controller-action:disabled {
+  --action-face-bg: var(--color-sunken);
+  color: var(--color-muted);
+  cursor: default;
+}
+
+.controller-action[data-held="true"]:enabled { --action-face-bg: var(--color-sunken); }
+.controller-action[data-held="true"]:enabled .controller-action-face {
   transform: scale(var(--press-scale));
+  transition: none;
+}
+
+.controller-action[data-held="true"]:enabled .icon {
   background: var(--color-ink);
   color: var(--color-surface);
-  transition: none;
 }
