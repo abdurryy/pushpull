@@ -1,4 +1,4 @@
-/* View styles: the Push/Pull mark gives visual feedback alongside the screen's text. */
+/* View styles: the Push/Pull mark for the wordmark and round start. */
 .push-mark {
   width: 2em;
   height: 1em;
@@ -21,76 +21,10 @@
 .push-mark-entry .push-mark-left { --mark-travel: -6px; }
 .push-mark-entry .push-mark-right { --mark-travel: 6px; }
 
-.push-mark-loading .push-mark-left,
-.push-mark-loading .push-mark-right {
-  animation: push-mark-separate var(--duration-loading) ease-in-out infinite;
-}
-
-.push-mark-loading .push-mark-left { --mark-travel: -2px; }
-.push-mark-loading .push-mark-right { --mark-travel: 2px; }
-
-.push-mark-searching .push-mark-beam {
-  fill: var(--color-ink);
-  animation: push-mark-sweep var(--duration-loading) ease-in-out infinite;
-}
-
-.push-mark-success .push-mark-left,
-.push-mark-success .push-mark-right {
-  animation: push-mark-settle var(--duration) var(--ease-out) both;
-}
-
-.push-mark-success .push-mark-left { --mark-travel: -4px; }
-.push-mark-success .push-mark-right { --mark-travel: 4px; }
-
-.push-mark-failure .push-mark-left,
-.push-mark-failure .push-mark-right {
-  animation: push-mark-shake var(--duration) var(--ease-out) both;
-}
-
-.push-mark-waiting .push-mark-left,
-.push-mark-waiting .push-mark-right {
-  animation: push-mark-separate var(--duration) var(--ease-out) both;
-}
-
-.push-mark-failure .push-mark-left { --mark-travel: -4px; }
-.push-mark-failure .push-mark-right { --mark-travel: 4px; }
-.push-mark-waiting .push-mark-left { --mark-travel: -2px; }
-.push-mark-waiting .push-mark-right { --mark-travel: 2px; }
-
-.push-mark-halo,
-.push-mark-spark,
-.push-mark-dots,
-.push-mark-beam,
-.push-mark-shimmer,
-.push-mark-ring {
-  opacity: 0;
-}
-
 .push-mark-shimmer {
   fill: var(--color-surface);
+  opacity: 0;
   animation: push-mark-glint var(--duration) ease-out;
-}
-
-.push-mark-ring {
-  fill: none;
-  stroke: var(--color-ink);
-  animation: push-mark-meet var(--duration-loading) ease-out infinite;
-}
-
-.push-mark-halo {
-  fill: none;
-  stroke: var(--color-success);
-  animation: push-mark-flash var(--duration) ease-out;
-}
-
-.push-mark-spark {
-  stroke: var(--color-error);
-  animation: push-mark-flash var(--duration) ease-out;
-}
-
-.push-mark-dots {
-  fill: var(--color-muted);
-  animation: push-mark-flash var(--duration) ease-out;
 }
 
 .push-mark-trace {
@@ -112,38 +46,8 @@
   100% { opacity: 1; transform: none; }
 }
 
-@keyframes push-mark-separate {
-  50% { transform: translateX(var(--mark-travel)); opacity: 0.75; }
-}
-
-@keyframes push-mark-shake {
-  25%, 60% { transform: translateX(var(--mark-travel)); }
-  45% { transform: translateX(0); }
-}
-
 @keyframes push-mark-glint {
   70% { opacity: 0.4; }
-}
-
-@keyframes push-mark-meet {
-  0%, 80% { opacity: 0; }
-  90% { opacity: 0.75; }
-}
-
-@keyframes push-mark-sweep {
-  0% { transform: translateX(-6px); }
-  50% { opacity: 0.6; }
-  100% { transform: translateX(6px); }
-}
-
-@keyframes push-mark-settle {
-  0% { transform: translateX(var(--mark-travel)) scale(0.85); }
-  60% { transform: scale(1.1); }
-  100% { transform: none; }
-}
-
-@keyframes push-mark-flash {
-  50% { opacity: 1; }
 }
 
 @keyframes push-mark-trace {

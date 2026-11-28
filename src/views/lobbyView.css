@@ -178,16 +178,6 @@
   min-height: var(--hit-min);
 }
 
-.lobby-next > .status-message {
-  overflow-wrap: anywhere;
-}
-
-/* The wordmark in the rail already identifies the lobby during routine readiness updates. */
-.lobby-next .status-message-waiting .push-mark,
-.lobby-next .status-message-success .push-mark {
-  display: none;
-}
-
 .lobby-next > .button,
 .lobby-actions {
   flex: none;

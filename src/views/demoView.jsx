@@ -18,7 +18,7 @@ function outcomeText(outcome) {
 }
 
 function renderWeatherStatus(status, city) {
-  if (status === "loading") return <><PushMark variant="searching" /> Looking up weather…</>;
+  if (status === "loading") return "Looking up weather…";
   if (status === "error") return "Weather is unavailable. Try again or start without it.";
   if (status === "done" && !city) return "No city found. Check the spelling or start without weather.";
   if (city) return city + " weather is ready for the next round.";

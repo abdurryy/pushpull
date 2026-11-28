@@ -47,7 +47,7 @@ Read only what the task needs. Every extra file costs tokens for the whole team.
 2. `src/styles/tokens.css`. These are the only values you may use.
 3. The closest existing View and its CSS, as a sample of the house style. For a change to an existing View, that View is enough. For a new View, copy the patterns of the closest one instead of inventing new ones:
    - `src/views/homeView.jsx` / `.css`: page layout, hierarchy, link cards, the board drawing, the wide-screen breakpoint.
-   - `src/views/loginView.jsx` / `.css`: buttons, pressed and disabled states, status lines with `PushMark`, error messages.
+   - `src/views/loginView.jsx` / `.css`: buttons, pressed and disabled states, and text feedback while signing in or out.
    - `src/views/lobbyView.jsx` / `.css`: a TV screen in the TV frame, with a room and a weather search in idle, loading, error, empty and content states.
    - `src/views/controllerView.jsx` / `.css`: touch zones, safe areas, the landscape-only controller.
 4. The **shared components** (design.md, Shared components). Open `/components` to see each one in every state, and use them before writing your own: status lines, team chips and seats, room codes, the score bar, the countdown, the game board, and the sound components.
@@ -172,7 +172,7 @@ Things that belong together sit closer than things that don't. Use this ladder:
 ### Feedback and status (graded: "feedback on user actions", "visibility of system status")
 
 - Every press shows a change **at once**: the pressed state has no transition (see the controller rules in design.md).
-- While waiting, **say what is happening in words**: `PushMark` plus a sentence like "Joining room 4KQ7…". Disable only the button that is waiting. The rest of the screen keeps working (a course requirement for grade C and up).
+- While waiting, **say what is happening in words**. Use `StatusMessage` for a sentence like "Joining room 4KQ7…" or update the pending button's label. Save `PushMark` for the app wordmark and round start. Disable only the button that is waiting so the rest of the screen stays usable.
 - For asynchronously loaded images, reuse `ImageSkeleton` from `src/views/imageSkeleton.jsx`. Reserve space with `width` and `height` or a layout class, supply `alt` and give it a suitable fallback. Keep decorative avatars quiet when the name is already visible. After decoding, the warm placeholder fades away in 540ms to reveal the image. Check intermediate frames during the gallery replay with normal motion. Also verify slow, failed and reduced-motion states.
 - After success, show the result **where the player is already looking**. No pop-up toasts.
 - An error says what went wrong in the player's words, what to do next, and has a "Try again" button. Keep whatever they typed.
@@ -228,7 +228,7 @@ These make a screen look machine-made. Never use them here.
 | A placeholder used as the label | A visible label above the input |
 | Icon-only buttons | Icon + text (on the controller: icon + short label) |
 | "Welcome!", "Submit", "Click here", lorem ipsum | Real, specific words |
-| A spinner with no words | `PushMark` + a sentence saying what is loading |
+| A spinner with no words | A sentence saying what is loading |
 | Things that bounce, float or fade in for fun | Motion only when something changes |
 | A modal or `alert()` for a simple message | Inline text where the player is looking |
 | The whole screen disabled while loading | Disable only the button that is waiting |

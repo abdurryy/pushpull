@@ -44,7 +44,7 @@ const PREVIEW_INPUTS = { a: ["right", "right"], b: ["up", "down"] };
 export function HomeView(props) {
   function renderAccountAction() {
     if (!props.authChecked) {
-      return <StatusMessage>Checking…</StatusMessage>;
+      return <StatusMessage>Checking sign-in…</StatusMessage>;
     }
     if (props.user) {
       return (
