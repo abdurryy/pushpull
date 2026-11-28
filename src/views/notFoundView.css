@@ -1,5 +1,6 @@
 /* View styles: compact 404 tiles and one recovery action. */
 .not-found {
+  --recovery-title-size: var(--text-hero);
   box-sizing: border-box;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -16,11 +17,13 @@
   text-align: center;
 }
 
-.not-found h1 {
-  margin: 0;
-  font: var(--weight-display) var(--text-hero) / 1.15 var(--font-display);
-  text-wrap: balance;
+.not-found .recovery-message {
+  gap: var(--space-4);
+  justify-items: center;
+  text-align: center;
 }
+
+.not-found .recovery-message > .button { margin-block-start: 0; }
 
 .not-found-code {
   display: flex;

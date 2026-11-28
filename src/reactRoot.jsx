@@ -45,6 +45,13 @@ function PhoneLoginRoute({ model }) {
   return <LoginPresenter model={model} joinSearch={joinSearch} />;
 }
 
+function RoomGameRoute({ app, room }) {
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get("mode");
+  const modeUnavailable = Boolean(mode && mode !== "double-snake");
+  return <RoomPresenter key="board" app={app} room={room} board modeUnavailable={modeUnavailable} />;
+}
+
 function makeRouter({ model, roomModel, roomController, testSuiteModel }) {
   function loadJoinCodeACB({ request }) {
     const code = new URL(request.url).searchParams.get("code");
@@ -60,7 +67,7 @@ function makeRouter({ model, roomModel, roomController, testSuiteModel }) {
     { path: "/demo", element: <DemoPresenter model={model} /> },
     { path: "/room", element: <RoomPresenter key="host" app={model} room={roomModel} /> },
     { path: "/room/login", element: <LoginPresenter model={model} host /> },
-    { path: "/room/game", element: <RoomPresenter key="board" app={model} room={roomModel} board /> },
+    { path: "/room/game", element: <RoomGameRoute app={model} room={roomModel} /> },
     // The shared screen: the lobby, where phones join a room and the host checks the weather. The game board comes later.
     { path: "/tv", element: <LobbyPresenter model={model} roomModel={roomModel} /> },
     // The phone flow starts with logging in: Log in -> Join a room -> Controller.

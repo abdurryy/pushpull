@@ -25,7 +25,19 @@ async function checkRoutes(page, baseUrl) {
   await openFromHome(page, baseUrl, "/play/login", /^Use phone\b/);
   await page.getByRole("button", { name: "Continue with Google", exact: true }).waitFor();
 
-  console.log("All four public routes passed and the demo round started.");
+  console.log("Checking recovery routes");
+  await page.goto(new URL("/missing/page", baseUrl).href);
+  await page.getByRole("heading", { level: 1, name: "Page not found" }).waitFor();
+  await page.getByRole("link", { name: "Back to home", exact: true }).click();
+  await page.waitForURL(baseUrl);
+
+  await page.goto(new URL("/room/game?mode=removed", baseUrl).href);
+  await page.getByRole("heading", { level: 1, name: "Mode unavailable" }).waitFor();
+  await page.getByRole("link", { name: "Open lobby" }).click();
+  await page.waitForURL(new URL("/room", baseUrl).href);
+  await page.getByRole("heading", { level: 1, name: "Host a room" }).waitFor();
+
+  console.log("Public routes and recovery links passed, and the demo round started.");
 }
 
 // Ignore local .env files and inherited settings that could enable Firebase.

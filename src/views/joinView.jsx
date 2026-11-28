@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { PushMark } from "./pushMark.jsx";
 import { RoomCodeInput } from "./roomCodeInput.jsx";
+import { RecoveryMessage } from "./recoveryMessage.jsx";
 import { StatusMessage } from "./statusMessage.jsx";
 import { TeamChip } from "./teamChip.jsx";
 import "./joinView.css";
@@ -108,7 +109,8 @@ export function JoinView(props) {
         {props.connected && !props.loading && !props.changingSide && (
           <>
             {!props.hostOnline && (
-              <StatusMessage kind="waiting">The TV lost its connection. Waiting for the host to reconnect…</StatusMessage>
+              <RecoveryMessage title="TV disconnected" kind="waiting"
+                reason="You can open the controller again when the host reconnects." />
             )}
             {props.side === "center" ? (
               <p className="join-instructions">
@@ -142,20 +144,22 @@ export function JoinView(props) {
       <>
         <div className="join-heading">
           <p className="join-context">Step 1 of 2</p>
-          <h1>Join a room</h1>
-          {props.closedRoomCode ? (
-            <StatusMessage kind="empty">
-              The host closed room {props.closedRoomCode}. Enter a new code to join another room.
-            </StatusMessage>
-          ) : <p className="join-instructions">Enter the four characters shown on the TV.</p>}
+          {props.error ? (
+            <RecoveryMessage as="h1" title="Couldn't join room" reason={props.error} />
+          ) : props.closedRoomCode ? (
+            <RecoveryMessage as="h1" title="Room closed" kind="empty"
+              reason={"The host closed room " + props.closedRoomCode + ". Enter a new code to join another room."} />
+          ) : (
+            <>
+              <h1>Join a room</h1>
+              <p className="join-instructions">Enter the four characters shown on the TV.</p>
+            </>
+          )}
         </div>
         <form className="join-form" onSubmit={joinACB}>
           <RoomCodeInput value={props.codeInput} invalid={Boolean(props.error)} onCodeChange={props.onCodeChange} />
           {!props.connected && <StatusMessage kind="waiting">Connection lost. Reconnecting…</StatusMessage>}
           {props.loading && props.connected && <StatusMessage>Joining room…</StatusMessage>}
-          {props.error && (
-            <StatusMessage kind="error">{props.error} Check the code on the TV or ask the host for help.</StatusMessage>
-          )}
           <button
             className="button"
             type="submit"
@@ -187,10 +191,9 @@ export function JoinView(props) {
     }
     if (!props.available) {
       return (
-        <>
-          <h1>Join a room</h1>
-          <StatusMessage kind="error">Room sync is unavailable.</StatusMessage>
-        </>
+        <RecoveryMessage as="h1" title="Rooms unavailable" reason="This copy of Push/Pull can't connect to rooms.">
+          <Link className="button" to="/">Back to home</Link>
+        </RecoveryMessage>
       );
     }
 
