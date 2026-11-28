@@ -36,6 +36,12 @@ npx playwright install chromium
 - `--name=<folder>` saves the run in its own folder. Without it, screenshots go in a folder named after the route and frames in one named after the button. Each run prints where its files are (the system temp folder, under `pushpull-screenshots`, `pushpull-frames` or `pushpull-audio`).
 - In Git Bash, a route like `"/tv"` turns into a Windows path before the script sees it. Start the command with `MSYS_NO_PATHCONV=1`, or use PowerShell.
 
+### Public route smoke test
+
+After installing Playwright's Chromium, run `npm run test:routes` before sharing a preview. It starts its own local Vite server and a fresh browser, opens the homepage, follows its links to the keyboard demo, component gallery and phone sign-in, and starts a demo round. The command prints each route as it checks it and exits with an error if a check fails.
+
+The test runs without Firebase credentials or emulators. It leaves the demo's optional weather field blank and keeps browser requests on the local server.
+
 ### Four-player room smoke test
 
 After `npm install` and `npx playwright install chromium`, start the local Firebase emulators in one terminal. The Realtime Database emulator needs Java.
@@ -181,6 +187,8 @@ Every pull request runs the **CI / Build** check ([.github/workflows/ci.yml](.gi
 The Firebase Hosting workflow builds and publishes the app on every push to `main`. Pull requests from branches in this repository get a temporary preview link in a comment. The production site is linked in README. Preview links can be used to try the UI, and Google sign-in on a preview requires that its hostname be added to Firebase Authentication's authorized domains.
 
 Deploy early and often (the course suggests Firebase Hosting). Don't deploy minified code: keep `minify: false` in `vite.config.js`.
+
+For a failed preview or a live release that needs recovery, follow the [deployment recovery runbook](docs/deployment-recovery.md).
 
 ## User testing
 

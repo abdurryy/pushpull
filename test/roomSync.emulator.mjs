@@ -9,8 +9,7 @@ import { makeRoomSync } from "../src/persistence/roomSync.js";
 const apps = [];
 const models = [];
 
-function client(uid) {
-  const name = uid || "unsigned";
+function client(uid, name = uid || "unsigned") {
   const projectId = "demo-pushpull";
   const app = initializeApp({
     projectId,
@@ -62,7 +61,10 @@ async function check() {
   await assert.rejects(set(ref(phone.db, roomPath + "/inputs/phone/stick"), "diagonal"), /permission.denied/i);
   await assert.rejects(set(ref(phone.db, roomPath + "/meta/hostUid"), "phone"), /permission.denied/i);
   await assert.rejects(set(ref(phone.db, roomPath + "/hostOnline"), false), /permission.denied/i);
-  await assert.rejects(set(ref(phone.db, roomPath), null), /permission.denied/i);
+  // Keep the SDK's speculative delete off the phone's room listener.
+  const guestWriter = client("phone", "guest-close-check");
+  await assert.rejects(set(ref(guestWriter.db, roomPath), null), /permission.denied/i);
+  assert.equal((await get(ref(phone.db, roomPath))).exists(), true);
 
   goOffline(phone.db);
   await eventually(() => !phone.model.connected && !host.model.room?.inputs?.phone);
@@ -132,10 +134,29 @@ async function check() {
   goOnline(host.db);
   await eventually(() => host.model.canStart);
 
-  await host.model.departRoom();
+  phone.model.setCodeInput(code);
+  await Promise.all([host.model.departRoom(), host.model.departRoom()]);
   assert.equal(host.model.code, null);
-  await eventually(() => phone.model.room === null);
-  assert.match(phone.model.error, /no longer available/);
+  await eventually(() => players.every(player => player.model.closedRoomCode === code));
+  for (const player of players) {
+    assert.equal(player.model.code, null);
+    assert.equal(player.model.room, null);
+    assert.equal(player.model.inputReady, false);
+    assert.equal(player.model.stick, "idle");
+    assert.equal(player.model.error, null);
+  }
+  assert.equal(phone.model.codeInput, "");
+  phone.model.setStick("right");
+  phone.model.pressButton("dash");
+  assert.equal((await get(ref(phone.db, roomPath))).exists(), false);
+
+  await host.model.createRoom();
+  const nextCode = host.model.code;
+  await eventually(() => host.model.room?.code === nextCode);
+  await phone.model.joinRoom(nextCode);
+  await eventually(() => phone.model.joined && phone.model.inputReady);
+  assert.equal(phone.model.closedRoomCode, null);
+  await host.model.departRoom();
   console.log("Room sync passed: access rules, reconnect, concurrent admission and team picks, seat reuse, team steering and closure.");
 }
 

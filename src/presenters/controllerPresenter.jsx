@@ -13,6 +13,7 @@ export const ControllerPresenter = observer(function ControllerPresenter({ room,
       shedHeld={controller.heldActions.shed}
       holdHeld={controller.heldActions.hold}
       roomCode={room?.code}
+      closedRoomCode={room?.closedRoomCode}
       team={hasTeam ? room.side : null}
       unavailable={Boolean(room && !hasTeam)}
       reconnecting={hasTeam && (!room.connected || !room.inputReady)}

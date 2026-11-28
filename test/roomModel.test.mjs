@@ -95,3 +95,38 @@ test("a room that is gone blocks Start round", async function () {
   model.receiveRoom(null);
   assert.equal(model.startBlockedReason, "Create a room first.");
 });
+
+test("a pending close keeps the host's room until Firebase accepts the deletion", async function () {
+  const sync = fakeSync();
+  let closeCalls = 0;
+  let rejectClose;
+  sync.trackHostConnection = async function trackHostConnectionACB() {};
+  sync.closeRoom = function closeRoomACB() {
+    closeCalls += 1;
+    return new Promise(function holdCloseACB(resolve, reject) {
+      rejectClose = reject;
+    });
+  };
+  const session = makeAutoObservable({ user: { uid: "host" } });
+  const { model, dispose } = makeRoomModel(sync, session);
+  try {
+    await model.createRoom();
+    model.receiveRoom({ hostOnline: true, players: FULL_TEAMS });
+    const closing = model.departRoom();
+    model.receiveRoom(null);
+    assert.equal(model.loading, true);
+    assert.equal(model.canStart, false);
+    assert.equal(model.code, "K7M4");
+    assert.equal(model.teams.a.length, 2);
+
+    await model.departRoom();
+    assert.equal(closeCalls, 1);
+    rejectClose(new Error("Close failed"));
+    await closing;
+    assert.equal(model.loading, false);
+    assert.equal(model.canStart, true);
+    assert.equal(model.error, "Close failed");
+  } finally {
+    dispose();
+  }
+});

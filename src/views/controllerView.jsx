@@ -19,8 +19,58 @@ function isInstalled() {
     || window.matchMedia("(display-mode: standalone), (display-mode: fullscreen)").matches;
 }
 
+function useControllerWakeLock(enabled) {
+  useEffect(function holdScreenAwakeACB() {
+    if (!enabled || !navigator.wakeLock) return;
+
+    const landscape = window.matchMedia("(orientation: landscape)");
+    let lock;
+    let pending = false;
+    let disposed = false;
+
+    function canHoldLock() {
+      return !disposed && !document.hidden && landscape.matches;
+    }
+
+    function releaseLock() {
+      const previous = lock;
+      lock = null;
+      if (previous && !previous.released) previous.release();
+    }
+
+    async function updateLockACB() {
+      if (!canHoldLock()) {
+        releaseLock();
+        return;
+      }
+      if (pending || (lock && !lock.released)) return;
+
+      pending = true;
+      try {
+        lock = await navigator.wakeLock.request("screen");
+        // The player may have left or rotated the phone while the browser was deciding.
+        if (!canHoldLock()) releaseLock();
+      } catch {
+        // The controller still works if the browser or device denies the request.
+      } finally {
+        pending = false;
+      }
+    }
+
+    document.addEventListener("visibilitychange", updateLockACB);
+    landscape.addEventListener("change", updateLockACB);
+    updateLockACB();
+    return function releaseLockACB() {
+      disposed = true;
+      document.removeEventListener("visibilitychange", updateLockACB);
+      landscape.removeEventListener("change", updateLockACB);
+      releaseLock();
+    };
+  }, [enabled]);
+}
+
 export function ControllerView({
-  onClear, onStick, onAction, direction, roomCode, team, unavailable, reconnecting, hostAway, error, ...heldActions
+  onClear, onStick, onAction, direction, roomCode, closedRoomCode, team, unavailable, reconnecting, hostAway, error, ...heldActions
 }) {
   const screen = useRef(null);
   const stickPointer = useRef(null);
@@ -28,6 +78,11 @@ export function ControllerView({
   const buttonKeys = useRef(new Map());
   const [mode, setMode] = useState("setup");
   const [stick, setStick] = useState(null);
+  const active = mode === "active" || mode === "fullscreen";
+  const inputPaused = Boolean(unavailable || reconnecting || hostAway);
+
+  // The live controller stays open between rounds, including while the TV starts one.
+  useControllerWakeLock(Boolean(active && team && !inputPaused));
 
   useEffect(function watchScreenACB() {
     function clearACB() {
@@ -56,6 +111,7 @@ export function ControllerView({
     document.addEventListener("visibilitychange", visibilityACB);
     document.addEventListener("fullscreenchange", fullscreenChangeACB);
     landscape.addEventListener("change", clearACB);
+    if (inputPaused) clearACB();
     return function cleanUpACB() {
       window.removeEventListener("blur", clearACB);
       document.removeEventListener("visibilitychange", visibilityACB);
@@ -63,7 +119,7 @@ export function ControllerView({
       landscape.removeEventListener("change", clearACB);
       onClear();
     };
-  }, [onClear]);
+  }, [onClear, inputPaused]);
 
   async function enterACB() {
     if (isInstalled()) {
@@ -83,7 +139,7 @@ export function ControllerView({
   }
 
   function stickDownACB(event) {
-    if (stickPointer.current || (event.pointerType === "mouse" && event.button !== 0)) return;
+    if (inputPaused || stickPointer.current || (event.pointerType === "mouse" && event.button !== 0)) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     const bounds = event.currentTarget.getBoundingClientRect();
     const radius = readToken("--controller-button") / 2;
@@ -168,19 +224,33 @@ export function ControllerView({
     }
   }
 
+  function actionClickACB(event) {
+    // Assistive technology can activate a native button without a pointer or keyboard event.
+    if (event.detail !== 0) return;
+    const name = event.currentTarget.value;
+    if (buttonPointers.current.has(name) || buttonKeys.current.get(name)?.size) return;
+    onAction(name, true);
+    onAction(name, false);
+    navigator.vibrate?.(readToken("--press-vibration-ms"));
+  }
+
   function contextMenuACB(event) { event.preventDefault(); }
   function continueACB(event) {
     if (event.type === "pointerdown" && event.button !== 0) return;
     if (event.type === "click" && event.detail !== 0) return;
     setMode("active");
   }
-  const active = mode === "active" || mode === "fullscreen";
-
   if (unavailable) {
     return (
       <main ref={screen} className="controller controller-unavailable">
-        <p role="status">Your room is unavailable. Join a room and choose a team to use this controller.</p>
-        <Link className="button" to="/play/join">Go to room setup</Link>
+        <p role="status">
+          {closedRoomCode
+            ? "The host closed room " + closedRoomCode + "."
+            : "Your room is unavailable. Join a room and choose a team to use this controller."}
+        </p>
+        <Link className="button" to="/play/join">
+          {closedRoomCode ? "Join another room" : "Go to room setup"}
+        </Link>
       </main>
     );
   }
@@ -208,7 +278,7 @@ export function ControllerView({
       ) : (
         <div className="controller-landscape controller-inputs" onContextMenu={contextMenuACB}>
           {roomStatus && <p className="controller-room-status" role="status">{roomStatus}</p>}
-          <div className="controller-stick" role="group" aria-label={"Joystick: " + direction}
+          <div className="controller-stick" role="group" aria-label={"Joystick: " + direction} aria-disabled={inputPaused}
             onPointerDown={stickDownACB} onPointerMove={stickMoveACB} onPointerUp={stickReleaseACB}
             onPointerCancel={stickReleaseACB} onLostPointerCapture={stickReleaseACB}>
             <span className="controller-stick-ring" aria-hidden="true"
@@ -222,6 +292,7 @@ export function ControllerView({
               return (
                 <button key={button.id} type="button" value={button.id}
                   className="controller-action" data-held={Boolean(heldActions[button.heldProp])}
+                  disabled={inputPaused} onClick={actionClickACB}
                   onPointerDown={actionDownACB} onPointerUp={actionReleaseACB}
                   onPointerCancel={actionReleaseACB} onLostPointerCapture={actionReleaseACB}
                   onKeyDown={actionKeyDownACB} onKeyUp={actionKeyUpACB} onBlur={actionBlurACB}>

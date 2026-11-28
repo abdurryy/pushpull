@@ -195,6 +195,7 @@ async function playRoom(browser, baseUrl) {
   await step("Close the test room", async function closeRoomACB() {
     await host.getByRole("link", { name: "Back to room" }).click();
     await host.getByRole("button", { name: "Close room" }).click();
+    await host.getByRole("dialog", { name: "Close this room?" }).getByRole("button", { name: "Close room" }).click();
     await host.getByRole("button", { name: "Create room" }).waitFor();
   });
   console.log(`Room ${code} passed. Team B won 0–1 and the score carried into Round 2.`);

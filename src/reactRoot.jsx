@@ -1,5 +1,5 @@
 // Root component: navigation. Maps each route to its presenter. Plain paths (/tv) work because Firebase Hosting serves index.html for every route.
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, useSearchParams } from "react-router-dom";
 import { HomePresenter } from "./presenters/homePresenter.jsx";
 import { LobbyPresenter } from "./presenters/lobbyPresenter.jsx";
 import { LoginPresenter } from "./presenters/loginPresenter.jsx";
@@ -9,6 +9,7 @@ import { DemoPresenter } from "./presenters/demoPresenter.jsx";
 import { ControllerPresenter } from "./presenters/controllerPresenter.jsx";
 import { GalleryPresenter } from "./presenters/galleryPresenter.jsx";
 import { ProfilePresenter } from "./presenters/profilePresenter.jsx";
+import { NotFoundView } from "./views/notFoundView.jsx";
 
 // "#/play/join?code=K7M4" becomes "https://pushpull.live/play/join?code=K7M4". An old invite carried its room
 // code inside the fragment, so the query comes along to the new address.
@@ -33,6 +34,14 @@ export function keepOldHashLinksWorking() {
   });
 }
 
+function PhoneLoginRoute({ model }) {
+  const [searchParams] = useSearchParams();
+  const code = searchParams.get("code");
+  // Keep the invite in the URL so reloading during sign-in preserves the join code.
+  const joinSearch = code ? "?" + new URLSearchParams({ code }) : "";
+  return <LoginPresenter model={model} joinSearch={joinSearch} />;
+}
+
 function makeRouter({ model, roomModel, roomController }) {
   function loadJoinCodeACB({ request }) {
     const code = new URL(request.url).searchParams.get("code");
@@ -52,14 +61,13 @@ function makeRouter({ model, roomModel, roomController }) {
     // The shared screen: the lobby, where phones join a room and the host checks the weather. The game board comes later.
     { path: "/tv", element: <LobbyPresenter model={model} roomModel={roomModel} /> },
     // The phone flow starts with logging in: Log in -> Join a room -> Controller.
-    { path: "/play/login", element: <LoginPresenter model={model} /> },
+    { path: "/play/login", element: <PhoneLoginRoute model={model} /> },
     { path: "/play/join", loader: loadJoinCodeACB, element: join, hydrateFallbackElement: join },
     { path: "/play/controller", element: <ControllerPresenter /> },
     { path: "/play/room-controller", element: <ControllerPresenter key="live" room={roomModel} controller={roomController} /> },
     // Dev page: every shared component in every state.
     { path: "/components", element: <GalleryPresenter /> },
-    // Unknown routes go back to the start screen.
-    { path: "*", element: <HomePresenter model={model} /> },
+    { path: "*", element: <NotFoundView /> },
   ]);
 }
 
