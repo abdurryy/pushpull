@@ -275,7 +275,7 @@ async function leavePlayer(phone) {
   const { pathname } = new URL(phone.url());
   // The controller link added a history entry. Going back keeps the joined room in memory.
   if (pathname === "/play/room-controller") await phone.goBack();
-  else if (pathname !== "/play/join") return;
+  else if (pathname !== "/play/join") throw new Error(`Could not confirm the seat was released from ${pathname}.`);
   const leave = phone.getByRole("button", { name: "Leave room" });
   const joinForm = phone.getByRole("button", { name: /^(Join room|Try again)$/ }).and(phone.locator(":enabled"));
   await leave.or(joinForm).first().waitFor();
