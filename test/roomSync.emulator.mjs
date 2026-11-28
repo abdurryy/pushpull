@@ -100,6 +100,7 @@ async function check() {
   leaving.model.leaveRoom();
   await rejected[0].model.joinRoom(code);
   assert.equal(rejected[0].model.code, code);
+  await eventually(() => !other.model.loading);
   await other.model.joinRoom("INVALID");
   assert.match(other.model.error, /four-character/);
 
@@ -127,6 +128,8 @@ async function check() {
   assert.deepEqual(host.model.steering.slice(0, 2).sort(), ["down", "up"]);
   assert.deepEqual(host.model.steering.slice(2), ["left", "left"]);
 
+  const previousEpoch = host.model.room.hostInputEpoch;
+  assert.equal(typeof previousEpoch, "string");
   goOffline(host.db);
   await eventually(() => phone.model.room?.hostOnline === false);
   await eventually(() => players.every(player => !player.model.inputReady && player.model.stick === "idle"));
@@ -138,6 +141,16 @@ async function check() {
   goOnline(host.db);
   await eventually(() => host.model.canStart && players.every(player => player.model.inputReady));
   assert.deepEqual(host.model.steering, [null, null, null, null]);
+  assert.notEqual(host.model.room.hostInputEpoch, previousEpoch);
+
+  // An old write can reach the server after the TV and other phones are ready.
+  const phoneInputPath = roomPath + "/inputs/phone";
+  await set(ref(guestWriter.db, phoneInputPath), { stick: "right", hostInputEpoch: previousEpoch });
+  await eventually(() => host.model.room?.inputs?.phone?.stick === "right");
+  assert.equal(host.model.canStart, true);
+  assert.deepEqual(host.model.steering, [null, null, null, null]);
+  phone.model.setStick("up");
+  await eventually(() => host.model.steering.includes("up"));
 
   phone.model.setCodeInput(code);
   await Promise.all([host.model.departRoom(), host.model.departRoom()]);

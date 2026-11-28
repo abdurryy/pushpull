@@ -103,7 +103,14 @@ export function makeRoomSync(database) {
     async trackHostConnection(code) {
       const presence = roomRef(code, "/hostOnline");
       await onDisconnect(presence).set(false);
-      await set(presence, true);
+      // Publish the new input epoch with presence so a queued write from before the outage cannot steer.
+      try {
+        await update(roomRef(code), { hostOnline: true, hostInputEpoch: crypto.randomUUID() });
+      } catch (error) {
+        // Hosting may update before the matching database rules are published.
+        if (error.message !== "permission_denied" && error.code !== "PERMISSION_DENIED") throw error;
+        await set(presence, true);
+      }
     },
 
     closeRoom(code) {
@@ -127,12 +134,14 @@ export function makeRoomSync(database) {
       }
     },
 
-    setStick(code, uid, stick) {
-      return update(roomRef(code, "/inputs/" + uid), { stick });
+    setStick(code, uid, stick, hostInputEpoch) {
+      return update(roomRef(code, "/inputs/" + uid), { stick, hostInputEpoch: hostInputEpoch ?? null });
     },
 
-    sendButton(code, uid, button, stick) {
-      return update(roomRef(code, "/inputs/" + uid), { button, stick, buttonAt: serverTimestamp() });
+    sendButton(code, uid, button, stick, hostInputEpoch) {
+      return update(roomRef(code, "/inputs/" + uid), {
+        button, stick, buttonAt: serverTimestamp(), hostInputEpoch: hostInputEpoch ?? null,
+      });
     },
 
     trackInputDisconnect(code, uid) {

@@ -15,6 +15,10 @@
           ".write": "auth != null && root.child('rooms').child($code).child('meta/hostUid').val() == auth.uid && root.child('rooms').child($code).child('meta/expiresAt').val() > now",
           ".validate": "newData.isBoolean()"
         },
+        "hostInputEpoch": {
+          ".write": "auth != null && root.child('rooms').child($code).child('meta/hostUid').val() == auth.uid && root.child('rooms').child($code).child('meta/expiresAt').val() > now && newData.exists()",
+          ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9-]{36}$/)"
+        },
         "seats": {
           "$seat": {
             ".write": "auth != null && $seat.matches(/^s[1-4]$/) && root.child('rooms').child($code).child('meta/expiresAt').val() > now && ((!data.exists() && newData.val() == auth.uid && newData.parent().parent().child('players').child(auth.uid).child('seat').val() == $seat) || (data.val() == auth.uid && !newData.exists() && !newData.parent().parent().child('players').child(auth.uid).exists()))"
@@ -35,6 +39,7 @@
             ".write": "auth != null && auth.uid == $uid && root.child('rooms').child($code).child('meta/expiresAt').val() > now && (!newData.exists() || newData.parent().parent().child('players').child($uid).exists())",
             ".validate": "newData.hasChildren(['stick'])",
             "stick": { ".validate": "newData.val() == 'idle' || newData.val() == 'up' || newData.val() == 'down' || newData.val() == 'left' || newData.val() == 'right'" },
+            "hostInputEpoch": { ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9-]{36}$/)" },
             "button": { ".validate": "newData.val() == 'dash' || newData.val() == 'ping' || newData.val() == 'shed' || newData.val() == 'hold'" },
             "buttonAt": { ".validate": "newData.isNumber() && newData.val() <= now" },
             "$other": { ".validate": false }

@@ -74,8 +74,10 @@ export function makeRoomModel(sync, appModel) {
       if (this.reconnectingHost) return [null, null, null, null];
       const { a, b } = this.teams;
       const inputs = this.room.inputs;
+      const epoch = this.room.hostInputEpoch;
       function stickFor(player) {
-        const stick = inputs?.[player?.id]?.stick;
+        const input = inputs?.[player?.id];
+        const stick = input?.hostInputEpoch === epoch ? input?.stick : null;
         return stick !== "idle" && STICKS.includes(stick) ? stick : null;
       }
       return [stickFor(a[0]), stickFor(a[1]), stickFor(b[0]), stickFor(b[1])];
@@ -165,8 +167,10 @@ export function makeRoomModel(sync, appModel) {
         return;
       }
       if (!this.room) this.loading = false;
+      if (this.role === "player" && (room.hostOnline !== true || this.room?.hostInputEpoch !== room.hostInputEpoch)) {
+        this.clearSteering();
+      }
       this.room = room;
-      if (this.role === "player" && room.hostOnline !== true) this.clearSteering();
       this.finishHostRecovery();
     },
 
@@ -224,12 +228,12 @@ export function makeRoomModel(sync, appModel) {
     setStick(direction) {
       if (!this.inputReady || this.reconnectingHost || !STICKS.includes(direction) || this.stick === direction) return;
       this.stick = direction;
-      sync.setStick(this.code, this.user.uid, direction).catch(reportRoomError());
+      sync.setStick(this.code, this.user.uid, direction, this.room.hostInputEpoch).catch(reportRoomError());
     },
 
     pressButton(button) {
       if (!this.inputReady || this.reconnectingHost || !BUTTONS.includes(button)) return;
-      sync.sendButton(this.code, this.user.uid, button, this.stick).catch(reportRoomError());
+      sync.sendButton(this.code, this.user.uid, button, this.stick, this.room.hostInputEpoch).catch(reportRoomError());
     },
 
     leaveRoom() {
@@ -312,7 +316,8 @@ export function makeRoomModel(sync, appModel) {
   const stopInput = reaction(
     function connectionAndRoomACB() {
       const hostOnline = model.role === "player" ? model.room?.hostOnline : undefined;
-      return [model.code, model.role, model.connected, model.user?.uid, hostOnline];
+      const epoch = model.role === "player" ? model.room?.hostInputEpoch : undefined;
+      return [model.code, model.role, model.connected, model.user?.uid, hostOnline, epoch];
     },
     async function registerPresenceACB([code, role, connected, uid, hostOnline]) {
       const registration = ++inputRegistration;
