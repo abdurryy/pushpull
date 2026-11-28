@@ -282,7 +282,7 @@ async function leavePlayer(phone) {
   if (await leave.isVisible()) {
     await leave.tap();
     await expectRoomResult(phone, joinForm);
-  }
+  } else if (await joinForm.innerText() !== "Try again") throw new Error("Could not confirm the test seat was released.");
 }
 
 async function saveFailure(players) {
