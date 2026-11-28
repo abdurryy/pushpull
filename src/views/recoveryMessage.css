@@ -9,9 +9,27 @@
 
 .recovery-message .recovery-title {
   margin: 0;
-  font: var(--weight-display) var(--recovery-title-size, var(--text-title)) / 1.15 var(--font-display);
+  font: var(--weight-display) var(--recovery-title-size, var(--text-title)) / 1.25 var(--font-display);
   text-wrap: balance;
 }
 
-.recovery-message .status-message { max-inline-size: 42ch; }
+.recovery-message .status-message {
+  max-inline-size: 42ch;
+  text-wrap: pretty;
+}
+
+/* The heading already identifies the state in words. */
+.recovery-message .push-mark { display: none; }
+
+.recovery-panel {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: var(--recovery-panel-width, var(--phone-max-width));
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--recovery-panel-padding, var(--space-5));
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  text-align: center;
+}
 .recovery-message > .button { margin-block-start: var(--space-2); }

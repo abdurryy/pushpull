@@ -12,6 +12,7 @@
 .room-game-recovery {
   min-block-size: 100svh;
   align-content: safe center;
+  justify-items: center;
 }
 
 .room h1,
@@ -51,6 +52,8 @@
 
   .room-game-recovery {
     --recovery-title-size: var(--tv-score);
+    --recovery-panel-width: calc(var(--phone-max-width) * 2);
+    --recovery-panel-padding: var(--space-7);
     font-size: var(--tv-title);
   }
 

@@ -50,8 +50,8 @@ export function RoomView(props) {
   if (props.modeUnavailable || props.gameUnavailable) {
     return (
       <main className="room room-host room-game-recovery">
-        <RecoveryMessage as="h1" title={props.modeUnavailable ? "Mode unavailable" : "Game unavailable"}
-          reason={props.modeUnavailable ? "This link asks for a mode the game doesn't have." : "There's no active room on this screen."}>
+        <RecoveryMessage as="h1" panel title={props.modeUnavailable ? "Mode unavailable" : "Game unavailable"}
+          reason={props.modeUnavailable ? "This link points to an unknown mode." : "There's no active room on this screen."}>
           <Link className="button" to="/room">Open lobby</Link>
         </RecoveryMessage>
       </main>
