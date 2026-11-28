@@ -263,11 +263,21 @@ async function playOnPhones(players, signal) {
   const labels = Object.keys(ACTIONS);
   await runForPhones(players, function actionCB(index) { return `Tap ${labels[index]}`; }, async function tapACB(phone, index) {
     await phone.getByRole("button", { name: labels[index], exact: true }).tap();
-    await phone.waitForFunction(function buttonArrivedACB(button) {
-      const model = window.roomModel;
-      return model.room?.inputs?.[model.user.uid]?.button === button;
-    }, ACTIONS[labels[index]]);
+    // Read the action on the next phone. Its snapshot only holds writes the server accepted,
+    // while the tapping phone also shows its own writes before the server answers.
+    const observer = players[(index + 1) % players.length].phone;
+    await observer.waitForFunction(function buttonArrivedACB({ uid, button }) {
+      return window.roomModel.room?.inputs?.[uid]?.button === button;
+    }, { uid: players[index].uid, button: ACTIONS[labels[index]] });
   });
+}
+
+async function confirmRoundStayedActive(ask) {
+  // The phones cannot see the TV's round, so the operator confirms it did not end during the taps.
+  const answer = await ask("Was the round still running on the TV after the four action taps? Type y and press Enter, or n if it ended: ");
+  if (answer.trim().toLowerCase() !== "y") {
+    throw new Error("The operator reported that the round ended before the action taps finished.");
+  }
 }
 
 async function confirmPhoneAccount(phone, uid) {
@@ -375,6 +385,7 @@ async function playOperatorRoom(browser, baseUrl, { code, hosted, headed }, sign
     }
     await ask(`Start the round on your TV for room ${code}, then press Enter to send inputs. `);
     await playOnPhones(players, signal);
+    await confirmRoundStayedActive(ask);
     signal.throwIfAborted();
   } catch (error) {
     failure = error;
@@ -488,7 +499,7 @@ async function runOperatorBrowser(baseUrl, options) {
     });
     async function ask(question) {
       try {
-        await input.question(question, { signal: interrupt.signal });
+        return await input.question(question, { signal: interrupt.signal });
       } finally {
         interrupt.signal.throwIfAborted();
       }
